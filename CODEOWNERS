@@ -1,0 +1,23 @@
+# Code owners for FCAI-OPP-Assignment-1-Image-Processing
+# This file defines who can approve changes to specific parts of the codebase
+
+# Global ownership - all files require approval from Eyad
+* @Eyad-Sharkawy
+
+# Specific file ownership (if you want to be more granular)
+# Source files
+*.cpp @Eyad-Sharkawy
+*.hpp @Eyad-Sharkawy
+*.h @Eyad-Sharkawy
+
+# Build and configuration files
+CMakeLists.txt @Eyad-Sharkawy
+*.cmake @Eyad-Sharkawy
+
+# Documentation
+README.md @Eyad-Sharkawy
+*.md @Eyad-Sharkawy
+
+# Project files
+.gitignore @Eyad-Sharkawy
+CODEOWNERS @Eyad-Sharkawy
