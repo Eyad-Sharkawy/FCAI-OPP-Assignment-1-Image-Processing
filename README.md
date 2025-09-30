@@ -2,13 +2,6 @@
 
 A C++ console application for basic image manipulation and filtering operations.
 
-## Authors
-
-- Ahmed Mohamed ElSayed Tolba (ID: 20242023) - Grayscale, Merge
-- Eyad Mohamed Saad Ali (ID: 20242062) - Black & White, Flip
-- Tarek Sami Mohamed Mohamed (ID: 20242190) - Invert, Rotate
-
-
 ## Features
 
 - **Load Images**: Support for JPG, JPEG, PNG, BMP, and TGA formats
@@ -53,7 +46,13 @@ make
 - `6` - Rotate image (90°/180°/270°)
 - `7` - Save current image
 - `8` - Exit
-  
+
+## Authors
+
+- Ahmed Mohamed ElSayed Tolba (ID: 20242023) - Grayscale, Merge
+- Eyad Mohamed Saad Ali (ID: 20242062) - Black & White, Flip
+- Tarek Sami Mohamed Mohamed (ID: 20242190) - Invert, Rotate
+
 ## Dependencies
 
 - stb_image.h - Image loading library
