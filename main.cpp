@@ -34,6 +34,13 @@ static std::string trim(const std::string &s) {
     size_t end = s.find_last_not_of(" \t\r\n");
     return s.substr(start, end - start + 1);
 }
+std::string erasedoublecaughts(std::string &r) {
+        if (!r.empty() && r.front() == '"')
+            r.erase(r.begin());
+        if (!r.empty() && r.back() == '"')
+            r.pop_back();
+        return r;
+}
 
 static void readLine(std::string &out) {
     std::getline(std::cin, out);
@@ -171,11 +178,11 @@ int main() {
 
     // Force initial image load before entering the menu
     while (!hasImage) {
-        std::cout<<"please enter the path without (\"\")"<<std::endl;
         std::cout << "Enter image path to load: ";
         std::getline(std::cin, imagePath);
         normalizePathSeparators(imagePath);
         lowercaseExtension(imagePath);
+        erasedoublecaughts(imagePath);
         try {
             image = Image(imagePath);
             result = image;
@@ -209,17 +216,17 @@ int main() {
                         readLine(imagePath);
                         normalizePathSeparators(imagePath);
                         lowercaseExtension(imagePath);
-
+                        erasedoublecaughts(imagePath);
                         result.saveImage(imagePath);
 
                         unsavedChanges = false;
                     }
                 }
-                std::cout<<"please enter the path without (\"\")";
                 std::cout << "Enter image path to load: ";
                 readLine(imagePath);
                 normalizePathSeparators(imagePath);
                 lowercaseExtension(imagePath);
+                erasedoublecaughts(imagePath);
 
                 image = Image(imagePath);
                 result = image;
@@ -277,6 +284,7 @@ int main() {
                     readLine(tempPath);
                     normalizePathSeparators(tempPath);
                     lowercaseExtension(tempPath);
+                    erasedoublecaughts(tempPath);
                     Image image2(tempPath);
 
                     result = merge(result, image2);
@@ -354,6 +362,7 @@ int main() {
                         readLine(savePath);
                         normalizePathSeparators(savePath);
                         lowercaseExtension(savePath);
+                        erasedoublecaughts(savePath);
                     }
                     result.saveImage(savePath);
                     std::cout << "Image saved as " << savePath << std::endl;
@@ -372,6 +381,7 @@ int main() {
                         readLine(imagePath);
                         normalizePathSeparators(imagePath);
                         lowercaseExtension(imagePath);
+                        erasedoublecaughts(imagePath);
 
                         result.saveImage(imagePath);
 
