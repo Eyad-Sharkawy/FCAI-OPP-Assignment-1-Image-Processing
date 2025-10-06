@@ -4,7 +4,7 @@
 #include <sstream>
 #include "Image_Class.h"
 
-// Ahmed Mohamed ElSayed Tolba (Small ID) Responsible for 1, 4
+// Ahmed Mohamed ElSayed Tolba (Small ID) Responsible for 1, 4,7,10,17("bonus")
 // ID: 20242023
 //
 // Eyad Mohamed Saad Ali (Middle ID) 2, 5
@@ -177,6 +177,8 @@ Image resize(Image image, size_t w, size_t h);//Eyad
 
 //filter 12
 
+//Filter 17 ("bonus")
+Image infraredbonus(Image &image); //Ahmed
 
 int main() {
     Image image;
@@ -224,8 +226,9 @@ int main() {
         std::cout << "  10. Detect Image Edges  \n";
         std::cout << "  11. Resizing Images \n";
         std::cout << "  12. Blur Images \n";
-        std::cout << "  13. Save current image\n";
-        std::cout << "  14. Exit\n";
+        std::cout << "  13. infrared (\"bonus\") \n";
+        std::cout << "  14. Save current image\n";
+        std::cout << "  15. Exit\n";
         int choice = readIntInRange("Enter your choice: ", 0, 14);
         switch (choice) {
             case 0: {
@@ -462,6 +465,19 @@ int main() {
             case 12:
                 break;
             case 13:
+                if (hasImage) {
+                    result = infraredbonus(result);
+                    unsavedChanges = true;
+                    std::cout << "Applied infrared.\n";
+                    std::cout << "=============================================\n";
+                } else {
+                    std::cout << "=============================================\n";
+                    std::cout << "error" << std::endl;
+                    std::cout << "please load an image" << std::endl;
+                    std::cout << "=============================================\n";
+                }
+            break;
+            case 14:
                         if (hasImage) {
                             char ans = readCharChoice("Save to same file or new file? (s/n): ", "sn");
                             std::string savePath;
@@ -497,7 +513,7 @@ int main() {
                             std::cout << "please load an image" << std::endl;
                         }
                     break;
-                    case 14: {
+                    case 15: {
                         if (unsavedChanges) {
                             char ans = readCharChoice("You have unsaved changes. Save before exiting? (y/n): ",
                                                       "yn");
@@ -767,3 +783,28 @@ Image resize(Image image, size_t w, size_t h) {
 }
 
 //Filter 12
+
+//Filter 17 ("bonus")
+Image infraredbonus(Image &image) {
+    for (int x = 0; x < image.width; ++x) {
+        for (int y = 0; y < image.height; ++y) {
+
+            int red   = image(x, y, 0);
+            int green = image(x, y, 1);
+            int blue  = image(x, y, 2);
+
+            float brightness = (red + green + blue) / 3.0f;
+
+            float inverted = 255 - brightness;
+
+            int R = 255;
+            unsigned int G = int(inverted);
+            unsigned int B = int(inverted);
+
+            image(x, y, 0) = R;
+            image(x, y, 1) = G;
+            image(x, y, 2) = B;
+        }
+    }
+    return image;
+}
