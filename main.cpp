@@ -19,7 +19,6 @@ static void normalizePathSeparators(std::string &p) {
     }
 }
 
-
 static void lowercaseExtension(std::string &p) {
     const size_t dotPos = p.find_last_of('.');
     if (dotPos == std::string::npos) return;
@@ -34,12 +33,13 @@ static std::string trim(const std::string &s) {
     size_t end = s.find_last_not_of(" \t\r\n");
     return s.substr(start, end - start + 1);
 }
+
 std::string erasedoublecaughts(std::string &r) {
-        if (!r.empty() && r.front() == '"')
-            r.erase(r.begin());
-        if (!r.empty() && r.back() == '"')
-            r.pop_back();
-        return r;
+    if (!r.empty() && r.front() == '"')
+        r.erase(r.begin());
+    if (!r.empty() && r.back() == '"')
+        r.pop_back();
+    return r;
 }
 
 static void readLine(std::string &out) {
@@ -176,7 +176,6 @@ int main() {
     std::cout << "Press Enter to continue...\n";
     std::cin.ignore();
 
-    // Force initial image load before entering the menu
     while (!hasImage) {
         std::cout << "Enter image path to load: ";
         std::getline(std::cin, imagePath);
@@ -192,6 +191,7 @@ int main() {
         } catch (const std::exception &e) {
             std::cout << "Failed to load image: " << e.what() << "\n";
             std::cout << "Please try again.\n";
+            std::cout << "=============================================\n";
         }
     }
     while (running) {
@@ -212,28 +212,49 @@ int main() {
                     char ans = readCharChoice("You have unsaved changes. Save before loading new image? (y/n): ",
                                               "yn");
                     if ('y' == ans) {
-                        std::cout << "Enter the image path to save in: ";
-                        readLine(imagePath);
-                        normalizePathSeparators(imagePath);
-                        lowercaseExtension(imagePath);
-                        erasedoublecaughts(imagePath);
-                        result.saveImage(imagePath);
-
-                        unsavedChanges = false;
+                        bool saveSuccess = false;
+                        std::string savePath;
+                        while (!saveSuccess) {
+                            std::cout << "Enter the image path to save in: ";
+                            readLine(savePath);
+                            normalizePathSeparators(savePath);
+                            lowercaseExtension(savePath);
+                            erasedoublecaughts(savePath);
+                            try {
+                                result.saveImage(savePath);
+                                saveSuccess = true;
+                                unsavedChanges = false;
+                                std::cout << "Image saved successfully as " << savePath << std::endl;
+                                std::cout << "=============================================\n";
+                            } catch (const std::exception &e) {
+                                std::cout << "Failed to save image: " << e.what() << "\n";
+                                std::cout << "Please try a different path.\n";
+                                std::cout << "=============================================\n";
+                            }
+                        }
                     }
                 }
-                std::cout << "Enter image path to load: ";
-                readLine(imagePath);
-                normalizePathSeparators(imagePath);
-                lowercaseExtension(imagePath);
-                erasedoublecaughts(imagePath);
-
-                image = Image(imagePath);
-                result = image;
-                hasImage = true;
-                unsavedChanges = false;
-                std::cout << "Image loaded successfully.\n";
-                std::cout << "=============================================\n";
+                bool loadSuccess = false;
+                while (!loadSuccess) {
+                    std::cout << "Enter image path to load: ";
+                    readLine(imagePath);
+                    normalizePathSeparators(imagePath);
+                    lowercaseExtension(imagePath);
+                    erasedoublecaughts(imagePath);
+                    try {
+                        image = Image(imagePath);
+                        result = image;
+                        hasImage = true;
+                        loadSuccess = true;
+                        unsavedChanges = false;
+                        std::cout << "Image loaded successfully.\n";
+                        std::cout << "=============================================\n";
+                    } catch (const std::exception &e) {
+                        std::cout << "Failed to load image: " << e.what() << "\n";
+                        std::cout << "Please try again.\n";
+                        std::cout << "=============================================\n";
+                    }
+                }
                 break;
             }
             case 1:
@@ -279,18 +300,27 @@ int main() {
             case 4:
                 if (hasImage) {
                     std::string tempPath;
-
-                    std::cout << "Enter the second image path to merge: ";
-                    readLine(tempPath);
-                    normalizePathSeparators(tempPath);
-                    lowercaseExtension(tempPath);
-                    erasedoublecaughts(tempPath);
-                    Image image2(tempPath);
-
-                    result = merge(result, image2);
-                    unsavedChanges = true;
-                    std::cout << "Merged images.\n";
-                    std::cout << "=============================================\n";
+                    // Modified: Add retry loop for loading the second image
+                    bool loadSuccess = false;
+                    while (!loadSuccess) {
+                        std::cout << "Enter the second image path to merge: ";
+                        readLine(tempPath);
+                        normalizePathSeparators(tempPath);
+                        lowercaseExtension(tempPath);
+                        erasedoublecaughts(tempPath);
+                        try {
+                            Image image2(tempPath);
+                            result = merge(result, image2);
+                            loadSuccess = true;
+                            unsavedChanges = true;
+                            std::cout << "Merged images.\n";
+                            std::cout << "=============================================\n";
+                        } catch (const std::exception &e) {
+                            std::cout << "Failed to load second image: " << e.what() << "\n";
+                            std::cout << "Please try again.\n";
+                            std::cout << "=============================================\n";
+                        }
+                    }
                 } else {
                     std::cout << "=============================================\n";
                     std::cout << "error" << std::endl;
@@ -364,9 +394,24 @@ int main() {
                         lowercaseExtension(savePath);
                         erasedoublecaughts(savePath);
                     }
-                    result.saveImage(savePath);
-                    std::cout << "Image saved as " << savePath << std::endl;
-                    unsavedChanges = false;
+                    bool saveSuccess = false;
+                    while (!saveSuccess) {
+                        try {
+                            result.saveImage(savePath);
+                            saveSuccess = true;
+                            std::cout << "Image saved as " << savePath << std::endl;
+                            unsavedChanges = false;
+                            std::cout << "=============================================\n";
+                        } catch (const std::exception &e) {
+                            std::cout << "Failed to save image: " << e.what() << "\n";
+                            std::cout << "Please enter a new path to save: ";
+                            readLine(savePath);
+                            normalizePathSeparators(savePath);
+                            lowercaseExtension(savePath);
+                            erasedoublecaughts(savePath);
+                            std::cout << "=============================================\n";
+                        }
+                    }
                 } else {
                     std::cout << "error" << std::endl;
                     std::cout << "please load an image" << std::endl;
@@ -374,22 +419,32 @@ int main() {
                 break;
             case 8: {
                 if (unsavedChanges) {
-                    char ans = readCharChoice("You have unsaved changes. Save before loading new image? (y/n): ",
+                    char ans = readCharChoice("You have unsaved changes. Save before exiting? (y/n): ",
                                               "yn");
                     if ('y' == ans) {
-                        std::cout << "Enter the image path to save in: ";
-                        readLine(imagePath);
-                        normalizePathSeparators(imagePath);
-                        lowercaseExtension(imagePath);
-                        erasedoublecaughts(imagePath);
-
-                        result.saveImage(imagePath);
-
-                        unsavedChanges = false;
+                        // Modified: Add retry loop for saving unsaved changes before exit
+                        bool saveSuccess = false;
+                        std::string savePath;
+                        while (!saveSuccess) {
+                            std::cout << "Enter the image path to save in: ";
+                            readLine(savePath);
+                            normalizePathSeparators(savePath);
+                            lowercaseExtension(savePath);
+                            erasedoublecaughts(savePath);
+                            try {
+                                result.saveImage(savePath);
+                                saveSuccess = true;
+                                unsavedChanges = false;
+                                std::cout << "Image saved successfully as " << savePath << std::endl;
+                                std::cout << "=============================================\n";
+                            } catch (const std::exception &e) {
+                                std::cout << "Failed to save image: " << e.what() << "\n";
+                                std::cout << "Please try a different path.\n";
+                                std::cout << "=============================================\n";
+                            }
+                        }
                     }
-                }
-
-                running = false;
+                }running = false;
                 std::cout << "Exiting program.\n";
                 break;
             }
