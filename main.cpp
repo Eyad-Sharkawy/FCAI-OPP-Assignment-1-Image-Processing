@@ -161,6 +161,11 @@ Image rotate90(const Image &image); // Tarek
 Image rotate180(const Image &image); // Tarek
 Image rotate270(const Image &image); // Tarek
 
+//Filter 7
+Image darkandlight(Image &image);//Ahmed
+
+//Filter 8
+Image crop(Image image, size_t x, size_t y, size_t w, size_t h);
 
 int main() {
     Image image;
@@ -203,9 +208,11 @@ int main() {
         std::cout << "  4. Merge with Another Image\n";
         std::cout << "  5. Flip\n";
         std::cout << "  6. Rotate\n";
-        std::cout << "  7. Save current image\n";
-        std::cout << "  8. Exit\n";
-        int choice = readIntInRange("Enter your choice: ", 0, 8);
+        std::cout << "  7. darkandlight \n";
+        std::cout << "  8. crop \n";
+        std::cout << "  13. Save current image\n";
+        std::cout << "  14. Exit\n";
+        int choice = readIntInRange("Enter your choice: ", 0, 14);
         switch (choice) {
             case 0: {
                 if (unsavedChanges) {
@@ -269,7 +276,7 @@ int main() {
                     std::cout << "please load an image" << std::endl;
                     std::cout << "=============================================\n";
                 }
-                break;
+            break;
             case 2:
                 if (hasImage) {
                     result = pureBlackAndWhite(result);
@@ -282,7 +289,7 @@ int main() {
                     std::cout << "please load an image" << std::endl;
                     std::cout << "=============================================\n";
                 }
-                break;
+            break;
             case 3:
                 if (hasImage) {
                     result = invert(result);
@@ -295,12 +302,11 @@ int main() {
                     std::cout << "please load an image" << std::endl;
                     std::cout << "=============================================\n";
                 }
-                break;
+            break;
 
             case 4:
                 if (hasImage) {
                     std::string tempPath;
-                    // Modified: Add retry loop for loading the second image
                     bool loadSuccess = false;
                     while (!loadSuccess) {
                         std::cout << "Enter the second image path to merge: ";
@@ -327,7 +333,7 @@ int main() {
                     std::cout << "please load an image" << std::endl;
                     std::cout << "=============================================\n";
                 }
-                break;
+            break;
 
             case 5:
                 if (hasImage) {
@@ -353,7 +359,7 @@ int main() {
                     std::cout << "please load an image" << std::endl;
                     std::cout << "=============================================\n";
                 }
-                break;
+            break;
             case 6:
                 if (hasImage) {
                     while (true) {
@@ -380,79 +386,110 @@ int main() {
                     std::cout << "please load an image" << std::endl;
                     std::cout << "=============================================\n";
                 }
-                break;
+            break;
             case 7:
                 if (hasImage) {
-                    char ans = readCharChoice("Save to same file or new file? (s/n): ", "sn");
-                    std::string savePath;
-                    if (ans == 's') {
-                        savePath = imagePath;
-                    } else {
-                        std::cout << "Enter the image path to save in: ";
-                        readLine(savePath);
-                        normalizePathSeparators(savePath);
-                        lowercaseExtension(savePath);
-                        erasedoublecaughts(savePath);
+                    result = darkandlight(result);
+                    unsavedChanges = true;
+                    std::cout << "Applied darkandlight edit.\n";
+                    std::cout << "=============================================\n";
+                } else {
+                    std::cout << "=============================================\n";
+                    std::cout << "error" << std::endl;
+                    std::cout << "please load an image" << std::endl;
+                    std::cout << "=============================================\n";
+                }
+                    break;
+            case 8:
+                if (hasImage) {
+                    size_t x, y, w, h;
+                    readFourSizeT(x, y, w, h, "Enter crop x y w h: ");
+                    if (x + w > static_cast<size_t>(result.width) || y + h > static_cast<size_t>(result.height)) {
+                        std::cout << "Crop rectangle out of bounds\n";
+                        break;
                     }
-                    bool saveSuccess = false;
-                    while (!saveSuccess) {
-                        try {
-                            result.saveImage(savePath);
-                            saveSuccess = true;
-                            std::cout << "Image saved as " << savePath << std::endl;
-                            unsavedChanges = false;
-                            std::cout << "=============================================\n";
-                        } catch (const std::exception &e) {
-                            std::cout << "Failed to save image: " << e.what() << "\n";
-                            std::cout << "Please enter a new path to save: ";
-                            readLine(savePath);
-                            normalizePathSeparators(savePath);
-                            lowercaseExtension(savePath);
-                            erasedoublecaughts(savePath);
-                            std::cout << "=============================================\n";
-                        }
-                    }
+                    result = crop(result, x, y, w, h);
+                    unsavedChanges = true;
+                    std::cout << "Cropped image.\n";
+                    std::cout << "=============================================\n";
                 } else {
                     std::cout << "error" << std::endl;
                     std::cout << "please load an image" << std::endl;
                 }
                 break;
-            case 8: {
-                if (unsavedChanges) {
-                    char ans = readCharChoice("You have unsaved changes. Save before exiting? (y/n): ",
-                                              "yn");
-                    if ('y' == ans) {
-                        // Modified: Add retry loop for saving unsaved changes before exit
-                        bool saveSuccess = false;
-                        std::string savePath;
-                        while (!saveSuccess) {
-                            std::cout << "Enter the image path to save in: ";
-                            readLine(savePath);
-                            normalizePathSeparators(savePath);
-                            lowercaseExtension(savePath);
-                            erasedoublecaughts(savePath);
-                            try {
-                                result.saveImage(savePath);
-                                saveSuccess = true;
-                                unsavedChanges = false;
-                                std::cout << "Image saved successfully as " << savePath << std::endl;
-                                std::cout << "=============================================\n";
-                            } catch (const std::exception &e) {
-                                std::cout << "Failed to save image: " << e.what() << "\n";
-                                std::cout << "Please try a different path.\n";
-                                std::cout << "=============================================\n";
+                    case 13:
+                        if (hasImage) {
+                            char ans = readCharChoice("Save to same file or new file? (s/n): ", "sn");
+                            std::string savePath;
+                            if (ans == 's') {
+                                savePath = imagePath;
+                            } else {
+                                std::cout << "Enter the image path to save in: ";
+                                readLine(savePath);
+                                normalizePathSeparators(savePath);
+                                lowercaseExtension(savePath);
+                                erasedoublecaughts(savePath);
                             }
+                            bool saveSuccess = false;
+                            while (!saveSuccess) {
+                                try {
+                                    result.saveImage(savePath);
+                                    saveSuccess = true;
+                                    std::cout << "Image saved as " << savePath << std::endl;
+                                    unsavedChanges = false;
+                                    std::cout << "=============================================\n";
+                                } catch (const std::exception &e) {
+                                    std::cout << "Failed to save image: " << e.what() << "\n";
+                                    std::cout << "Please enter a new path to save: ";
+                                    readLine(savePath);
+                                    normalizePathSeparators(savePath);
+                                    lowercaseExtension(savePath);
+                                    erasedoublecaughts(savePath);
+                                    std::cout << "=============================================\n";
+                                }
+                            }
+                        } else {
+                            std::cout << "error" << std::endl;
+                            std::cout << "please load an image" << std::endl;
                         }
+                    break;
+                    case 14: {
+                        if (unsavedChanges) {
+                            char ans = readCharChoice("You have unsaved changes. Save before exiting? (y/n): ",
+                                                      "yn");
+                            if ('y' == ans) {
+                                // Modified: Add retry loop for saving unsaved changes before exit
+                                bool saveSuccess = false;
+                                std::string savePath;
+                                while (!saveSuccess) {
+                                    std::cout << "Enter the image path to save in: ";
+                                    readLine(savePath);
+                                    normalizePathSeparators(savePath);
+                                    lowercaseExtension(savePath);
+                                    erasedoublecaughts(savePath);
+                                    try {
+                                        result.saveImage(savePath);
+                                        saveSuccess = true;
+                                        unsavedChanges = false;
+                                        std::cout << "Image saved successfully as " << savePath << std::endl;
+                                        std::cout << "=============================================\n";
+                                    } catch (const std::exception &e) {
+                                        std::cout << "Failed to save image: " << e.what() << "\n";
+                                        std::cout << "Please try a different path.\n";
+                                        std::cout << "=============================================\n";
+                                    }
+                                }
+                            }
+                        }running = false;
+                        std::cout << "Exiting program.\n";
+                        break;
                     }
-                }running = false;
-                std::cout << "Exiting program.\n";
-                break;
-            }
-            default: {
-                std::cout << "Invalid choice! Try again.\n";
-            }
+                    default: {
+                        std::cout << "Invalid choice! Try again.\n";
+                    }
+                }
         }
-    }
+
     return 0;
 }
 
@@ -478,7 +515,7 @@ Image blackAndWhite(const Image &image) {
 }
 
 //Filter 2
-Image pureBlackAndWhite(const Image &image) {
+Image pureBlackAndWhite(const Image &image){
     Image result = blackAndWhite(image);
 
     for (size_t i = 0; i < result.width; ++i) {
@@ -600,19 +637,6 @@ Image rotate270(const Image &image) {
     return rotatedImage;
 }
 
-Image crop(Image image, size_t x, size_t y, size_t w, size_t h) {
-    Image result(w, h);
-    for (size_t i = 0; i < w; ++i) {
-        for (size_t j = 0; j < h; ++j) {
-            for (size_t k = 0; k < static_cast<size_t>(image.channels); ++k) {
-                result(i, j, static_cast<int>(k)) = image(static_cast<int>(i + x), static_cast<int>(j + y),
-                                                          static_cast<int>(k));
-            }
-        }
-    }
-    return result;
-}
-
 Image resize(Image image, size_t w, size_t h) {
     Image result(w, h);
 
@@ -636,3 +660,42 @@ Image resize(Image image, size_t w, size_t h) {
 
     return result;
 }
+//Filter7
+    Image darkandlight(Image &image) {
+    std::cout << "Do you want to dark or light \n";
+    std::string choice;
+    std::cin >> choice;
+    Image result(image.width, image.height);
+    for (int i = 0; i < image.width; ++i) {
+        for (int j = 0; j < image.height; ++j) {
+            for (int k = 0; k < image.channels; ++k) {
+                int p = image(i, j, k);
+                if (choice == "dark") {
+                    p = p/3;
+                }
+                else if (choice == "light") {
+                    p = p * 2;
+                    if (p > 255)
+                    {p = 255;}
+                }
+                result(i, j, k) = p;
+            }
+        }
+    }
+    return result;
+}
+
+//Filter 8
+Image crop(Image image, size_t x, size_t y, size_t w, size_t h) {
+    Image result(w, h);
+    for (size_t i = 0; i < w; ++i) {
+        for (size_t j = 0; j < h; ++j) {
+            for (size_t k = 0; k < static_cast<size_t>(image.channels); ++k) {
+                result(i, j, static_cast<int>(k)) = image(static_cast<int>(i + x), static_cast<int>(j + y),
+                                                          static_cast<int>(k));
+            }
+        }
+    }
+    return result;
+}
+
