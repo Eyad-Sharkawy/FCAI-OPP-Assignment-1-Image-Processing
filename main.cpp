@@ -171,6 +171,7 @@ int main() {
 
     // Force initial image load before entering the menu
     while (!hasImage) {
+        std::cout<<"please enter the path without (\"\")"<<std::endl;
         std::cout << "Enter image path to load: ";
         std::getline(std::cin, imagePath);
         normalizePathSeparators(imagePath);
@@ -214,6 +215,7 @@ int main() {
                         unsavedChanges = false;
                     }
                 }
+                std::cout<<"please enter the path without (\"\")";
                 std::cout << "Enter image path to load: ";
                 readLine(imagePath);
                 normalizePathSeparators(imagePath);
