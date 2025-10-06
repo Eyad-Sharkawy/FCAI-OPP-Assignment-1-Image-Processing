@@ -165,7 +165,18 @@ Image rotate270(const Image &image); // Tarek
 Image darkandlight(Image &image);//Ahmed
 
 //Filter 8
-Image crop(Image image, size_t x, size_t y, size_t w, size_t h);
+Image crop(Image image, size_t x, size_t y, size_t w, size_t h);//Eyad
+
+//Filter9
+
+//Filter 10
+Image edges(Image &image);//Ahmed
+
+//Filter 11
+Image resize(Image image, size_t w, size_t h);//Eyad
+
+//filter 12
+
 
 int main() {
     Image image;
@@ -201,15 +212,18 @@ int main() {
     }
     while (running) {
         std::cout << "Menu Options:\n";
-        std::cout << "  0. Load a new image\n";
-        std::cout << "  1. Grayscale\n";
-        std::cout << "  2. Black and White\n";
-        std::cout << "  3. Invert Colors\n";
-        std::cout << "  4. Merge with Another Image\n";
-        std::cout << "  5. Flip\n";
-        std::cout << "  6. Rotate\n";
-        std::cout << "  7. darkandlight \n";
-        std::cout << "  8. crop \n";
+        std::cout << "  0.  Load a new image\n";
+        std::cout << "  1.  Grayscale\n";
+        std::cout << "  2.  Black and White\n";
+        std::cout << "  3.  Invert Colors\n";
+        std::cout << "  4.  Merge with Another Image\n";
+        std::cout << "  5.  Flip\n";
+        std::cout << "  6.  Rotate\n";
+        std::cout << "  7.  Darkandlight \n";
+        std::cout << "  9.  Frame \n";
+        std::cout << "  10. Detect Image Edges  \n";
+        std::cout << "  11. Resizing Images \n";
+        std::cout << "  12. Blur Images \n";
         std::cout << "  13. Save current image\n";
         std::cout << "  14. Exit\n";
         int choice = readIntInRange("Enter your choice: ", 0, 14);
@@ -333,7 +347,7 @@ int main() {
                     std::cout << "please load an image" << std::endl;
                     std::cout << "=============================================\n";
                 }
-            break;
+                 break;
 
             case 5:
                 if (hasImage) {
@@ -417,7 +431,37 @@ int main() {
                     std::cout << "please load an image" << std::endl;
                 }
                 break;
-                    case 13:
+            case 9:
+                break;
+            case 10:
+                if (hasImage) {
+                    result = edges(result);
+                    unsavedChanges = true;
+                    std::cout << "Applied edge detecting .\n";
+                    std::cout << "=============================================\n";
+                } else {
+                    std::cout << "=============================================\n";
+                    std::cout << "error" << std::endl;
+                    std::cout << "please load an image" << std::endl;
+                    std::cout << "=============================================\n";
+                }
+                break;
+            case 11:
+                if (hasImage) {
+                        size_t w, h;
+                        readTwoSizeT(w, h, "Enter new width and height: ");
+                        result = resize(result, w, h);
+                        unsavedChanges = true;
+                        std::cout << "Resized image to " << w << "x" << h << "\n";
+                        std::cout << "=============================================\n";
+                    } else {
+                        std::cout << "error" << std::endl;
+                        std::cout << "please load an image" << std::endl;
+                    }
+                    break;
+            case 12:
+                break;
+            case 13:
                         if (hasImage) {
                             char ans = readCharChoice("Save to same file or new file? (s/n): ", "sn");
                             std::string savePath;
@@ -637,29 +681,6 @@ Image rotate270(const Image &image) {
     return rotatedImage;
 }
 
-Image resize(Image image, size_t w, size_t h) {
-    Image result(w, h);
-
-    const double xScale = static_cast<double>(image.width) / w;
-    const double yScale = static_cast<double>(image.height) / h;
-
-    for (size_t i = 0; i < w; ++i) {
-        for (size_t j = 0; j < h; ++j) {
-            size_t src_x = static_cast<size_t>(i * xScale);
-            size_t src_y = static_cast<size_t>(j * yScale);
-
-            if (src_x >= static_cast<size_t>(image.width)) src_x = static_cast<size_t>(image.width - 1);
-            if (src_y >= static_cast<size_t>(image.height)) src_y = static_cast<size_t>(image.height - 1);
-
-            for (size_t k = 0; k < static_cast<size_t>(image.channels); ++k) {
-                result(i, j, static_cast<int>(k)) = image(static_cast<int>(src_x), static_cast<int>(src_y),
-                                                          static_cast<int>(k));
-            }
-        }
-    }
-
-    return result;
-}
 //Filter7
     Image darkandlight(Image &image) {
     std::cout << "Do you want to dark or light \n";
@@ -699,3 +720,50 @@ Image crop(Image image, size_t x, size_t y, size_t w, size_t h) {
     return result;
 }
 
+//Filter 9
+
+//Filter 10
+Image edges(Image &image) {
+    Image blackimage=pureBlackAndWhite(image);
+    Image edge(image.width,image.height);
+    for (int i = 0; i < blackimage.width - 1; ++i) {
+        for (int j = 0; j <blackimage.height - 1; ++j) {
+            int current = blackimage(i, j, 0);
+            int right   = blackimage(i + 1, j, 0);
+            int down    = blackimage(i, j + 1, 0);
+            int diff = abs(current - right) + abs(current - down);
+            if (diff > 0) {
+                edge(i, j, 0) = edge(i, j, 1) = edge(i, j, 2) = 0;
+            } else {
+                edge(i, j, 0) = edge(i, j, 1) = edge(i, j, 2) = 255;
+            }
+        }
+    }
+    return edge;
+}
+
+//Filter 11
+Image resize(Image image, size_t w, size_t h) {
+    Image result(w, h);
+
+    const double xScale = static_cast<double>(image.width) / w;
+    const double yScale = static_cast<double>(image.height) / h;
+
+    for (size_t i = 0; i < w; ++i) {
+        for (size_t j = 0; j < h; ++j) {
+            size_t src_x = static_cast<size_t>(i * xScale);
+            size_t src_y = static_cast<size_t>(j * yScale);
+
+            if (src_x >= static_cast<size_t>(image.width)) src_x = static_cast<size_t>(image.width - 1);
+            if (src_y >= static_cast<size_t>(image.height)) src_y = static_cast<size_t>(image.height - 1);
+
+            for (size_t k = 0; k < static_cast<size_t>(image.channels); ++k) {
+                result(i, j, static_cast<int>(k)) = image(static_cast<int>(src_x), static_cast<int>(src_y),
+                                                          static_cast<int>(k));
+            }
+        }
+    }
+    return result;
+}
+
+//Filter 12
