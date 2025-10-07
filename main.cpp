@@ -231,8 +231,8 @@ int main() {
         std::cout << "  10. Detect Image Edges  \n";
         std::cout << "  11. Resizing Images \n";
         std::cout << "  12. Blur Images \n";
-        std::cout << "  13. infrared (\"bonus\") \n";
-        std::cout << "  14. purpleFilter (\"bonus\") \n";
+        std::cout << "  13. infrared  \n";
+        std::cout << "  14. purpleFilter \n";
         std::cout << "  15. Save current image\n";
         std::cout << "  16. Exit\n";
         int choice = readIntInRange("Enter your choice: ", 0, 17);
