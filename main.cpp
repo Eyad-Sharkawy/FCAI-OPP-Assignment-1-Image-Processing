@@ -177,7 +177,7 @@ Image edges(Image &image);//Ahmed
 Image resize(Image image, size_t w, size_t h);//Eyad
 
 //filter 12
-
+Image blurImage(Image &image);// Tarek
 //Filter 17 ("bonus")
 Image infraredbonus(Image &image); //Ahmed
 
@@ -196,7 +196,7 @@ int main() {
     std::cin.ignore();
 
     while (!hasImage) {
-        std::cout << "Enter image path to load: ";
+        std::cout << "Enter image path and name to load: ";
         std::getline(std::cin, imagePath);
         normalizePathSeparators(imagePath);
         lowercaseExtension(imagePath);
@@ -230,7 +230,7 @@ int main() {
         std::cout << "  13. infrared (\"bonus\") \n";
         std::cout << "  14. Save current image\n";
         std::cout << "  15. Exit\n";
-        int choice = readIntInRange("Enter your choice: ", 0, 14);
+        int choice = readIntInRange("Enter your choice: ", 0, 17);
         switch (choice) {
             case 0: {
                 if (unsavedChanges) {
@@ -240,7 +240,7 @@ int main() {
                         bool saveSuccess = false;
                         std::string savePath;
                         while (!saveSuccess) {
-                            std::cout << "Enter the image path to save in: ";
+                            std::cout << "Enter the image path and name to save in: ";
                             readLine(savePath);
                             normalizePathSeparators(savePath);
                             lowercaseExtension(savePath);
@@ -261,7 +261,7 @@ int main() {
                 }
                 bool loadSuccess = false;
                 while (!loadSuccess) {
-                    std::cout << "Enter image path to load: ";
+                    std::cout << "Enter image path and name to load: ";
                     readLine(imagePath);
                     normalizePathSeparators(imagePath);
                     lowercaseExtension(imagePath);
@@ -327,7 +327,7 @@ int main() {
                     std::string tempPath;
                     bool loadSuccess = false;
                     while (!loadSuccess) {
-                        std::cout << "Enter the second image path to merge: ";
+                        std::cout << "Enter the second image path and name to merge: ";
                         readLine(tempPath);
                         normalizePathSeparators(tempPath);
                         lowercaseExtension(tempPath);
@@ -436,7 +436,32 @@ int main() {
                 }
                 break;
             case 9:
+                if (hasImage) {
+                    while (true) {
+                        char op = readCharChoice(
+                            "Do You want simple or decorated frame ? \n S/D", "sd");
+                        if (op == 's') {
+                            result = simpleFrame(result);
+                            break;
+                        } else if (op == 'd') {
+                            result = decoratedFrame(result);
+                            break;
+                        } else {
+                            std::cout << "Error!\nInput a correct option" << std::endl;
+                        }
+                    }
+                    unsavedChanges = true;
+                    std::cout << "Frame is done.\n";
+                    std::cout << "=============================================\n";
+                } else {
+                    std::cout << "=============================================\n";
+                    std::cout << "error" << std::endl;
+                    std::cout << "please load an image" << std::endl;
+                    std::cout << "=============================================\n";
+                }
+
                 break;
+
             case 10:
                 if (hasImage) {
                     result = edges(result);
@@ -464,6 +489,17 @@ int main() {
                     }
                     break;
             case 12:
+                if (hasImage) {
+                    result = blurImage(result);
+                    unsavedChanges = true;
+                    std::cout << "Applied Blur.\n";
+                    std::cout << "=============================================\n";
+                } else {
+                    std::cout << "=============================================\n";
+                    std::cout << "error" << std::endl;
+                    std::cout << "please load an image" << std::endl;
+                    std::cout << "=============================================\n";
+                }
                 break;
             case 13:
                 if (hasImage) {
@@ -485,7 +521,7 @@ int main() {
                             if (ans == 's') {
                                 savePath = imagePath;
                             } else {
-                                std::cout << "Enter the image path to save in: ";
+                                std::cout << "Enter the image path and name to save in: ";
                                 readLine(savePath);
                                 normalizePathSeparators(savePath);
                                 lowercaseExtension(savePath);
@@ -523,7 +559,7 @@ int main() {
                                 bool saveSuccess = false;
                                 std::string savePath;
                                 while (!saveSuccess) {
-                                    std::cout << "Enter the image path to save in: ";
+                                    std::cout << "Enter the image path and name to save in: ";
                                     readLine(savePath);
                                     normalizePathSeparators(savePath);
                                     lowercaseExtension(savePath);
@@ -857,7 +893,40 @@ Image resize(Image image, size_t w, size_t h) {
 }
 
 //Filter 12
+Image blurImage(Image &image) {
+        int blurSize = 15;
+        Image blurred(image.width, image.height);
 
+        for (int y = 0; y < image.height; y++) {
+            for (int x = 0; x < image.width; x++) {
+
+                int R = 0, G = 0, B = 0;
+                int count = 0;
+
+                for (int i = -blurSize; i <= blurSize; i++) {
+                    for (int j = -blurSize; j <= blurSize; j++) {
+                        int nx = x + j;
+                        int ny = y + i;
+
+
+                        if (nx >= 0 && nx < image.width && ny >= 0 && ny < image.height) {
+                            R += image(nx, ny, 0);
+                            G += image(nx, ny, 1);
+                            B += image(nx, ny, 2);
+                            count++;
+                        }
+                    }
+                }
+
+
+                blurred.setPixel(x, y, 0, R / count);
+                blurred.setPixel(x, y, 1, G / count);
+                blurred.setPixel(x, y, 2, B / count);
+            }
+        }
+
+      return blurred;
+    }
 //Filter 17 ("bonus")
 Image infraredbonus(Image &image) {
     for (int x = 0; x < image.width; ++x) {
