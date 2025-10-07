@@ -4,13 +4,13 @@
 #include <sstream>
 #include "Image_Class.h"
 
-// Ahmed Mohamed ElSayed Tolba (Small ID) Responsible for 1, 4,7,10,17("bonus")
+// Ahmed Mohamed ElSayed Tolba (Small ID) Responsible for 1, 4,7,10,(17 "bonus")
 // ID: 20242023
 //
 // Eyad Mohamed Saad Ali (Middle ID) 2, 5
 // ID: 20242062
 //
-// Tarek Sami Mohamed Mohamed (Large ID) 3, 6
+// Tarek Sami Mohamed Mohamed (Large ID) 3, 6, 9, 12, (16 "bonus")
 // ID: 20242190
 
 static void normalizePathSeparators(std::string &p) {
@@ -168,7 +168,8 @@ Image darkandlight(Image &image);//Ahmed
 Image crop(Image image, size_t x, size_t y, size_t w, size_t h);//Eyad
 
 //Filter9
-
+Image simpleFrame(Image &image);// Tarek
+Image decoratedFrame(Image &image);// Tarek
 //Filter 10
 Image edges(Image &image);//Ahmed
 
@@ -737,6 +738,79 @@ Image crop(Image image, size_t x, size_t y, size_t w, size_t h) {
 }
 
 //Filter 9
+
+Image simpleFrame(Image &image) {
+    int frameSize = 10;
+    Image editedImage(image.width + 2* frameSize ,image.height + 2* frameSize);
+    for (int y = 0; y < editedImage.height ; y++)
+    {
+        for (int x = 0; x < editedImage.width; x++)
+        {
+
+                editedImage.setPixel(x, y, 0, 0);
+                editedImage.setPixel(x, y, 1, 0);
+                editedImage.setPixel(x, y, 2, 255);
+
+        }
+    }
+
+    for (int y = 0; y < image.height ; y++) {
+        for (int x = 0; x < image.width; x++) {
+            for (int c = 0; c < 3; c++) {
+                int pixelValue = image(x,y,c);
+                editedImage.setPixel(x + frameSize, y + frameSize, c, pixelValue);
+            }
+        }
+    }
+    return editedImage;
+}
+
+
+Image decoratedFrame(Image &image) {
+    int frameSize = 10;
+    int innerFrame = 5;
+    Image editedImage(image.width + 2* frameSize ,image.height + 2* frameSize);
+    for (int y = 0; y < editedImage.height ; y++)
+    {
+        for (int x = 0; x < editedImage.width; x++)
+        {
+
+            editedImage.setPixel(x, y, 0, 0);
+            editedImage.setPixel(x, y, 1, 0);
+            editedImage.setPixel(x, y, 2, 255);
+
+        }
+    }
+
+    for (int y = 0; y < image.height ; y++) {
+        for (int x = 0; x < image.width; x++) {
+            for (int c = 0; c < 3; c++) {
+                int pixelValue = image(x,y,c);
+                editedImage.setPixel(x + frameSize, y + frameSize, c, pixelValue);
+            }
+        }
+    }
+    int gap = 5;
+    for (int y = frameSize+gap ; y < frameSize + image.height -gap; y++)
+    {
+        for (int x = frameSize +gap; x < frameSize + image.width -gap; x++)
+        {
+
+            bool isWhiteBorder =
+                          (x < frameSize + gap + innerFrame ||
+                           x >= frameSize + image.width - gap - innerFrame ||
+                           y < frameSize + gap + innerFrame ||
+                           y >= frameSize + image.height - gap - innerFrame);
+
+            if (isWhiteBorder) {
+                editedImage.setPixel(x, y, 0, 255); // R
+                editedImage.setPixel(x, y, 1, 255); // G
+                editedImage.setPixel(x, y, 2, 255); // B
+            }
+        }
+    }
+     return editedImage;
+}
 
 //Filter 10
 Image edges(Image &image) {
