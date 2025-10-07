@@ -1,18 +1,34 @@
+//==================================================================================
+//                                       Header
+//==================================================================================
+//section: S33
+//group:B
+//lab7
+//TA:Laila Mostafa
+//==================================================================================
+//Team members:
+// Ahmed Mohamed ElSayed Tolba  // ID: 20242023
+// Eyad Mohamed Saad Ali        // ID: 20242062
+// Tarek Sami Mohamed Mohamed   // ID: 20242190
+//===================================================================================
+//Work breakdown:
+// Ahmed Mohamed ElSayed Tolba (Small ID) : 1, 4,7,10,(17 "bonus") ,menu
+//
+// Eyad Mohamed Saad Ali (Middle ID): 2, 5
+//
+// Tarek Sami Mohamed Mohamed (Large ID): 3, 6, 9, 12, (16 "bonus"),menu
+//===================================================================================
+// Document link:
+//===================================================================================
+// Video link:
+//===================================================================================
+//                                    End of Header
+//========================================Code=======================================
 #include <iostream>
 #include <cctype>
 #include <algorithm>
 #include <sstream>
 #include "Image_Class.h"
-
-// Ahmed Mohamed ElSayed Tolba (Small ID) Responsible for 1, 4,7,10,(17 "bonus")
-// ID: 20242023
-//
-// Eyad Mohamed Saad Ali (Middle ID) 2, 5
-// ID: 20242062
-//
-// Tarek Sami Mohamed Mohamed (Large ID) 3, 6, 9, 12, (16 "bonus")
-// ID: 20242190
-
 static void normalizePathSeparators(std::string &p) {
     for (size_t i = 0; i < p.size(); ++i) {
         if (p[i] == '\\') p[i] = '/';
