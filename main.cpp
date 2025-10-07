@@ -176,9 +176,13 @@ Image edges(Image &image);//Ahmed
 //Filter 11
 Image resize(Image image, size_t w, size_t h);//Eyad
 
-//filter 12
+//Filter 12
 Image blurImage(Image &image);// Tarek
-//Filter 17 ("bonus")
+
+//Filetr 16 (bonus)
+Image purpleFilter(Image &image);// Tarek
+
+//Filter 17 (bonus)
 Image infraredbonus(Image &image); //Ahmed
 
 int main() {
@@ -228,8 +232,9 @@ int main() {
         std::cout << "  11. Resizing Images \n";
         std::cout << "  12. Blur Images \n";
         std::cout << "  13. infrared (\"bonus\") \n";
-        std::cout << "  14. Save current image\n";
-        std::cout << "  15. Exit\n";
+        std::cout << "  14. purpleFilter (\"bonus\") \n";
+        std::cout << "  15. Save current image\n";
+        std::cout << "  16. Exit\n";
         int choice = readIntInRange("Enter your choice: ", 0, 17);
         switch (choice) {
             case 0: {
@@ -515,6 +520,19 @@ int main() {
                 }
             break;
             case 14:
+                if (hasImage) {
+                    result = purpleFilter(result);
+                    unsavedChanges = true;
+                    std::cout << "Applied Purple.\n";
+                    std::cout << "=============================================\n";
+                } else {
+                    std::cout << "=============================================\n";
+                    std::cout << "error" << std::endl;
+                    std::cout << "please load an image" << std::endl;
+                    std::cout << "=============================================\n";
+                }
+                break;
+            case 15:
                         if (hasImage) {
                             char ans = readCharChoice("Save to same file or new file? (s/n): ", "sn");
                             std::string savePath;
@@ -550,7 +568,7 @@ int main() {
                             std::cout << "please load an image" << std::endl;
                         }
                     break;
-                    case 15: {
+                    case 16: {
                         if (unsavedChanges) {
                             char ans = readCharChoice("You have unsaved changes. Save before exiting? (y/n): ",
                                                       "yn");
@@ -927,7 +945,29 @@ Image blurImage(Image &image) {
 
       return blurred;
     }
-//Filter 17 ("bonus")
+
+// Filter 16 (bonus)
+Image purpleFilter(Image &image) {
+    for (int y = 0; y < image.height; y++) {
+        for (int x = 0; x < image.width; x++) {
+            int r = image(x, y, 0);
+            int g = image(x, y, 1);
+            int b = image(x, y, 2);
+
+
+            r = std::min(255, (int)(r * 1.3));
+            g = std::max(0,   (int)(g * 0.5));
+            b = std::min(255, (int)(b * 1.3));
+
+
+            image.setPixel(x, y, 0, r);
+            image.setPixel(x, y, 1, g);
+            image.setPixel(x, y, 2, b);
+        }
+    }
+    return image;
+}
+//Filter 17 (bonus)
 Image infraredbonus(Image &image) {
     for (int x = 0; x < image.width; ++x) {
         for (int y = 0; y < image.height; ++y) {
