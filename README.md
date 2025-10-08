@@ -1,17 +1,8 @@
-# Image Studio – Qt GUI Image Processing App
+# Image Processing Application
 
-Modern Qt-based GUI for image manipulation and filters, plus the original console app.
+A C++ console application for basic image manipulation and filtering operations.
 
-## GUI Features (Image Studio)
-
-- **Drag & Drop Loading**: Drop JPG/JPEG/PNG/BMP/TGA files into the window
-- **Responsive Preview**: Image scales smoothly when resizing the window
-- **Undo / Redo**: Stack-based history for all filter actions
-- **Mouse Crop**: Click Crop, drag a rectangle, release to crop
-- **Load/Save**: Multiple formats supported
-- **All Filters**: Full parity with the original console app
-
-### Filters
+## Features
 
 - **Load Images**: Support for JPG, JPEG, PNG, BMP, and TGA formats
 - **Grayscale Conversion**: Convert images to grayscale
@@ -28,39 +19,49 @@ Modern Qt-based GUI for image manipulation and filters, plus the original consol
 - **Infrared Effect**: Create infrared-style images
 - **Purple Filter**: Apply purple color enhancement
 - **TV/CRT Filter**: Create retro TV monitor effects with scanlines and color distortion
-  
-> Note: All filters support Undo/Redo.
+- **Save Images**: Save processed images in various formats
 
-## Requirements (GUI)
+## Requirements
 
-- Windows with Qt 6 (tested on 6.8.1 MinGW)
-- MinGW toolchain (comes with Qt for Windows)
+- C++20 compatible compiler
+- CMake 3.30 or higher
+- Windows/Linux/macOS
 
-## Build (GUI)
+## Building
 
-1) Ensure `assets/icon.ico` exists (for EXE icon). Window icon also set via `assets/icon.jpg`.
-2) From repo root, run:
-
-```bat
-build_release.bat
+```bash
+mkdir build
+cd build
+cmake ..
+make
 ```
 
-Artifacts:
-- `build_release/release/ImageStudio.exe`
+## Usage
 
-## Usage (GUI)
+1. Run the executable
+2. Load an image when prompted
+3. Select from the menu options to apply filters
+4. Save your processed image
 
-1. Run `build_release/release/ImageStudio.exe`
-2. Drag & drop an image or click Load Image
-3. Apply filters via buttons or the Filters menu
-4. Use Undo/Redo as needed
-5. Crop: Click Crop, drag a rectangle on the image, release to apply
-6. Save your processed image
+## Menu Options
 
-## Console Application (Legacy)
-
-The repository still includes the original console app (`main.cpp`).
-It provides the same filters via a text menu and can be built separately if needed.
+- `0` - Load a new image
+- `1` - Apply grayscale filter
+- `2` - Apply black & white filter
+- `3` - Invert colors
+- `4` - Merge with another image
+- `5` - Flip image (horizontal/vertical)
+- `6` - Rotate image (90°/180°/270°)
+- `7` - Dark and light adjustment
+- `9` - Frame effects (simple/decorated)
+- `10` - Detect image edges
+- `11` - Resize images
+- `12` - Blur images
+- `13` - Infrared effect
+- `14` - Purple filter
+- `15` - TV/CRT filter (retro monitor effect)
+- `16` - Save current image
+- `17` - Exit
 
 ## TV/CRT Filter Details
 
@@ -82,9 +83,8 @@ This filter is perfect for creating nostalgic, retro-style images or adding vint
 
 ## Dependencies
 
-- Qt 6 (Widgets)
-- `stb_image.h` - Image loading
-- `stb_image_write.h` - Image writing
+- stb_image.h - Image loading library
+- stb_image_write.h - Image writing library
 
 ## License
 

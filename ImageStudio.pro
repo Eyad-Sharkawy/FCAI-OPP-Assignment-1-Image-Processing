@@ -9,7 +9,9 @@ SOURCES += src/simple_qt_app.cpp
 
 HEADERS += include/Image_Class.h
 
-INCLUDEPATH += include
+# Include paths for headers and third-party libraries
+INCLUDEPATH += include \
+               third_party/stb
 
 QMAKE_CXXFLAGS += -std=c++20
 
