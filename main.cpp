@@ -30,7 +30,6 @@
 #include <sstream>
 #include <random>
 #include <chrono>
-#include <stack>
 #include "Image_Class.h"
 static void normalizePathSeparators(std::string &p) {
     for (size_t i = 0; i < p.size(); ++i) {
@@ -208,40 +207,12 @@ Image infraredbonus(Image &image); //Ahmed
 //TV/CRT Filter
 Image tvFilter(Image &image); //Eyad
 
-static void clearStack(std::stack<Image> &s) {
-    while (!s.empty()) s.pop();
-}
-
-static void saveStateForUndo(std::stack<Image> &undoStack, std::stack<Image> &redoStack, const Image &current) {
-    undoStack.push(current);
-    // any new action invalidates redo history
-    clearStack(redoStack);
-}
-
-static bool doUndo(std::stack<Image> &undoStack, std::stack<Image> &redoStack, Image &current) {
-    if (undoStack.empty()) return false;
-    redoStack.push(current);
-    current = undoStack.top();
-    undoStack.pop();
-    return true;
-}
-
-static bool doRedo(std::stack<Image> &undoStack, std::stack<Image> &redoStack, Image &current) {
-    if (redoStack.empty()) return false;
-    undoStack.push(current);
-    current = redoStack.top();
-    redoStack.pop();
-    return true;
-}
-
 int main() {
     Image image;
     Image result;
     bool hasImage = false;
     bool running = true;
     bool unsavedChanges = false;
-    std::stack<Image> undoStack;
-    std::stack<Image> redoStack;
     std::string file;
     std::string imagePath;
     std::cout << "===================================================\n";
@@ -286,12 +257,9 @@ int main() {
         std::cout << "  13. infrared\n";
         std::cout << "  14. purpleFilter\n";
         std::cout << "  15. TV/CRT Filter\n";
-        std::cout << "  16. Reset to Original\n";
-        std::cout << "  17. Undo\n";
-        std::cout << "  18. Redo\n";
-        std::cout << "  19. Save current image\n";
-        std::cout << "  20. Exit\n";
-        int choice = readIntInRange("Enter your choice: ", 0, 20);
+        std::cout << "  16. Save current image\n";
+        std::cout << "  17. Exit\n";
+        int choice = readIntInRange("Enter your choice: ", 0, 17);
         switch (choice) {
             case 0: {
                 if (unsavedChanges) {
@@ -333,8 +301,6 @@ int main() {
                         hasImage = true;
                         loadSuccess = true;
                         unsavedChanges = false;
-                        clearStack(undoStack);
-                        clearStack(redoStack);
                         std::cout << "Image loaded successfully.\n";
                         std::cout << "=============================================\n";
                     } catch (const std::exception &e) {
@@ -347,7 +313,6 @@ int main() {
             }
             case 1:
                 if (hasImage) {
-                    saveStateForUndo(undoStack, redoStack, result);
                     result = blackAndWhite(result);
                     unsavedChanges = true;
                     std::cout << "Applied Grayscale.\n";
@@ -361,7 +326,6 @@ int main() {
             break;
             case 2:
                 if (hasImage) {
-                    saveStateForUndo(undoStack, redoStack, result);
                     result = pureBlackAndWhite(result);
                     unsavedChanges = true;
                     std::cout << "Applied Black & White.\n";
@@ -375,7 +339,6 @@ int main() {
             break;
             case 3:
                 if (hasImage) {
-                    saveStateForUndo(undoStack, redoStack, result);
                     result = invert(result);
                     unsavedChanges = true;
                     std::cout << "Applied Invert.\n";
@@ -400,7 +363,6 @@ int main() {
                         eraseDoubleQuotes(tempPath);
                         try {
                             Image image2(tempPath);
-                            saveStateForUndo(undoStack, redoStack, result);
                             result = merge(result, image2);
                             loadSuccess = true;
                             unsavedChanges = true;
@@ -426,11 +388,9 @@ int main() {
                         char op = readCharChoice(
                             "Which way do you want to flip the image\n V (Vertical) or H (horizontal)? ", "vh");
                         if (op == 'v') {
-                            saveStateForUndo(undoStack, redoStack, result);
                             result = flipVertically(result);
                             break;
                         } else if (op == 'h') {
-                            saveStateForUndo(undoStack, redoStack, result);
                             result = flipHorizontally(result);
                             break;
                         } else {
@@ -452,15 +412,12 @@ int main() {
                     while (true) {
                         int op = readIntFromSet("How many degree (90, 180, 270): ", {90, 180, 270});
                         if (op == 90) {
-                            saveStateForUndo(undoStack, redoStack, result);
                             result = rotate90(result);
                             break;
                         } else if (op == 180) {
-                            saveStateForUndo(undoStack, redoStack, result);
                             result = rotate180(result);
                             break;
                         } else if (op == 270) {
-                            saveStateForUndo(undoStack, redoStack, result);
                             result = rotate270(result);
                             break;
                         } else {
@@ -479,7 +436,6 @@ int main() {
             break;
             case 7:
                 if (hasImage) {
-                    saveStateForUndo(undoStack, redoStack, result);
                     result = darkandlight(result);
                     unsavedChanges = true;
                     std::cout << "Applied darkandlight edit.\n";
@@ -499,7 +455,6 @@ int main() {
                         std::cout << "Crop rectangle out of bounds\n";
                         break;
                     }
-                    saveStateForUndo(undoStack, redoStack, result);
                     result = crop(result, x, y, w, h);
                     unsavedChanges = true;
                     std::cout << "Cropped image.\n";
@@ -515,11 +470,9 @@ int main() {
                         char op = readCharChoice(
                             "Do You want simple or decorated frame ? \n S/D", "sd");
                         if (op == 's') {
-                            saveStateForUndo(undoStack, redoStack, result);
                             result = simpleFrame(result);
                             break;
                         } else if (op == 'd') {
-                            saveStateForUndo(undoStack, redoStack, result);
                             result = decoratedFrame(result);
                             break;
                         } else {
@@ -540,7 +493,6 @@ int main() {
 
             case 10:
                 if (hasImage) {
-                    saveStateForUndo(undoStack, redoStack, result);
                     result = edges(result);
                     unsavedChanges = true;
                     std::cout << "Applied edge detecting .\n";
@@ -556,7 +508,6 @@ int main() {
                 if (hasImage) {
                         size_t w, h;
                         readTwoSizeT(w, h, "Enter new width and height: ");
-                        saveStateForUndo(undoStack, redoStack, result);
                         result = resize(result, w, h);
                         unsavedChanges = true;
                         std::cout << "Resized image to " << w << "x" << h << "\n";
@@ -568,7 +519,6 @@ int main() {
                     break;
             case 12:
                 if (hasImage) {
-                    saveStateForUndo(undoStack, redoStack, result);
                     result = blurImage(result);
                     unsavedChanges = true;
                     std::cout << "Applied Blur.\n";
@@ -582,7 +532,6 @@ int main() {
                 break;
             case 13:
                 if (hasImage) {
-                    saveStateForUndo(undoStack, redoStack, result);
                     result = infraredbonus(result);
                     unsavedChanges = true;
                     std::cout << "Applied infrared.\n";
@@ -596,7 +545,6 @@ int main() {
             break;
             case 14:
                 if (hasImage) {
-                    saveStateForUndo(undoStack, redoStack, result);
                     result = purpleFilter(result);
                     unsavedChanges = true;
                     std::cout << "Applied Purple.\n";
@@ -610,7 +558,6 @@ int main() {
                 break;
             case 15:
                 if (hasImage) {
-                    saveStateForUndo(undoStack, redoStack, result);
                     result = tvFilter(result);
                     unsavedChanges = true;
                     std::cout << "Applied TV/CRT Filter.\n";
@@ -622,47 +569,7 @@ int main() {
                     std::cout << "=============================================\n";
                 }
                 break;
-            case 16: { // Reset
-                        if (hasImage) {
-                            saveStateForUndo(undoStack, redoStack, result);
-                            result = image; // restore to original loaded image
-                            unsavedChanges = true;
-                            std::cout << "Image reset to original.\n";
-                            std::cout << "=============================================\n";
-                        } else {
-                            std::cout << "error" << std::endl;
-                            std::cout << "please load an image" << std::endl;
-                        }
-                        break; }
-            case 17: { // Undo
-                        if (hasImage) {
-                            if (doUndo(undoStack, redoStack, result)) {
-                                unsavedChanges = true;
-                                std::cout << "Undo done.\n";
-                            } else {
-                                std::cout << "Nothing to undo.\n";
-                            }
-                            std::cout << "=============================================\n";
-                        } else {
-                            std::cout << "error" << std::endl;
-                            std::cout << "please load an image" << std::endl;
-                        }
-                        break; }
-            case 18: { // Redo
-                        if (hasImage) {
-                            if (doRedo(undoStack, redoStack, result)) {
-                                unsavedChanges = true;
-                                std::cout << "Redo done.\n";
-                            } else {
-                                std::cout << "Nothing to redo.\n";
-                            }
-                            std::cout << "=============================================\n";
-                        } else {
-                            std::cout << "error" << std::endl;
-                            std::cout << "please load an image" << std::endl;
-                        }
-                        break; }
-            case 19:
+            case 16:
                         if (hasImage) {
                             char ans = readCharChoice("Save to same file or new file? (s/n): ", "sn");
                             std::string savePath;
@@ -698,7 +605,7 @@ int main() {
                             std::cout << "please load an image" << std::endl;
                         }
                     break;
-                    case 20: {
+                    case 17: {
                         if (unsavedChanges) {
                             char ans = readCharChoice("You have unsaved changes. Save before exiting? (y/n): ",
                                                       "yn");
