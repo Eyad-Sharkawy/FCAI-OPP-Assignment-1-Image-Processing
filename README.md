@@ -62,22 +62,10 @@ Artifacts:
 The repository still includes the original console app (`main.cpp`).
 It provides the same filters via a text menu and can be built separately if needed.
 
-## TV/CRT Filter Details
-
-The TV/CRT filter (option 15) creates an authentic retro television monitor effect with the following features:
-
-- **Horizontal Scanlines**: Dark horizontal lines that simulate CRT monitor interlacing
-- **Color Distortion**: Blue/purple tints in darker areas and warm orange highlights in bright areas
-- **Chromatic Aberration**: Color separation at high-contrast edges for realistic distortion
-- **Noise Generation**: Time-synced random noise using modern C++ random number generation
-- **Authentic Feel**: Mimics the look of old CRT monitors and televisions
-
-This filter is perfect for creating nostalgic, retro-style images or adding vintage effects to modern photos.
-
 ## Authors
 
 - Ahmed Mohamed ElSayed Tolba (ID: 20242023) - Filters 1, 4, 7, 10, 17 (bonus), menu
-- Eyad Mohamed Saad Ali (ID: 20242062) - Filters 2, 5, 8, 11, 15 (bonus), menu, TV/CRT Filter
+- Eyad Mohamed Saad Ali (ID: 20242062) - Filters 2, 5, 8, 11, 15 (bonus), menu
 - Tarek Sami Mohamed Mohamed (ID: 20242190) - Filters 3, 6, 9, 12, 16 (bonus), menu
 
 ## Dependencies
