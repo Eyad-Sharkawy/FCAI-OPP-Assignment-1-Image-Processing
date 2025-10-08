@@ -11,6 +11,14 @@ A C++ console application for basic image manipulation and filtering operations.
 - **Image Merging**: Blend two images together
 - **Image Flipping**: Flip images horizontally or vertically
 - **Image Rotation**: Rotate images by 90°, 180°, or 270°
+- **Dark and Light**: Adjust image brightness and contrast
+- **Frame Effects**: Add simple or decorated frames to images
+- **Edge Detection**: Detect and highlight image edges
+- **Image Resizing**: Resize images to different dimensions
+- **Blur Effects**: Apply blur filters to images
+- **Infrared Effect**: Create infrared-style images
+- **Purple Filter**: Apply purple color enhancement
+- **TV/CRT Filter**: Create retro TV monitor effects with scanlines and color distortion
 - **Save Images**: Save processed images in various formats
 
 ## Requirements
@@ -44,14 +52,34 @@ make
 - `4` - Merge with another image
 - `5` - Flip image (horizontal/vertical)
 - `6` - Rotate image (90°/180°/270°)
-- `7` - Save current image
-- `8` - Exit
+- `7` - Dark and light adjustment
+- `9` - Frame effects (simple/decorated)
+- `10` - Detect image edges
+- `11` - Resize images
+- `12` - Blur images
+- `13` - Infrared effect
+- `14` - Purple filter
+- `15` - TV/CRT filter (retro monitor effect)
+- `16` - Save current image
+- `17` - Exit
+
+## TV/CRT Filter Details
+
+The TV/CRT filter (option 15) creates an authentic retro television monitor effect with the following features:
+
+- **Horizontal Scanlines**: Dark horizontal lines that simulate CRT monitor interlacing
+- **Color Distortion**: Blue/purple tints in darker areas and warm orange highlights in bright areas
+- **Chromatic Aberration**: Color separation at high-contrast edges for realistic distortion
+- **Noise Generation**: Time-synced random noise using modern C++ random number generation
+- **Authentic Feel**: Mimics the look of old CRT monitors and televisions
+
+This filter is perfect for creating nostalgic, retro-style images or adding vintage effects to modern photos.
 
 ## Authors
 
-- Ahmed Mohamed ElSayed Tolba (ID: 20242023) - Grayscale, Merge
-- Eyad Mohamed Saad Ali (ID: 20242062) - Black & White, Flip
-- Tarek Sami Mohamed Mohamed (ID: 20242190) - Invert, Rotate
+- Ahmed Mohamed ElSayed Tolba (ID: 20242023) - Filters 1, 4, 7, 10, 17 (bonus), menu
+- Eyad Mohamed Saad Ali (ID: 20242062) - Filters 2, 5, 8, 11, 15 (bonus), menu, TV/CRT Filter
+- Tarek Sami Mohamed Mohamed (ID: 20242190) - Filters 3, 6, 9, 12, 16 (bonus), menu
 
 ## Dependencies
 

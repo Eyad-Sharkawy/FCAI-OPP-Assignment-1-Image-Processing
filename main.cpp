@@ -12,9 +12,9 @@
 // Tarek Sami Mohamed Mohamed   // ID: 20242190
 //===================================================================================
 //Work breakdown:
-// Ahmed Mohamed ElSayed Tolba (Small ID) : 1, 4,7,10,(17 "bonus") ,menu
+// Ahmed Mohamed ElSayed Tolba (Small ID) : 1, 4,7,10,(17 "bonus"), menu
 //
-// Eyad Mohamed Saad Ali (Middle ID): 2, 5
+// Eyad Mohamed Saad Ali (Middle ID): 2, 5, 8, 11, (15 "bonus"), menu
 //
 // Tarek Sami Mohamed Mohamed (Large ID): 3, 6, 9, 12, (16 "bonus"),menu
 //===================================================================================
@@ -28,6 +28,8 @@
 #include <cctype>
 #include <algorithm>
 #include <sstream>
+#include <random>
+#include <chrono>
 #include "Image_Class.h"
 static void normalizePathSeparators(std::string &p) {
     for (size_t i = 0; i < p.size(); ++i) {
@@ -50,7 +52,7 @@ static std::string trim(const std::string &s) {
     return s.substr(start, end - start + 1);
 }
 
-std::string erasedoublecaughts(std::string &r) {
+std::string eraseDoubleQuotes(std::string &r) {
     if (!r.empty() && r.front() == '"')
         r.erase(r.begin());
     if (!r.empty() && r.back() == '"')
@@ -186,6 +188,7 @@ Image crop(Image image, size_t x, size_t y, size_t w, size_t h);//Eyad
 //Filter9
 Image simpleFrame(Image &image);// Tarek
 Image decoratedFrame(Image &image);// Tarek
+
 //Filter 10
 Image edges(Image &image);//Ahmed
 
@@ -200,6 +203,9 @@ Image purpleFilter(Image &image);// Tarek
 
 //Filter 17 (bonus)
 Image infraredbonus(Image &image); //Ahmed
+
+//TV/CRT Filter
+Image tvFilter(Image &image); //Eyad
 
 int main() {
     Image image;
@@ -220,7 +226,7 @@ int main() {
         std::getline(std::cin, imagePath);
         normalizePathSeparators(imagePath);
         lowercaseExtension(imagePath);
-        erasedoublecaughts(imagePath);
+        eraseDoubleQuotes(imagePath);
         try {
             image = Image(imagePath);
             result = image;
@@ -242,15 +248,17 @@ int main() {
         std::cout << "  4.  Merge with Another Image\n";
         std::cout << "  5.  Flip\n";
         std::cout << "  6.  Rotate\n";
-        std::cout << "  7.  Darkandlight \n";
-        std::cout << "  9.  Frame \n";
-        std::cout << "  10. Detect Image Edges  \n";
-        std::cout << "  11. Resizing Images \n";
-        std::cout << "  12. Blur Images \n";
-        std::cout << "  13. infrared  \n";
-        std::cout << "  14. purpleFilter \n";
-        std::cout << "  15. Save current image\n";
-        std::cout << "  16. Exit\n";
+        std::cout << "  7.  DarkAndLight\n";
+        std::cout << "  8.  Crop\n";
+        std::cout << "  9.  Frame\n";
+        std::cout << "  10. Detect Image Edges\n";
+        std::cout << "  11. Resizing Images\n";
+        std::cout << "  12. Blur Images\n";
+        std::cout << "  13. infrared\n";
+        std::cout << "  14. purpleFilter\n";
+        std::cout << "  15. TV/CRT Filter\n";
+        std::cout << "  16. Save current image\n";
+        std::cout << "  17. Exit\n";
         int choice = readIntInRange("Enter your choice: ", 0, 17);
         switch (choice) {
             case 0: {
@@ -265,7 +273,7 @@ int main() {
                             readLine(savePath);
                             normalizePathSeparators(savePath);
                             lowercaseExtension(savePath);
-                            erasedoublecaughts(savePath);
+                            eraseDoubleQuotes(savePath);
                             try {
                                 result.saveImage(savePath);
                                 saveSuccess = true;
@@ -286,7 +294,7 @@ int main() {
                     readLine(imagePath);
                     normalizePathSeparators(imagePath);
                     lowercaseExtension(imagePath);
-                    erasedoublecaughts(imagePath);
+                    eraseDoubleQuotes(imagePath);
                     try {
                         image = Image(imagePath);
                         result = image;
@@ -352,7 +360,7 @@ int main() {
                         readLine(tempPath);
                         normalizePathSeparators(tempPath);
                         lowercaseExtension(tempPath);
-                        erasedoublecaughts(tempPath);
+                        eraseDoubleQuotes(tempPath);
                         try {
                             Image image2(tempPath);
                             result = merge(result, image2);
@@ -549,6 +557,19 @@ int main() {
                 }
                 break;
             case 15:
+                if (hasImage) {
+                    result = tvFilter(result);
+                    unsavedChanges = true;
+                    std::cout << "Applied TV/CRT Filter.\n";
+                    std::cout << "=============================================\n";
+                } else {
+                    std::cout << "=============================================\n";
+                    std::cout << "error" << std::endl;
+                    std::cout << "please load an image" << std::endl;
+                    std::cout << "=============================================\n";
+                }
+                break;
+            case 16:
                         if (hasImage) {
                             char ans = readCharChoice("Save to same file or new file? (s/n): ", "sn");
                             std::string savePath;
@@ -559,7 +580,7 @@ int main() {
                                 readLine(savePath);
                                 normalizePathSeparators(savePath);
                                 lowercaseExtension(savePath);
-                                erasedoublecaughts(savePath);
+                                eraseDoubleQuotes(savePath);
                             }
                             bool saveSuccess = false;
                             while (!saveSuccess) {
@@ -575,7 +596,7 @@ int main() {
                                     readLine(savePath);
                                     normalizePathSeparators(savePath);
                                     lowercaseExtension(savePath);
-                                    erasedoublecaughts(savePath);
+                                    eraseDoubleQuotes(savePath);
                                     std::cout << "=============================================\n";
                                 }
                             }
@@ -584,7 +605,7 @@ int main() {
                             std::cout << "please load an image" << std::endl;
                         }
                     break;
-                    case 16: {
+                    case 17: {
                         if (unsavedChanges) {
                             char ans = readCharChoice("You have unsaved changes. Save before exiting? (y/n): ",
                                                       "yn");
@@ -597,7 +618,7 @@ int main() {
                                     readLine(savePath);
                                     normalizePathSeparators(savePath);
                                     lowercaseExtension(savePath);
-                                    erasedoublecaughts(savePath);
+                                    eraseDoubleQuotes(savePath);
                                     try {
                                         result.saveImage(savePath);
                                         saveSuccess = true;
@@ -611,7 +632,8 @@ int main() {
                                     }
                                 }
                             }
-                        }running = false;
+                        }
+                        running = false;
                         std::cout << "Exiting program.\n";
                         break;
                     }
@@ -1006,4 +1028,66 @@ Image infraredbonus(Image &image) {
         }
     }
     return image;
+}
+
+//TV/CRT Filter - Creates retro TV monitor effect
+Image tvFilter(Image &image) {
+    // Create a copy to work with
+    Image result = image;
+    
+    // Initialize random number generator with time-based seed
+    auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    std::mt19937 rng(seed);
+    std::uniform_int_distribution<int> noise_dist(-10, 10);
+    
+    for (int y = 0; y < result.height; y++) {
+        for (int x = 0; x < result.width; x++) {
+            // Get original pixel values
+            int r = result(x, y, 0);
+            int g = result(x, y, 1);
+            int b = result(x, y, 2);
+            
+            // 1. Add horizontal scanlines (dark lines every few pixels)
+            float scanlineIntensity = 1.0f;
+            if (y % 3 == 0) {  // Every 3rd row gets darker
+                scanlineIntensity = 0.7f;
+            }
+            
+            // 2. Color shift and glow effect
+            // Enhance blues and purples, add warm orange highlights
+            float brightness = (r + g + b) / 3.0f / 255.0f;
+            
+            // Add blue/purple tint to darker areas
+            if (brightness < 0.5f) {
+                r = std::min(255, static_cast<int>(r * 0.8f));
+                g = std::min(255, static_cast<int>(g * 0.7f));
+                b = std::min(255, static_cast<int>(b * 1.2f));
+            }
+            
+            // Add warm orange glow to bright areas
+            if (brightness > 0.7f) {
+                r = std::min(255, static_cast<int>(r * 1.3f));
+                g = std::min(255, static_cast<int>(g * 1.1f));
+                b = std::max(0, static_cast<int>(b * 0.9f));
+            }
+
+            // 3. Apply scanline effect
+            r = static_cast<int>(r * scanlineIntensity);
+            g = static_cast<int>(g * scanlineIntensity);
+            b = static_cast<int>(b * scanlineIntensity);
+            
+            // 5. Add slight noise/grain for authentic TV feel
+            int noise = noise_dist(rng); // -10 to +10
+            r = std::min(255, std::max(0, r + noise));
+            g = std::min(255, std::max(0, g + noise));
+            b = std::min(255, std::max(0, b + noise));
+            
+            // Set the final pixel
+            result.setPixel(x, y, 0, r);
+            result.setPixel(x, y, 1, g);
+            result.setPixel(x, y, 2, b);
+        }
+    }
+    
+    return result;
 }
