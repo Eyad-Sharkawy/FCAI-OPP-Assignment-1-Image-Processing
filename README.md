@@ -1,3 +1,5 @@
+<img width="1024" height="1024" alt="Image" src="https://github.com/user-attachments/assets/32dfecd3-89bb-45da-a8b3-812a811e3e43" />
+
 # Image Processing Application
 
 A C++ console application for basic image manipulation and filtering operations.
