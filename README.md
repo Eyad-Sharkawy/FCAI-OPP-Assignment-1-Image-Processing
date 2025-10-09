@@ -1,4 +1,4 @@
-<img width="1024" height="1024" alt="Image" src="https://github.com/user-attachments/assets/32dfecd3-89bb-45da-a8b3-812a811e3e43" />
+<img width="500" height="500" alt="Image" src="https://github.com/user-attachments/assets/32dfecd3-89bb-45da-a8b3-812a811e3e43" />
 
 # Image Processing Application
 
