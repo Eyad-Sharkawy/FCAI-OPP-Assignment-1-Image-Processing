@@ -1,4 +1,6 @@
-<img width="500" height="500" alt="Image" src="https://github.com/user-attachments/assets/32dfecd3-89bb-45da-a8b3-812a811e3e43" />
+<p align="center">
+  <img width="500" height="500" alt="Image" style="" src="https://github.com/user-attachments/assets/32dfecd3-89bb-45da-a8b3-812a811e3e43" />
+</p>
 
 # Image Processing Application
 
