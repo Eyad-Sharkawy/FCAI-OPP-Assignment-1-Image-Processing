@@ -1,5 +1,9 @@
 # Image Studio
 
+<p align="center">
+  <img width="500" height="500" alt="Image" style="" src="https://github.com/user-attachments/assets/32dfecd3-89bb-45da-a8b3-812a811e3e43" />
+</p>
+
 A comprehensive image processing application with both console and GUI interfaces, featuring advanced image manipulation and filtering operations.
 
 ## 🚀 Quick Start - Download Portable Version
