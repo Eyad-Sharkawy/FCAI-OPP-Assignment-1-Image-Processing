@@ -1,17 +1,17 @@
 //==================================================================================
 //                                       Header
 //==================================================================================
-//section: S33
-//group:B
-//lab7
-//TA:Laila Mostafa
-//==================================================================================
-//Team members:
+// section: S33
+// group: B
+// lab7
+// TA: Laila Mostafa
+//===================================================================================
+// Team members:
 // Ahmed Mohamed ElSayed Tolba  // ID: 20242023
 // Eyad Mohamed Saad Ali        // ID: 20242062
 // Tarek Sami Mohamed Mohamed   // ID: 20242190
 //===================================================================================
-//Work breakdown:
+// Work breakdown:
 // Ahmed Mohamed ElSayed Tolba (Small ID): 1, 4,7,10,(17 "bonus"), menu
 //
 // Eyad Mohamed Saad Ali (Middle ID): 2, 5, 8, 11, (15 "bonus"), menu
@@ -1185,3 +1185,4 @@ Image tvFilter(Image &image) {
     
     return result;
 }
+
