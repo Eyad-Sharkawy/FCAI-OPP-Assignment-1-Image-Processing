@@ -53,6 +53,8 @@
 #include <cmath>
 #include <algorithm>
 #include <stack>
+#include <random>
+#include <chrono>
 #include "Image_Class.h"
 
 class SimpleImageApp : public QMainWindow
@@ -354,24 +356,54 @@ private slots:
         QApplication::processEvents();
         
         try {
-            // Simple TV filter effect
+            // Initialize random number generator with time-based seed
+            auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+            std::mt19937 rng(seed);
+            std::uniform_int_distribution<int> noise_dist(-10, 10);
+            
             for (int y = 0; y < currentImage.height; y++) {
                 for (int x = 0; x < currentImage.width; x++) {
+                    // Get original pixel values
                     int r = currentImage(x, y, 0);
                     int g = currentImage(x, y, 1);
                     int b = currentImage(x, y, 2);
                     
-                    // Add scanlines
-                    if (y % 3 == 0) {
-                        r = (int)(r * 0.7f);
-                        g = (int)(g * 0.7f);
-                        b = (int)(b * 0.7f);
+                    // 1. Add horizontal scanlines (dark lines every few pixels)
+                    float scanlineIntensity = 1.0f;
+                    if (y % 3 == 0) {  // Every 3rd row gets darker
+                        scanlineIntensity = 0.7f;
                     }
                     
-                    // Add some color shift
-                    r = std::min(255, (int)(r * 1.1f));
-                    b = std::min(255, (int)(b * 1.2f));
+                    // 2. Color shift and glow effect
+                    // Enhance blues and purples, add warm orange highlights
+                    float brightness = (r + g + b) / 3.0f / 255.0f;
                     
+                    // Add blue/purple tint to darker areas
+                    if (brightness < 0.5f) {
+                        r = std::min(255, static_cast<int>(r * 0.8f));
+                        g = std::min(255, static_cast<int>(g * 0.7f));
+                        b = std::min(255, static_cast<int>(b * 1.2f));
+                    }
+                    
+                    // Add warm orange glow to bright areas
+                    if (brightness > 0.7f) {
+                        r = std::min(255, static_cast<int>(r * 1.3f));
+                        g = std::min(255, static_cast<int>(g * 1.1f));
+                        b = std::max(0, static_cast<int>(b * 0.9f));
+                    }
+
+                    // 3. Apply scanline effect
+                    r = static_cast<int>(r * scanlineIntensity);
+                    g = static_cast<int>(g * scanlineIntensity);
+                    b = static_cast<int>(b * scanlineIntensity);
+                    
+                    // 4. Add slight noise/grain for authentic TV feel
+                    int noise = noise_dist(rng); // -10 to +10
+                    r = std::min(255, std::max(0, r + noise));
+                    g = std::min(255, std::max(0, g + noise));
+                    b = std::min(255, std::max(0, b + noise));
+                    
+                    // Set the final pixel
                     currentImage.setPixel(x, y, 0, r);
                     currentImage.setPixel(x, y, 1, g);
                     currentImage.setPixel(x, y, 2, b);
@@ -604,28 +636,34 @@ private slots:
     {
         if (!hasImage) return;
         
+        // Ask user for dark or light using GUI instead of std::cin
+        QStringList options; options << "dark" << "light";
+        bool ok = false;
+        QString choice = QInputDialog::getItem(this, "Dark or Light", "Choose:", options, 0, false, &ok);
+        if (!ok) return;
+
         saveStateForUndo();
         
         statusBar()->showMessage("Applying Dark & Light filter...");
         QApplication::processEvents();
         
         try {
-            for (int y = 0; y < currentImage.height; y++) {
-                for (int x = 0; x < currentImage.width; x++) {
-                    int r = currentImage(x, y, 0);
-                    int g = currentImage(x, y, 1);
-                    int b = currentImage(x, y, 2);
-                    
-                    // Increase contrast
-                    r = std::min(255, std::max(0, (r - 128) * 2 + 128));
-                    g = std::min(255, std::max(0, (g - 128) * 2 + 128));
-                    b = std::min(255, std::max(0, (b - 128) * 2 + 128));
-                    
-                    currentImage.setPixel(x, y, 0, r);
-                    currentImage.setPixel(x, y, 1, g);
-                    currentImage.setPixel(x, y, 2, b);
+            Image result(currentImage.width, currentImage.height);
+            for (int i = 0; i < currentImage.width; ++i) {
+                for (int j = 0; j < currentImage.height; ++j) {
+                    for (int k = 0; k < currentImage.channels; ++k) {
+                        int p = currentImage(i, j, k);
+                        if (choice == "dark") {
+                            p = p / 3;
+                        } else { // light
+                            p = p * 2;
+                            if (p > 255) p = 255;
+                        }
+                        result.setPixel(i, j, k, (unsigned char)p);
+                    }
                 }
             }
+            currentImage = result;
             updateImageDisplay();
             statusBar()->showMessage("Dark & Light filter applied");
         } catch (const std::exception& e) {
@@ -651,40 +689,61 @@ private slots:
             QApplication::processEvents();
             
             try {
-                int borderWidth = (choice == "Simple Frame") ? 10 : 20;
-                Image result(currentImage.width + 2 * borderWidth, currentImage.height + 2 * borderWidth);
-                
                 if (choice == "Simple Frame") {
-                    // Fill with white border
+                    // Blue simple frame
+                    int frameSize = 10;
+                    Image result(currentImage.width + 2 * frameSize, currentImage.height + 2 * frameSize);
                     for (int y = 0; y < result.height; y++) {
                         for (int x = 0; x < result.width; x++) {
-                            result.setPixel(x, y, 0, 255);
-                            result.setPixel(x, y, 1, 255);
+                            result.setPixel(x, y, 0, 0);
+                            result.setPixel(x, y, 1, 0);
                             result.setPixel(x, y, 2, 255);
                         }
                     }
-                } else {
-                    // Fill with gradient border
-                    for (int y = 0; y < result.height; y++) {
-                        for (int x = 0; x < result.width; x++) {
-                            int intensity = 255 - (std::min(x, std::min(y, std::min(result.width - x, result.height - y))) * 255 / borderWidth);
-                            result.setPixel(x, y, 0, intensity);
-                            result.setPixel(x, y, 1, intensity);
-                            result.setPixel(x, y, 2, intensity);
+                    for (int y = 0; y < currentImage.height; y++) {
+                        for (int x = 0; x < currentImage.width; x++) {
+                            for (int c = 0; c < 3; c++) {
+                                result.setPixel(x + frameSize, y + frameSize, c, currentImage(x, y, c));
+                            }
                         }
                     }
-                }
-                
-                // Copy original image
-                for (int y = 0; y < currentImage.height; y++) {
-                    for (int x = 0; x < currentImage.width; x++) {
-                        result.setPixel(x + borderWidth, y + borderWidth, 0, currentImage(x, y, 0));
-                        result.setPixel(x + borderWidth, y + borderWidth, 1, currentImage(x, y, 1));
-                        result.setPixel(x + borderWidth, y + borderWidth, 2, currentImage(x, y, 2));
+                    currentImage = result;
+                } else {
+                    // Decorated frame: blue outer + inner white border
+                    int frameSize = 10;
+                    int innerFrame = 5;
+                    int gap = 5;
+                    Image result(currentImage.width + 2 * frameSize, currentImage.height + 2 * frameSize);
+                    for (int y = 0; y < result.height; y++) {
+                        for (int x = 0; x < result.width; x++) {
+                            result.setPixel(x, y, 0, 0);
+                            result.setPixel(x, y, 1, 0);
+                            result.setPixel(x, y, 2, 255);
+                        }
                     }
+                    for (int y = 0; y < currentImage.height; y++) {
+                        for (int x = 0; x < currentImage.width; x++) {
+                            for (int c = 0; c < 3; c++) {
+                                result.setPixel(x + frameSize, y + frameSize, c, currentImage(x, y, c));
+                            }
+                        }
+                    }
+                    for (int y = frameSize + gap; y < frameSize + currentImage.height - gap; y++) {
+                        for (int x = frameSize + gap; x < frameSize + currentImage.width - gap; x++) {
+                            bool isWhiteBorder =
+                                (x < frameSize + gap + innerFrame ||
+                                 x >= frameSize + currentImage.width - gap - innerFrame ||
+                                 y < frameSize + gap + innerFrame ||
+                                 y >= frameSize + currentImage.height - gap - innerFrame);
+                            if (isWhiteBorder) {
+                                result.setPixel(x, y, 0, 255);
+                                result.setPixel(x, y, 1, 255);
+                                result.setPixel(x, y, 2, 255);
+                            }
+                        }
+                    }
+                    currentImage = result;
                 }
-                
-                currentImage = result;
                 updateImageDisplay();
                 statusBar()->showMessage("Frame filter applied");
             } catch (const std::exception& e) {
@@ -703,29 +762,48 @@ private slots:
         QApplication::processEvents();
         
         try {
-            Image result = currentImage;
-            
-            // Simple edge detection using Sobel operator
-            for (int y = 1; y < currentImage.height - 1; y++) {
-                for (int x = 1; x < currentImage.width - 1; x++) {
-                    // Sobel X
-                    int gx = -currentImage(x-1, y-1, 0) + currentImage(x+1, y-1, 0) +
-                             -2*currentImage(x-1, y, 0) + 2*currentImage(x+1, y, 0) +
-                             -currentImage(x-1, y+1, 0) + currentImage(x+1, y+1, 0);
-                    
-                    // Sobel Y
-                    int gy = -currentImage(x-1, y-1, 0) - 2*currentImage(x, y-1, 0) - currentImage(x+1, y-1, 0) +
-                             currentImage(x-1, y+1, 0) + 2*currentImage(x, y+1, 0) + currentImage(x+1, y+1, 0);
-                    
-                    int magnitude = std::min(255, (int)std::sqrt(gx*gx + gy*gy));
-                    
-                    result.setPixel(x, y, 0, magnitude);
-                    result.setPixel(x, y, 1, magnitude);
-                    result.setPixel(x, y, 2, magnitude);
+            // BW threshold image
+            Image bw(currentImage.width, currentImage.height);
+            for (int y = 0; y < currentImage.height; y++) {
+                for (int x = 0; x < currentImage.width; x++) {
+                    int r = currentImage(x, y, 0);
+                    int g = currentImage(x, y, 1);
+                    int b = currentImage(x, y, 2);
+                    int gray = (r + g + b) / 3;
+                    int bwVal = (gray > 128) ? 255 : 0;
+                    bw.setPixel(x, y, 0, bwVal);
+                    bw.setPixel(x, y, 1, bwVal);
+                    bw.setPixel(x, y, 2, bwVal);
                 }
             }
-            
-            currentImage = result;
+
+            Image edge(currentImage.width, currentImage.height);
+            for (int y = 0; y < edge.height; y++) {
+                for (int x = 0; x < edge.width; x++) {
+                    edge.setPixel(x, y, 0, 255);
+                    edge.setPixel(x, y, 1, 255);
+                    edge.setPixel(x, y, 2, 255);
+                }
+            }
+
+            for (int i = 0; i < bw.width - 1; ++i) {
+                for (int j = 0; j < bw.height - 1; ++j) {
+                    int current = bw(i, j, 0);
+                    int right   = bw(i + 1, j, 0);
+                    int down    = bw(i, j + 1, 0);
+                    int diff = std::abs(current - right) + std::abs(current - down);
+                    if (diff > 0) {
+                        edge.setPixel(i, j, 0, 0);
+                        edge.setPixel(i, j, 1, 0);
+                        edge.setPixel(i, j, 2, 0);
+                    } else {
+                        edge.setPixel(i, j, 0, 255);
+                        edge.setPixel(i, j, 1, 255);
+                        edge.setPixel(i, j, 2, 255);
+                    }
+                }
+            }
+            currentImage = edge;
             updateImageDisplay();
             statusBar()->showMessage("Edge Detection filter applied");
         } catch (const std::exception& e) {
@@ -788,27 +866,30 @@ private slots:
         QApplication::processEvents();
         
         try {
-            Image result = currentImage;
-            
-            // Simple box blur
-            for (int y = 1; y < currentImage.height - 1; y++) {
-                for (int x = 1; x < currentImage.width - 1; x++) {
-                    int r = 0, g = 0, b = 0;
-                    
-                    for (int dy = -1; dy <= 1; dy++) {
-                        for (int dx = -1; dx <= 1; dx++) {
-                            r += currentImage(x + dx, y + dy, 0);
-                            g += currentImage(x + dx, y + dy, 1);
-                            b += currentImage(x + dx, y + dy, 2);
+            // Radius-15 average blur
+            int blurSize = 15;
+            Image result(currentImage.width, currentImage.height);
+            for (int y = 0; y < currentImage.height; y++) {
+                for (int x = 0; x < currentImage.width; x++) {
+                    int R = 0, G = 0, B = 0;
+                    int count = 0;
+                    for (int i = -blurSize; i <= blurSize; i++) {
+                        for (int j = -blurSize; j <= blurSize; j++) {
+                            int nx = x + j;
+                            int ny = y + i;
+                            if (nx >= 0 && nx < currentImage.width && ny >= 0 && ny < currentImage.height) {
+                                R += currentImage(nx, ny, 0);
+                                G += currentImage(nx, ny, 1);
+                                B += currentImage(nx, ny, 2);
+                                count++;
+                            }
                         }
                     }
-                    
-                    result.setPixel(x, y, 0, r / 9);
-                    result.setPixel(x, y, 1, g / 9);
-                    result.setPixel(x, y, 2, b / 9);
+                    result.setPixel(x, y, 0, R / count);
+                    result.setPixel(x, y, 1, G / count);
+                    result.setPixel(x, y, 2, B / count);
                 }
             }
-            
             currentImage = result;
             updateImageDisplay();
             statusBar()->showMessage("Blur filter applied");
@@ -827,22 +908,22 @@ private slots:
         QApplication::processEvents();
         
         try {
-            for (int y = 0; y < currentImage.height; y++) {
-                for (int x = 0; x < currentImage.width; x++) {
-                    int r = currentImage(x, y, 0);
-                    int g = currentImage(x, y, 1);
-                    int b = currentImage(x, y, 2);
+            for (int x = 0; x < currentImage.width; ++x) {
+                for (int y = 0; y < currentImage.height; ++y) {
+                    int red   = currentImage(x, y, 0);
+                    int green = currentImage(x, y, 1);
+                    int blue  = currentImage(x, y, 2);
 
-                    float brightness = (r + g + b) / 3.0f;
+                    float brightness = (red + green + blue) / 3.0f;
                     float inverted = 255 - brightness;
 
                     int R = 255;
                     unsigned int G = int(inverted);
                     unsigned int B = int(inverted);
 
-                    currentImage.setPixel(x, y, 0, R);
-                    currentImage.setPixel(x, y, 1, G);
-                    currentImage.setPixel(x, y, 2, B);
+                    currentImage(x, y, 0) = R;
+                    currentImage(x, y, 1) = G;
+                    currentImage(x, y, 2) = B;
                 }
             }
             updateImageDisplay();
@@ -869,7 +950,7 @@ private slots:
                     int b = currentImage(x, y, 2);
 
                     r = std::min(255, (int)(r * 1.3));
-                    g = std::max(0, (int)(g * 0.5));
+                    g = std::max(0,   (int)(g * 0.5));
                     b = std::min(255, (int)(b * 1.3));
 
                     currentImage.setPixel(x, y, 0, r);
