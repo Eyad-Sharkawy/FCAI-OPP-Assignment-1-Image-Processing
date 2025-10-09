@@ -927,33 +927,6 @@ Image crop(Image image, size_t x, size_t y, size_t w, size_t h) {
 
 Image simpleFrame(Image &image) {
     int frameSize = 10;
-    Image editedImage(image.width + 2* frameSize ,image.height + 2* frameSize);
-    for (int y = 0; y < editedImage.height ; y++)
-    {
-        for (int x = 0; x < editedImage.width; x++)
-        {
-
-                editedImage.setPixel(x, y, 0, 0);
-                editedImage.setPixel(x, y, 1, 0);
-                editedImage.setPixel(x, y, 2, 255);
-
-        }
-    }
-
-    for (int y = 0; y < image.height ; y++) {
-        for (int x = 0; x < image.width; x++) {
-            for (int c = 0; c < 3; c++) {
-                int pixelValue = image(x,y,c);
-                editedImage.setPixel(x + frameSize, y + frameSize, c, pixelValue);
-            }
-        }
-    }
-    return editedImage;
-}
-
-
-Image decoratedFrame(Image &image) {
-    int frameSize = 10;
     int innerFrame = 5;
     Image editedImage(image.width + 2* frameSize ,image.height + 2* frameSize);
     for (int y = 0; y < editedImage.height ; y++)
@@ -996,6 +969,95 @@ Image decoratedFrame(Image &image) {
         }
     }
      return editedImage;
+}
+
+Image decoratedFrame(Image &image) {
+
+    int frameWidth = 25;
+
+
+    int outerColor[3] = {100, 70, 50};
+    int innerColor[3] = {235, 225, 210};
+    int accentColor[3] = {180, 140, 80};
+
+
+    int originalWidth = image.width;
+    int originalHeight = image.height;
+    int newWidth = originalWidth + 2 * frameWidth;
+    int newHeight = originalHeight + 2 * frameWidth;
+
+
+
+
+    Image framedImg(newWidth, newHeight);
+
+
+    for (int y = 0; y < originalHeight; y++) {
+        for (int x = 0; x < originalWidth; x++) {
+            for (int c = 0; c < 3; c++) {
+                framedImg.setPixel(x + frameWidth, y + frameWidth, c,
+                                  image.getPixel(x, y, c));
+            }
+        }
+    }
+
+
+    for (int y = 0; y < newHeight; y++) {
+        for (int x = 0; x < newWidth; x++) {
+
+            if (x < frameWidth || x >= newWidth - frameWidth ||
+                y < frameWidth || y >= newHeight - frameWidth) {
+
+
+                int distFromEdge = std::min({x, y, newWidth - 1 - x, newHeight - 1 - y});
+
+
+                if (distFromEdge < 3) {
+                    for (int c = 0; c < 3; c++) {
+                        framedImg.setPixel(x, y, c, outerColor[c]);
+                    }
+                }
+
+                else if (distFromEdge == 12 || distFromEdge == 15 ||distFromEdge == 9) {
+                    for (int c = 0; c < 3; c++) {
+                        framedImg.setPixel(x, y, c, accentColor[c]);
+                    }
+                }
+
+                else if (distFromEdge < frameWidth - 4) {
+                    for (int c = 0; c < 3; c++) {
+                        framedImg.setPixel(x, y, c, innerColor[c]);
+                    }
+
+
+                    int cornerDist = std::min(std::min(x, newWidth - 1 - x),
+                                       std::min(y, newHeight - 1 - y));
+
+
+                    if (cornerDist < frameWidth) {
+                        if ((x + y) % 12 == 0) {
+                            for (int c = 0; c < 3; c++) {
+                                framedImg.setPixel(x, y, c, accentColor[c]);
+                            }
+                        }
+                    }
+                }
+
+                else if (distFromEdge >= frameWidth - 4 && distFromEdge < frameWidth - 1) {
+                    for (int c = 0; c < 3; c++) {
+                        framedImg.setPixel(x, y, c, accentColor[c]);
+                    }
+                }
+
+                else {
+                    for (int c = 0; c < 3; c++) {
+                        framedImg.setPixel(x, y, c, outerColor[c]);
+                    }
+                }
+                }
+        }
+    }
+    return framedImg;
 }
 
 //Filter 10
@@ -1044,38 +1106,54 @@ Image resize(Image image, size_t w, size_t h) {
 
 //Filter 12
 Image blurImage(Image &image) {
-        int blurSize = 15;
-        Image blurred(image.width, image.height);
+    int blurSize = 20;
+    Image temp(image.width, image.height);
+    Image blured(image.width, image.height);
 
-        for (int y = 0; y < image.height; y++) {
-            for (int x = 0; x < image.width; x++) {
+    // Horizontal pass
+    for (int y = 0; y < image.height; y++) {
+        for (int x = 0; x < image.width; x++) {
+            int R = 0, G = 0, B = 0;
+            int count = 0;
 
-                int R = 0, G = 0, B = 0;
-                int count = 0;
+            int xStart = (x - blurSize < 0) ? 0 : x - blurSize;
+            int xEnd = (x + blurSize >= image.width) ? image.width - 1 : x + blurSize;
 
-                for (int i = -blurSize; i <= blurSize; i++) {
-                    for (int j = -blurSize; j <= blurSize; j++) {
-                        int nx = x + j;
-                        int ny = y + i;
-
-
-                        if (nx >= 0 && nx < image.width && ny >= 0 && ny < image.height) {
-                            R += image(nx, ny, 0);
-                            G += image(nx, ny, 1);
-                            B += image(nx, ny, 2);
-                            count++;
-                        }
-                    }
-                }
-
-
-                blurred.setPixel(x, y, 0, R / count);
-                blurred.setPixel(x, y, 1, G / count);
-                blurred.setPixel(x, y, 2, B / count);
+            for (int nx = xStart; nx <= xEnd; nx++) {
+                R += image(nx, y, 0);
+                G += image(nx, y, 1);
+                B += image(nx, y, 2);
+                count++;
             }
-        }
 
-      return blurred;
+            temp.setPixel(x, y, 0, R / count);
+            temp.setPixel(x, y, 1, G / count);
+            temp.setPixel(x, y, 2, B / count);
+        }
+    }
+
+    // Vertical pass
+    for (int y = 0; y < image.height; y++) {
+        for (int x = 0; x < image.width; x++) {
+            int R = 0, G = 0, B = 0;
+            int count = 0;
+
+            int yStart = (y - blurSize < 0) ? 0 : y - blurSize;
+            int yEnd = (y + blurSize >= image.height) ? image.height - 1 : y + blurSize;
+
+            for (int ny = yStart; ny <= yEnd; ny++) {
+                R += temp(x, ny, 0);
+                G += temp(x, ny, 1);
+                B += temp(x, ny, 2);
+                count++;
+            }
+
+            blured.setPixel(x, y, 0, R / count);
+            blured.setPixel(x, y, 1, G / count);
+            blured.setPixel(x, y, 2, B / count);
+        }
+    }
+return blured;
     }
 
 // Filter 16 (bonus)
