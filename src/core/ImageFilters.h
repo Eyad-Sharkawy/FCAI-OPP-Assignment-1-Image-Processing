@@ -1,3 +1,13 @@
+/**
+* @File  : Image_Class.h
+ * @brief : This file contains the declaration of the Image class.
+ *
+ * @authors : Eyad Sharkawy, Ahmed Tolba , Tarek Sami.
+ * @copyright : FCAI Cairo University
+ * @version   : v2.0.0
+ * @date      : 13/10/2025
+ */
+
 #ifndef IMAGEFILTERS_H
 #define IMAGEFILTERS_H
 
