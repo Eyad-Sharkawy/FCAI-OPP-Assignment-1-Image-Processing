@@ -66,19 +66,19 @@
 #include "../core/io/ImageIO.h"
 
 /**
- * @class SimpleImageApp
+ * @class ImageStudio
  * @brief Main Qt window for Image Studio.
  *
  * Owns the UI, wires signals/slots, manages current/original images,
  * delegates image processing to ImageFilters, and coordinates history,
  * progress, cancellation, drag-and-drop, and cropping interactions.
  */
-class SimpleImageApp : public QMainWindow
+class ImageStudio : public QMainWindow
 {
     Q_OBJECT
 
 public:
-SimpleImageApp(QWidget *parent = nullptr) : QMainWindow(parent), hasImage(false)
+ImageStudio(QWidget *parent = nullptr) : QMainWindow(parent), hasImage(false)
     {
         ui.setupUi(this);
         
@@ -101,52 +101,52 @@ SimpleImageApp(QWidget *parent = nullptr) : QMainWindow(parent), hasImage(false)
         ui.imageLabel->setText("No image loaded\nClick 'Load Image' or drag & drop an image here");
         
         // Connect signals
-        connect(ui.loadButton, &QPushButton::clicked, this, &SimpleImageApp::loadImage);
-        connect(ui.saveButton, &QPushButton::clicked, this, &SimpleImageApp::saveImage);
-        connect(ui.unloadButton, &QPushButton::clicked, this, &SimpleImageApp::unloadImage);
-        connect(ui.resetButton, &QPushButton::clicked, this, &SimpleImageApp::resetImage);
-        connect(ui.undoButton, &QPushButton::clicked, this, &SimpleImageApp::undo);
-        connect(ui.redoButton, &QPushButton::clicked, this, &SimpleImageApp::redo);
-        connect(ui.grayscaleButton, &QPushButton::clicked, this, &SimpleImageApp::applyGrayscale);
-        connect(ui.blackWhiteButton, &QPushButton::clicked, this, &SimpleImageApp::applyBlackAndWhite);
-        connect(ui.invertButton, &QPushButton::clicked, this, &SimpleImageApp::applyInvert);
-        connect(ui.mergeButton, &QPushButton::clicked, this, &SimpleImageApp::applyMerge);
-        connect(ui.flipButton, &QPushButton::clicked, this, &SimpleImageApp::applyFlip);
-        connect(ui.rotateButton, &QPushButton::clicked, this, &SimpleImageApp::applyRotate);
-        connect(ui.darkLightButton, &QPushButton::clicked, this, &SimpleImageApp::applyDarkAndLight);
-        connect(ui.frameButton, &QPushButton::clicked, this, &SimpleImageApp::applyFrame);
-        connect(ui.cropButton, &QPushButton::clicked, this, &SimpleImageApp::startCropMode);
-        connect(ui.edgesButton, &QPushButton::clicked, this, &SimpleImageApp::applyEdges);
-        connect(ui.resizeButton, &QPushButton::clicked, this, &SimpleImageApp::applyResize);
-        connect(ui.blurButton, &QPushButton::clicked, this, &SimpleImageApp::applyBlur);
-        connect(ui.infraredButton, &QPushButton::clicked, this, &SimpleImageApp::applyInfrared);
-        connect(ui.purpleButton, &QPushButton::clicked, this, &SimpleImageApp::applyPurpleFilter);
-        connect(ui.tvFilterButton, &QPushButton::clicked, this, &SimpleImageApp::applyTVFilter);
-        connect(ui.cancelButton, &QPushButton::clicked, this, &SimpleImageApp::cancelFilter);
+        connect(ui.loadButton, &QPushButton::clicked, this, &ImageStudio::loadImage);
+        connect(ui.saveButton, &QPushButton::clicked, this, &ImageStudio::saveImage);
+        connect(ui.unloadButton, &QPushButton::clicked, this, &ImageStudio::unloadImage);
+        connect(ui.resetButton, &QPushButton::clicked, this, &ImageStudio::resetImage);
+        connect(ui.undoButton, &QPushButton::clicked, this, &ImageStudio::undo);
+        connect(ui.redoButton, &QPushButton::clicked, this, &ImageStudio::redo);
+        connect(ui.grayscaleButton, &QPushButton::clicked, this, &ImageStudio::applyGrayscale);
+        connect(ui.blackWhiteButton, &QPushButton::clicked, this, &ImageStudio::applyBlackAndWhite);
+        connect(ui.invertButton, &QPushButton::clicked, this, &ImageStudio::applyInvert);
+        connect(ui.mergeButton, &QPushButton::clicked, this, &ImageStudio::applyMerge);
+        connect(ui.flipButton, &QPushButton::clicked, this, &ImageStudio::applyFlip);
+        connect(ui.rotateButton, &QPushButton::clicked, this, &ImageStudio::applyRotate);
+        connect(ui.darkLightButton, &QPushButton::clicked, this, &ImageStudio::applyDarkAndLight);
+        connect(ui.frameButton, &QPushButton::clicked, this, &ImageStudio::applyFrame);
+        connect(ui.cropButton, &QPushButton::clicked, this, &ImageStudio::startCropMode);
+        connect(ui.edgesButton, &QPushButton::clicked, this, &ImageStudio::applyEdges);
+        connect(ui.resizeButton, &QPushButton::clicked, this, &ImageStudio::applyResize);
+        connect(ui.blurButton, &QPushButton::clicked, this, &ImageStudio::applyBlur);
+        connect(ui.infraredButton, &QPushButton::clicked, this, &ImageStudio::applyInfrared);
+        connect(ui.purpleButton, &QPushButton::clicked, this, &ImageStudio::applyPurpleFilter);
+        connect(ui.tvFilterButton, &QPushButton::clicked, this, &ImageStudio::applyTVFilter);
+        connect(ui.cancelButton, &QPushButton::clicked, this, &ImageStudio::cancelFilter);
         
         // Connect menu actions
-        connect(ui.actionLoadImage, &QAction::triggered, this, &SimpleImageApp::loadImage);
-        connect(ui.actionSaveImage, &QAction::triggered, this, &SimpleImageApp::saveImage);
-        connect(ui.actionUnloadImage, &QAction::triggered, this, &SimpleImageApp::unloadImage);
-        connect(ui.actionResetImage, &QAction::triggered, this, &SimpleImageApp::resetImage);
-        connect(ui.actionUndo, &QAction::triggered, this, &SimpleImageApp::undo);
-        connect(ui.actionRedo, &QAction::triggered, this, &SimpleImageApp::redo);
+        connect(ui.actionLoadImage, &QAction::triggered, this, &ImageStudio::loadImage);
+        connect(ui.actionSaveImage, &QAction::triggered, this, &ImageStudio::saveImage);
+        connect(ui.actionUnloadImage, &QAction::triggered, this, &ImageStudio::unloadImage);
+        connect(ui.actionResetImage, &QAction::triggered, this, &ImageStudio::resetImage);
+        connect(ui.actionUndo, &QAction::triggered, this, &ImageStudio::undo);
+        connect(ui.actionRedo, &QAction::triggered, this, &ImageStudio::redo);
         connect(ui.actionExit, &QAction::triggered, this, &QWidget::close);
-        connect(ui.actionGrayscale, &QAction::triggered, this, &SimpleImageApp::applyGrayscale);
-        connect(ui.actionBlackWhite, &QAction::triggered, this, &SimpleImageApp::applyBlackAndWhite);
-        connect(ui.actionInvert, &QAction::triggered, this, &SimpleImageApp::applyInvert);
-        connect(ui.actionMerge, &QAction::triggered, this, &SimpleImageApp::applyMerge);
-        connect(ui.actionFlip, &QAction::triggered, this, &SimpleImageApp::applyFlip);
-        connect(ui.actionRotate, &QAction::triggered, this, &SimpleImageApp::applyRotate);
-        connect(ui.actionCrop, &QAction::triggered, this, &SimpleImageApp::startCropMode);
-        connect(ui.actionDarkLight, &QAction::triggered, this, &SimpleImageApp::applyDarkAndLight);
-        connect(ui.actionFrame, &QAction::triggered, this, &SimpleImageApp::applyFrame);
-        connect(ui.actionEdgeDetection, &QAction::triggered, this, &SimpleImageApp::applyEdges);
-        connect(ui.actionResize, &QAction::triggered, this, &SimpleImageApp::applyResize);
-        connect(ui.actionBlur, &QAction::triggered, this, &SimpleImageApp::applyBlur);
-        connect(ui.actionInfrared, &QAction::triggered, this, &SimpleImageApp::applyInfrared);
-        connect(ui.actionPurpleFilter, &QAction::triggered, this, &SimpleImageApp::applyPurpleFilter);
-        connect(ui.actionTVFilter, &QAction::triggered, this, &SimpleImageApp::applyTVFilter);
+        connect(ui.actionGrayscale, &QAction::triggered, this, &ImageStudio::applyGrayscale);
+        connect(ui.actionBlackWhite, &QAction::triggered, this, &ImageStudio::applyBlackAndWhite);
+        connect(ui.actionInvert, &QAction::triggered, this, &ImageStudio::applyInvert);
+        connect(ui.actionMerge, &QAction::triggered, this, &ImageStudio::applyMerge);
+        connect(ui.actionFlip, &QAction::triggered, this, &ImageStudio::applyFlip);
+        connect(ui.actionRotate, &QAction::triggered, this, &ImageStudio::applyRotate);
+        connect(ui.actionCrop, &QAction::triggered, this, &ImageStudio::startCropMode);
+        connect(ui.actionDarkLight, &QAction::triggered, this, &ImageStudio::applyDarkAndLight);
+        connect(ui.actionFrame, &QAction::triggered, this, &ImageStudio::applyFrame);
+        connect(ui.actionEdgeDetection, &QAction::triggered, this, &ImageStudio::applyEdges);
+        connect(ui.actionResize, &QAction::triggered, this, &ImageStudio::applyResize);
+        connect(ui.actionBlur, &QAction::triggered, this, &ImageStudio::applyBlur);
+        connect(ui.actionInfrared, &QAction::triggered, this, &ImageStudio::applyInfrared);
+        connect(ui.actionPurpleFilter, &QAction::triggered, this, &ImageStudio::applyPurpleFilter);
+        connect(ui.actionTVFilter, &QAction::triggered, this, &ImageStudio::applyTVFilter);
         
         // Create status bar
         statusBar()->showMessage("Ready - Drag an image here or click 'Load Image'");
@@ -155,7 +155,7 @@ SimpleImageApp(QWidget *parent = nullptr) : QMainWindow(parent), hasImage(false)
         resizeTimer = new QTimer(this);
         resizeTimer->setSingleShot(true);
         resizeTimer->setInterval(100); // 100ms delay
-        connect(resizeTimer, &QTimer::timeout, this, &SimpleImageApp::updateImageDisplay);
+        connect(resizeTimer, &QTimer::timeout, this, &ImageStudio::updateImageDisplay);
         
         // Enable drag and drop
         setAcceptDrops(true);
@@ -172,7 +172,7 @@ SimpleImageApp(QWidget *parent = nullptr) : QMainWindow(parent), hasImage(false)
     }
     
     // Destructor to clean up
-    ~SimpleImageApp() {
+    ~ImageStudio() {
         delete imageFilters;
     }
 
@@ -1149,7 +1149,7 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     app.setWindowIcon(QIcon("assets/icon.jpg"));
     
-    SimpleImageApp window;
+    ImageStudio window;
     window.show();
     
     return app.exec();
