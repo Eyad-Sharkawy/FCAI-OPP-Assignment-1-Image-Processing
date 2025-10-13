@@ -1,4 +1,4 @@
-# Image Studio GUI
+# Image Studio v2.0.0
 
 A modern Qt-based image processing application with a clean, intuitive interface.
 
@@ -18,9 +18,11 @@ ImageStudio/
 │       └── stb_image_write.h
 ├── assets/                    # Application assets
 │   └── icons/                 # Icon files
-├── docs/                      # Documentation
-│   ├── README_Console.md
-│   └── README_GUI.md
+├── docs/                      # Essential documentation
+│   ├── README.md              # Documentation hub
+│   ├── USER_GUIDE.md          # Complete user manual
+│   ├── DEVELOPER_GUIDE.md     # Development documentation
+│   └── INSTALLATION.md        # Installation guide
 ├── scripts/                   # Build scripts
 │   ├── build_release.bat
 │   └── build_portable.bat
@@ -98,6 +100,15 @@ The application uses Qt Designer for UI layout, providing:
 - **UI**: Qt Designer (.ui files)
 - **Build System**: CMake + Qt qmake
 - **Architecture**: MVC pattern with separation of concerns
+
+## 📚 Documentation
+
+Essential documentation is available in the `docs/` folder:
+
+- **[User Guide](docs/USER_GUIDE.md)** - Complete user manual with step-by-step instructions
+- **[Developer Guide](docs/DEVELOPER_GUIDE.md)** - Architecture, build system, and development guide
+- **[Installation Guide](docs/INSTALLATION.md)** - Installation instructions for all platforms
+- **[Documentation Hub](docs/README.md)** - Central documentation index
 
 ## 📝 License
 

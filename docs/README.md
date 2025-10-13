@@ -1,324 +1,185 @@
-# 🎨 Image Studio GUI - Professional Image Processing Application
+# Image Studio v2.0.0 - Documentation Hub
 
-<p align="center">
-  <img width="600" height="400" alt="Image Studio GUI" src="https://github.com/user-attachments/assets/32dfecd3-89bb-45da-a8b3-812a811e3e43" />
-</p>
+Welcome to the Image Studio documentation! This is your central hub for all documentation related to Image Studio v2.0.0.
 
-<p align="center">
-  <strong>A comprehensive Qt-based image processing application with advanced filters, real-time preview, and professional user interface.</strong>
-</p>
+## 📚 Documentation Overview
 
-<p align="center">
-  <a href="#-quick-start">Quick Start</a> •
-  <a href="#-features">Features</a> •
-  <a href="#-downloads">Downloads</a> •
-  <a href="#-building">Building</a> •
-  <a href="#-usage">Usage</a> •
-  <a href="#-technical-details">Technical Details</a>
-</p>
-
----
+Image Studio is a modern, feature-rich image processing application built with Qt 6 and C++20. This documentation covers everything from basic usage to advanced development.
 
 ## 🚀 Quick Start
 
-### 📦 Download & Run (Recommended)
-1. **Download** the latest portable version from [Releases](https://github.com/Eyad-Sharkawy/FCAI-OPP-Assignment-1-Image-Studio/releases)
-2. **Extract** `ImageStudio_Portable_v1.1.0-gui.zip` to any folder
-3. **Run** `ImageStudio.bat` or `bin\ImageStudio.exe`
-4. **Drag & drop** an image or use File → Open
-5. **Apply filters** and enjoy! 🎉
+### For Users
+1. **Installation**: [Installation Guide](INSTALLATION.md) - Get started in minutes
+2. **User Guide**: [User Guide](USER_GUIDE.md) - Learn all features
+3. **Troubleshooting**: [User Guide - Troubleshooting](USER_GUIDE.md#troubleshooting) - Solve common issues
 
-**✨ No installation required - all Qt dependencies included!**
+### For Developers
+1. **Installation**: [Installation Guide](INSTALLATION.md) - Set up development environment
+2. **Developer Guide**: [Developer Guide](DEVELOPER_GUIDE.md) - Architecture and development
 
----
+## 📖 Documentation Structure
 
-## ✨ Features
+### User Documentation
+- **[User Guide](USER_GUIDE.md)** - Complete user manual
+  - Getting started
+  - Interface overview
+  - Image processing filters
+  - Advanced features
+  - Keyboard shortcuts
+  - Troubleshooting
+  - FAQ
 
-### 🖼️ **Complete Image Processing Suite**
-- **15+ Professional Filters**: Grayscale, Black & White, Invert, Merge, Flip, Rotate, Crop, Dark & Light, Frame (Simple & Decorated), Edge Detection, Resize, Blur, Infrared, Purple, TV/CRT
-- **Real-time Preview**: See changes instantly as you apply filters
-- **Batch Processing**: Apply multiple filters in sequence
-- **Format Support**: JPG, JPEG, PNG, BMP, TGA
+- **[Installation Guide](INSTALLATION.md)** - Installation instructions
+  - System requirements
+  - Download options
+  - Installation methods
+  - Build from source
+  - Troubleshooting
 
-### ⏹️ **Advanced Cancel System**
-- **Cancel Any Operation**: Stop long-running filters mid-process
-- **Progress Tracking**: Visual progress bars for all operations
-- **Responsive UI**: Interface remains interactive during processing
-- **Thread-Safe**: Built with `std::atomic` for reliable cancellation
+### Developer Documentation
+- **[Developer Guide](DEVELOPER_GUIDE.md)** - Development documentation
+  - Project overview
+  - Architecture details
+  - Build system
+  - Code structure
+  - Adding new features
+  - Testing
+  - Debugging
+  - Contributing
 
-### 🎨 **Professional User Interface**
-- **Modern Qt Design**: Clean, intuitive interface
-- **Drag & Drop**: Load images by dragging files into the window
-- **Menu System**: Complete File and Filters menus with keyboard shortcuts
-- **Status Bar**: Real-time image information and operation feedback
-- **Responsive Layout**: Image display scales with window size
+## 🎯 Quick Reference
 
-### 🔄 **State Management**
-- **Undo/Redo**: Full state management with Ctrl+Z/Ctrl+Y
-- **Save Prompts**: Automatic prompts for unsaved changes
-- **Unload Image**: Clear current image with save confirmation
-- **Exit Confirmation**: Save unsaved changes before closing
+### Key Features
+- **Image Processing**: 15+ professional filters
+- **Smart UI**: Aspect ratio preservation, dynamic resizing
+- **Undo/Redo**: Unlimited history management
+- **Drag & Drop**: Easy image loading
+- **Multiple Formats**: JPEG, PNG, BMP, TIFF, GIF
+- **Portable**: No installation required
 
-### 🛠️ **Developer Features**
-- **Modular Architecture**: Clean, maintainable code structure
-- **Error Handling**: Comprehensive error handling and user feedback
-- **Build System**: Automated build scripts for release and portable versions
-- **Cross-Platform**: Windows, Linux, macOS support
-
----
-
-## 📥 Downloads
-
-### 🎯 **Latest Release: v1.1.0-gui**
-
-| Version | Type | Size | Requirements | Description |
-|---------|------|------|--------------|-------------|
-| **Portable** | ZIP | ~50MB | Windows 10/11 (64-bit) | Complete package with all dependencies |
-| **Release** | EXE | ~2MB | Windows 10/11 + Qt 6.8.1 | Optimized executable (requires Qt) |
-
-### 📋 **System Requirements**
+### System Requirements
 - **OS**: Windows 10/11 (64-bit)
 - **RAM**: 4GB minimum, 8GB recommended
 - **Storage**: 100MB free space
-- **Display**: 1024x768 minimum resolution
+- **Graphics**: DirectX 11 compatible
 
----
+### Download
+- **Portable Version**: `ImageStudio_Portable_v2.0.0-gui.zip` (~25MB)
+- **Source Code**: GitHub repository
+- **Requirements**: Qt 6.8.1+, C++20 compiler
 
-## 🛠️ Building from Source
+## 🛠️ Development
 
-### Prerequisites
-- **Qt 6.8.1** with MinGW 64-bit
-- **C++20 compatible compiler** (GCC 13.1.0+)
-- **CMake 3.30+** (for console version)
-- **Windows/Linux/macOS**
-
-### Quick Build
-```bash
-# Clone the repository
-git clone https://github.com/Eyad-Sharkawy/FCAI-OPP-Assignment-1-Image-Studio.git
-cd FCAI-OPP-Assignment-1-Image-Studio
-
-# Switch to GUI branch
-git checkout gui
-
-# Build release version
-scripts/build_release.bat
-
-# Build portable version
-scripts/build_portable.bat
+### Architecture
+```
+┌──────────────────────────────────────────────────────────┐
+│                    Presentation Layer                    │
+│  ┌─────────────────┐  ┌────────────────────────────────┐ │
+│  │   Main Window   │  │        Qt Designer UI          │ │
+│  │  (QMainWindow)  │  │      (mainwindow.ui)           │ │
+│  └─────────────────┘  └────────────────────────────────┘ │
+└──────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────┐
+│                   Application Layer                      │
+│  ┌─────────────────────────────────────────────────────┐ │
+│  │            SimpleImageApp Class                     │ │
+│  │  - Signal/Slot Management                           │ │
+│  │  - UI Event Handling                                │ │
+│  │  - Image State Management                           │ │
+│  └─────────────────────────────────────────────────────┘ │
+└──────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────┐
+│                    Business Logic                        │
+│  ┌─────────────────────────────────────────────────────┐ │
+│  │              Image_Class                            │ │
+│  │  - Image Data Structure                             │ │
+│  │  - Processing Algorithms                            │ │
+│  │  - File I/O Operations                              │ │
+│  └─────────────────────────────────────────────────────┘ │
+└──────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────┐
+│                    Data Access Layer                     │
+│  ┌─────────────────────────────────────────────────────┐ │
+│  │                STB Library                          │ │
+│  │  - Image Loading (stb_image.h)                      │ │
+│  │  - Image Saving (stb_image_write.h)                 │ │
+│  └─────────────────────────────────────────────────────┘ │
+└──────────────────────────────────────────────────────────┘
 ```
 
-### Build Outputs
-- **Release Build**: `build_release/release/ImageStudio.exe`
-- **Portable Package**: `build_portable/ImageStudio_Portable/`
-- **Portable ZIP**: `build_portable/ImageStudio_Portable_v1.1.0-gui.zip`
-
----
-
-## 📖 Usage Guide
-
-### 🖱️ **Basic Operations**
-
-#### Loading Images
-1. **Drag & Drop**: Drag image files directly into the window
-2. **File Menu**: File → Open → Select image file
-3. **Supported Formats**: JPG, JPEG, PNG, BMP, TGA
-
-#### Applying Filters
-1. **Button Interface**: Click filter buttons in the main window
-2. **Menu Interface**: Use Filters menu for all operations
-3. **Real-time Preview**: See changes instantly
-4. **Cancel Operations**: Use Cancel button for long-running filters
-
-#### Saving Images
-1. **File Menu**: File → Save (Ctrl+S)
-2. **Format Selection**: Choose from JPG, PNG, BMP, TGA
-3. **Quality Settings**: Adjust compression for JPG files
-
-### ⌨️ **Keyboard Shortcuts**
-
-| Shortcut | Action |
-|----------|--------|
-| `Ctrl+O` | Open image |
-| `Ctrl+S` | Save image |
-| `Ctrl+Z` | Undo |
-| `Ctrl+Y` | Redo |
-| `Ctrl+Q` | Exit application |
-| `Escape` | Cancel current operation |
-
-### 🎯 **Filter Categories**
-
-#### **Basic Filters**
-- **Grayscale**: Convert to grayscale
-- **Black & White**: Convert to pure black and white
-- **Invert**: Invert image colors
-
-#### **Transform Filters**
-- **Flip**: Flip horizontally or vertically
-- **Rotate**: Rotate by 90°, 180°, or 270°
-- **Resize**: Change image dimensions
-- **Crop**: Interactive cropping with mouse selection
-
-#### **Effect Filters**
-- **Blur**: Apply blur effects (radius-15 average kernel)
-- **Edge Detection**: Detect and highlight edges (BW-diff method)
-- **Dark & Light**: Adjust brightness and contrast
-
-#### **Special Filters**
-- **Infrared**: Create infrared-style images
-- **Purple Filter**: Apply purple color enhancement
-- **TV/CRT Filter**: Create retro TV monitor effects with scanlines
-- **Merge**: Blend with another image
-
-#### **Frame Filters**
-- **Simple Frame**: Blue outer border with inner white border
-- **Decorated Frame**: Brown/beige design with accent patterns
-
----
-
-## 🔧 Technical Details
-
-### **Architecture**
-- **Framework**: Qt 6.8.1 with MinGW 64-bit
-- **Language**: C++20 with modern features
-- **Image Processing**: Custom `Image_Class` with pixel-level manipulation
-- **Threading**: `std::atomic` for thread-safe cancellation
-- **Memory Management**: RAII principles with smart pointers
-
-### **Key Components**
-
-#### **Main Application Class**
-```cpp
-class SimpleImageApp : public QMainWindow
-{
-    // UI Components
-    QLabel* imageLabel;
-    QPushButton* filterButtons[15];
-    QProgressBar* progressBar;
-    QPushButton* cancelButton;
-    
-    // State Management
-    std::stack<Image> undoStack;
-    std::stack<Image> redoStack;
-    std::atomic<bool> cancelRequested;
-    
-    // Image Processing
-    Image currentImage;
-    bool hasImage;
-    bool hasUnsavedChanges;
-};
+### Project Structure
 ```
-
-#### **Filter Implementation**
-- **Modular Design**: Each filter is a separate method
-- **Progress Tracking**: Real-time progress updates
-- **Cancellation Support**: Thread-safe cancellation for all filters
-- **Error Handling**: Comprehensive error handling and user feedback
-
-### **Build System**
-- **qmake**: Qt project configuration
-- **mingw32-make**: Build automation
-- **windeployqt**: Automatic Qt dependency deployment
-- **Custom Scripts**: Automated build and packaging
-
-### **Dependencies**
-- **Qt 6.8.1**: Core, Gui, Widgets, Concurrent
-- **STB Libraries**: stb_image.h, stb_image_write.h
-- **MinGW 64-bit**: Compiler toolchain
-- **Windows API**: Platform-specific functionality
-
----
-
-## 📁 Project Structure
-
-```
-Image-Studio-GUI/
+ImageStudio/
 ├── src/
-│   └── simple_qt_app.cpp          # Main GUI application
-├── include/
-│   └── Image_Class.h              # Image processing class
-├── third_party/
-│   └── stb/                       # STB image libraries
-│       ├── stb_image.h
-│       └── stb_image_write.h
-├── scripts/
-│   ├── build_release.bat          # Release build script
-│   └── build_portable.bat         # Portable build script
-├── build_portable/
-│   └── ImageStudio_Portable/      # Portable package
-│       ├── bin/
-│       │   ├── ImageStudio.exe    # Main executable
-│       │   ├── platforms/         # Qt platform plugins
-│       │   ├── styles/            # Qt style plugins
-│       │   └── translations/      # Qt translation files
-│       └── ImageStudio.bat        # Launcher script
-├── build_release/
-│   └── release/
-│       └── ImageStudio.exe        # Release executable
-├── ImageStudio.pro                # Qt project file
-├── main.cpp                       # Console application
-└── README_GUI.md                  # This file
+│   ├── gui/                   # GUI Components
+│   │   ├── image_studio.cpp   # Main application class
+│   │   └── mainwindow.ui      # Qt Designer UI file
+│   └── core/                  # Core Functionality
+│       └── Image_Class.h      # Image processing class
+├── third_party/               # External Libraries
+│   └── stb/                   # STB image library
+├── docs/                      # Documentation
+├── assets/                    # Resources
+├── scripts/                   # Build Scripts
+└── build_*/                   # Build Output
 ```
 
----
+## 🤝 Contributing
 
-## 🚀 Recent Updates (v1.1.0-gui)
+### Getting Started
+1. Read the [Developer Guide](DEVELOPER_GUIDE.md)
+2. Set up your development environment
+3. Fork the repository
+4. Create a feature branch
+5. Make your changes
+6. Submit a pull request
 
-### **🔧 Major Improvements**
-- **Fixed Portable Version**: Using `windeployqt` for proper Qt deployment
-- **Enhanced Cancel System**: Added cancellation to ALL filters
-- **Progress Tracking**: Visual progress bars for long-running operations
-- **Improved UI**: Better positioning and responsive design
+### Code Style
+- **Language**: C++20
+- **Framework**: Qt 6
+- **Naming**: camelCase for variables, PascalCase for classes
+- **Indentation**: 4 spaces
+- **Comments**: Document complex algorithms
 
-### **🎯 New Features**
-- **Unload Image**: Clear current image with save prompts
-- **Exit Confirmation**: Save unsaved changes before closing
-- **Enhanced Error Handling**: Better user feedback and error messages
-- **Professional Interface**: Improved visual design and layout
+### Testing
+- Unit tests for core functionality
+- Integration tests for UI
+- Manual testing checklist
+- Performance testing
 
-### **🛠️ Technical Enhancements**
-- **Thread Safety**: Using `std::atomic` for cancellation flags
-- **Automated Builds**: Improved build scripts with `windeployqt`
-- **Code Organization**: Better modular structure and maintainability
-- **Performance**: Optimized filter implementations
+## 📞 Support
 
----
+### Getting Help
+- **Documentation**: Check relevant guide first
+- **GitHub Issues**: Report bugs and request features
+- **Email**: Contact development team
 
-## 👥 Development Team
-
-- **Ahmed Mohamed ElSayed Tolba** (ID: 20242023)
-  - Filters: Grayscale, Merge, Dark & Light, Edge Detection, TV/CRT
-  - Menu system and core architecture
-
-- **Eyad Mohamed Saad Ali** (ID: 20242062)
-  - Filters: Black & White, Flip, Resize, Infrared
-  - GUI implementation and Qt integration
-
-- **Tarek Sami Mohamed Mohamed** (ID: 20242190)
-  - Filters: Invert, Rotate, Frame, Blur, Purple
-  - Image processing algorithms and optimization
-
----
+### Reporting Issues
+When reporting issues, please include:
+- Operating system version
+- Image Studio version
+- Steps to reproduce
+- Error messages
+- System specifications
 
 ## 📄 License
 
-Educational project for **FCAI Cairo University** - Object-Oriented Programming Course
+This project is developed as part of a C++ Object-Oriented Programming assignment at FCAI (Faculty of Computers and Artificial Intelligence).
 
----
+**Team Members:**
+- Ahmed Mohamed ElSayed Tolba (ID: 20242023)
+- Eyad Mohamed Saad Ali (ID: 20242062)
+- Tarek Sami Mohamed Mohamed (ID: 20242190)
 
 ## 🔗 Links
 
-- **Repository**: [FCAI-OPP-Assignment-1-Image-Studio](https://github.com/Eyad-Sharkawy/FCAI-OPP-Assignment-1-Image-Studio)
-- **Releases**: [Download Latest Version](https://github.com/Eyad-Sharkawy/FCAI-OPP-Assignment-1-Image-Studio/releases)
-- **GUI Branch**: [View GUI Implementation](https://github.com/Eyad-Sharkawy/FCAI-OPP-Assignment-1-Image-Studio/tree/gui)
-- **Issues**: [Report Bugs or Request Features](https://github.com/Eyad-Sharkawy/FCAI-OPP-Assignment-1-Image-Studio/issues)
+- **GitHub Repository**: [Image Studio on GitHub](https://github.com/your-repo/image-studio)
+- **Releases**: [Latest Releases](https://github.com/your-repo/image-studio/releases)
+- **Issues**: [Report Issues](https://github.com/your-repo/image-studio/issues)
+- **Discussions**: [Community Discussions](https://github.com/your-repo/image-studio/discussions)
 
 ---
 
-<p align="center">
-  <strong>Made with ❤️ by FCAI Students</strong>
-</p>
+**Image Studio v2.0.0** - Professional Image Processing Made Simple! 🎨
 
-<p align="center">
-  <em>Professional image processing made simple and accessible</em>
-</p>
+*Last updated: October 13, 2024*

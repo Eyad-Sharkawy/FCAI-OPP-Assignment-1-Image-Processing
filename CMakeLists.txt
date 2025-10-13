@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(ImageStudio VERSION 1.1.0)
+project(ImageStudio VERSION 2.0.0)
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 20)

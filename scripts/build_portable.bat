@@ -72,8 +72,28 @@ if %ERRORLEVEL% EQU 0 (
     echo.
     echo Portable package created in: build_portable\ImageStudio_Portable\
     echo.
-    echo To create a ZIP file, run:
-    echo powershell Compress-Archive -Path "ImageStudio_Portable" -DestinationPath "ImageStudio_Portable.zip"
+    echo Creating ZIP file...
+    
+    REM Create ZIP file with version number
+    set VERSION=2.0.0
+    set ZIP_NAME=ImageStudio_Portable_v%VERSION%-gui.zip
+    
+    REM Remove existing ZIP if it exists
+    if exist "%ZIP_NAME%" del "%ZIP_NAME%"
+    
+    REM Create ZIP using PowerShell
+    powershell -Command "Compress-Archive -Path 'ImageStudio_Portable' -DestinationPath 'ImageStudio_Portable_v2.0.0-gui.zip' -Force"
+    
+    if %ERRORLEVEL% EQU 0 (
+        echo.
+        echo ✓ ZIP file created successfully: ImageStudio_Portable_v2.0.0-gui.zip
+        echo ✓ Portable package ready for distribution!
+    ) else (
+        echo.
+        echo ⚠ Warning: Could not create ZIP file automatically.
+        echo   You can create it manually by running:
+        echo   powershell Compress-Archive -Path "ImageStudio_Portable" -DestinationPath "ImageStudio_Portable_v2.0.0-gui.zip"
+    )
     echo.
 ) else (
     echo.
