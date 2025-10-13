@@ -5,12 +5,14 @@ CONFIG += c++20
 TARGET = ImageStudio
 TEMPLATE = app
 
-SOURCES += src/simple_qt_app.cpp
+SOURCES += src/gui/image_studio.cpp
 
-HEADERS += include/Image_Class.h
+HEADERS += src/core/Image_Class.h
+
+FORMS += src/gui/mainwindow.ui
 
 # Include paths for headers and third-party libraries
-INCLUDEPATH += include \
+INCLUDEPATH += src/core \
                third_party/stb
 
 QMAKE_CXXFLAGS += -std=c++20

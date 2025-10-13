@@ -59,7 +59,8 @@
 #include <random>
 #include <chrono>
 #include <atomic>
-#include "Image_Class.h"
+#include "../core/Image_Class.h"
+#include "ui_mainwindow.h"
 
 class SimpleImageApp : public QMainWindow
 {
@@ -68,22 +69,17 @@ class SimpleImageApp : public QMainWindow
 public:
 SimpleImageApp(QWidget *parent = nullptr) : QMainWindow(parent), hasImage(false)
     {
+        ui.setupUi(this);
+        
         setWindowTitle("Image Studio");
         setWindowIcon(QIcon("assets/icon.jpg"));
         setMinimumSize(600, 400);
         
-        // Create central widget
-        QWidget *centralWidget = new QWidget();
-        setCentralWidget(centralWidget);
-        
-        // Create layout
-        QVBoxLayout *layout = new QVBoxLayout(centralWidget);
-        
-        // Create image label
-        imageLabel = new QLabel();
-        imageLabel->setAlignment(Qt::AlignCenter);
-        imageLabel->setMinimumSize(400, 300);
-        imageLabel->setStyleSheet(
+        // Set up the image label styling
+        ui.imageLabel->setAlignment(Qt::AlignCenter);
+        ui.imageLabel->setMinimumSize(400, 300);
+        ui.imageLabel->setScaledContents(false); // Disable automatic scaling to prevent stretching
+        ui.imageLabel->setStyleSheet(
             "QLabel {"
             "  border: 2px solid #9e9e9e;"
             "  background-color: #f4f4f4;"
@@ -91,150 +87,55 @@ SimpleImageApp(QWidget *parent = nullptr) : QMainWindow(parent), hasImage(false)
             "  font-size: 14px;"
             "}"
         );
-        imageLabel->setText("No image loaded\nClick 'Load Image' or drag & drop an image here");
-        
-        // Create scroll area
-        scrollArea = new QScrollArea();
-        scrollArea->setWidget(imageLabel);
-        scrollArea->setWidgetResizable(true);
-        layout->addWidget(scrollArea);
-        
-        // Create buttons in a grid layout
-        QGridLayout *buttonLayout = new QGridLayout();
-        
-        // File operations
-        loadButton = new QPushButton("Load Image");
-        saveButton = new QPushButton("Save Image");
-        unloadButton = new QPushButton("Unload Image");
-        resetButton = new QPushButton("Reset");
-        undoButton = new QPushButton("Undo");
-        redoButton = new QPushButton("Redo");
-        
-        // Basic filters
-        grayscaleButton = new QPushButton("Grayscale");
-        blackWhiteButton = new QPushButton("Black & White");
-        invertButton = new QPushButton("Invert");
-        mergeButton = new QPushButton("Merge");
-        
-        // Transform filters
-        flipButton = new QPushButton("Flip");
-        rotateButton = new QPushButton("Rotate");
-        cropButton = new QPushButton("Crop");
-        darkLightButton = new QPushButton("Dark & Light");
-        frameButton = new QPushButton("Frame");
-        
-        // Advanced filters
-        edgesButton = new QPushButton("Edge Detection");
-        resizeButton = new QPushButton("Resize");
-        blurButton = new QPushButton("Blur");
-        infraredButton = new QPushButton("Infrared");
-        purpleButton = new QPushButton("Purple Filter");
-        tvFilterButton = new QPushButton("TV/CRT Filter");
-        
-        // Cancel button and progress bar
-        cancelButton = new QPushButton("Cancel");
-        progressBar = new QProgressBar();
-        progressBar->setVisible(false);
-        cancelButton->setVisible(false);
-        progressBar->setTextVisible(false); // Disable progress bar text to avoid overlap
-        
-        // Add buttons to grid
-        int row = 0, col = 0;
-        buttonLayout->addWidget(loadButton, row, col++);
-        buttonLayout->addWidget(saveButton, row, col++);
-        buttonLayout->addWidget(unloadButton, row, col++);
-        buttonLayout->addWidget(resetButton, row, col++);
-        buttonLayout->addWidget(undoButton, row, col++);
-        buttonLayout->addWidget(redoButton, row, col++);
-        
-        row++; col = 0;
-        buttonLayout->addWidget(grayscaleButton, row, col++);
-        buttonLayout->addWidget(blackWhiteButton, row, col++);
-        buttonLayout->addWidget(invertButton, row, col++);
-        buttonLayout->addWidget(mergeButton, row, col++);
-        
-        row++; col = 0;
-        buttonLayout->addWidget(flipButton, row, col++);
-        buttonLayout->addWidget(rotateButton, row, col++);
-        buttonLayout->addWidget(darkLightButton, row, col++);
-        buttonLayout->addWidget(frameButton, row, col++);
-        buttonLayout->addWidget(cropButton, row, col++);
-        
-        row++; col = 0;
-        buttonLayout->addWidget(edgesButton, row, col++);
-        buttonLayout->addWidget(resizeButton, row, col++);
-        buttonLayout->addWidget(blurButton, row, col++);
-        buttonLayout->addWidget(infraredButton, row, col++);
-        
-        row++; col = 0;
-        buttonLayout->addWidget(purpleButton, row, col++);
-        buttonLayout->addWidget(tvFilterButton, row, col++);
-        
-        // Add progress bar and cancel button in a separate row with horizontal layout
-        row++; col = 0;
-        QHBoxLayout *progressLayout = new QHBoxLayout();
-        progressLayout->addWidget(progressBar);
-        progressLayout->addWidget(cancelButton);
-        progressLayout->setSpacing(10); // Add some spacing between progress bar and cancel button
-        buttonLayout->addLayout(progressLayout, row, col, 1, 4);
-        
-        layout->addLayout(buttonLayout);
+        ui.imageLabel->setText("No image loaded\nClick 'Load Image' or drag & drop an image here");
         
         // Connect signals
-        connect(loadButton, &QPushButton::clicked, this, &SimpleImageApp::loadImage);
-        connect(saveButton, &QPushButton::clicked, this, &SimpleImageApp::saveImage);
-        connect(unloadButton, &QPushButton::clicked, this, &SimpleImageApp::unloadImage);
-        connect(resetButton, &QPushButton::clicked, this, &SimpleImageApp::resetImage);
-        connect(undoButton, &QPushButton::clicked, this, &SimpleImageApp::undo);
-        connect(redoButton, &QPushButton::clicked, this, &SimpleImageApp::redo);
-        connect(grayscaleButton, &QPushButton::clicked, this, &SimpleImageApp::applyGrayscale);
-        connect(blackWhiteButton, &QPushButton::clicked, this, &SimpleImageApp::applyBlackAndWhite);
-        connect(invertButton, &QPushButton::clicked, this, &SimpleImageApp::applyInvert);
-        connect(mergeButton, &QPushButton::clicked, this, &SimpleImageApp::applyMerge);
-        connect(flipButton, &QPushButton::clicked, this, &SimpleImageApp::applyFlip);
-        connect(rotateButton, &QPushButton::clicked, this, &SimpleImageApp::applyRotate);
-        connect(darkLightButton, &QPushButton::clicked, this, &SimpleImageApp::applyDarkAndLight);
-        connect(frameButton, &QPushButton::clicked, this, &SimpleImageApp::applyFrame);
-        connect(cropButton, &QPushButton::clicked, this, &SimpleImageApp::startCropMode);
-        connect(edgesButton, &QPushButton::clicked, this, &SimpleImageApp::applyEdges);
-        connect(resizeButton, &QPushButton::clicked, this, &SimpleImageApp::applyResize);
-        connect(blurButton, &QPushButton::clicked, this, &SimpleImageApp::applyBlur);
-        connect(infraredButton, &QPushButton::clicked, this, &SimpleImageApp::applyInfrared);
-        connect(purpleButton, &QPushButton::clicked, this, &SimpleImageApp::applyPurpleFilter);
-        connect(tvFilterButton, &QPushButton::clicked, this, &SimpleImageApp::applyTVFilter);
-        connect(cancelButton, &QPushButton::clicked, this, &SimpleImageApp::cancelFilter);
+        connect(ui.loadButton, &QPushButton::clicked, this, &SimpleImageApp::loadImage);
+        connect(ui.saveButton, &QPushButton::clicked, this, &SimpleImageApp::saveImage);
+        connect(ui.unloadButton, &QPushButton::clicked, this, &SimpleImageApp::unloadImage);
+        connect(ui.resetButton, &QPushButton::clicked, this, &SimpleImageApp::resetImage);
+        connect(ui.undoButton, &QPushButton::clicked, this, &SimpleImageApp::undo);
+        connect(ui.redoButton, &QPushButton::clicked, this, &SimpleImageApp::redo);
+        connect(ui.grayscaleButton, &QPushButton::clicked, this, &SimpleImageApp::applyGrayscale);
+        connect(ui.blackWhiteButton, &QPushButton::clicked, this, &SimpleImageApp::applyBlackAndWhite);
+        connect(ui.invertButton, &QPushButton::clicked, this, &SimpleImageApp::applyInvert);
+        connect(ui.mergeButton, &QPushButton::clicked, this, &SimpleImageApp::applyMerge);
+        connect(ui.flipButton, &QPushButton::clicked, this, &SimpleImageApp::applyFlip);
+        connect(ui.rotateButton, &QPushButton::clicked, this, &SimpleImageApp::applyRotate);
+        connect(ui.darkLightButton, &QPushButton::clicked, this, &SimpleImageApp::applyDarkAndLight);
+        connect(ui.frameButton, &QPushButton::clicked, this, &SimpleImageApp::applyFrame);
+        connect(ui.cropButton, &QPushButton::clicked, this, &SimpleImageApp::startCropMode);
+        connect(ui.edgesButton, &QPushButton::clicked, this, &SimpleImageApp::applyEdges);
+        connect(ui.resizeButton, &QPushButton::clicked, this, &SimpleImageApp::applyResize);
+        connect(ui.blurButton, &QPushButton::clicked, this, &SimpleImageApp::applyBlur);
+        connect(ui.infraredButton, &QPushButton::clicked, this, &SimpleImageApp::applyInfrared);
+        connect(ui.purpleButton, &QPushButton::clicked, this, &SimpleImageApp::applyPurpleFilter);
+        connect(ui.tvFilterButton, &QPushButton::clicked, this, &SimpleImageApp::applyTVFilter);
+        connect(ui.cancelButton, &QPushButton::clicked, this, &SimpleImageApp::cancelFilter);
         
-        // Create menu bar
-        QMenuBar *menuBar = this->menuBar();
-        QMenu *fileMenu = menuBar->addMenu("File");
-        fileMenu->addAction("Load Image", this, &SimpleImageApp::loadImage);
-        fileMenu->addAction("Save Image", this, &SimpleImageApp::saveImage);
-        fileMenu->addAction("Unload Image", this, &SimpleImageApp::unloadImage);
-        fileMenu->addAction("Reset Image", this, &SimpleImageApp::resetImage);
-        fileMenu->addSeparator();
-        fileMenu->addAction("Undo", this, &SimpleImageApp::undo, QKeySequence::Undo);
-        fileMenu->addAction("Redo", this, &SimpleImageApp::redo, QKeySequence::Redo);
-        fileMenu->addSeparator();
-        fileMenu->addAction("Exit", this, &QWidget::close);
-        
-        QMenu *filterMenu = menuBar->addMenu("Filters");
-        filterMenu->addAction("Grayscale", this, &SimpleImageApp::applyGrayscale);
-        filterMenu->addAction("Black & White", this, &SimpleImageApp::applyBlackAndWhite);
-        filterMenu->addAction("Invert", this, &SimpleImageApp::applyInvert);
-        filterMenu->addAction("Merge", this, &SimpleImageApp::applyMerge);
-        filterMenu->addSeparator();
-        filterMenu->addAction("Flip", this, &SimpleImageApp::applyFlip);
-        filterMenu->addAction("Rotate", this, &SimpleImageApp::applyRotate);
-        filterMenu->addAction("Crop", this, &SimpleImageApp::startCropMode);
-        filterMenu->addAction("Dark & Light", this, &SimpleImageApp::applyDarkAndLight);
-        filterMenu->addAction("Frame", this, &SimpleImageApp::applyFrame);
-        filterMenu->addSeparator();
-        filterMenu->addAction("Edge Detection", this, &SimpleImageApp::applyEdges);
-        filterMenu->addAction("Resize", this, &SimpleImageApp::applyResize);
-        filterMenu->addAction("Blur", this, &SimpleImageApp::applyBlur);
-        filterMenu->addAction("Infrared", this, &SimpleImageApp::applyInfrared);
-        filterMenu->addAction("Purple Filter", this, &SimpleImageApp::applyPurpleFilter);
-        filterMenu->addAction("TV/CRT Filter", this, &SimpleImageApp::applyTVFilter);
+        // Connect menu actions
+        connect(ui.actionLoadImage, &QAction::triggered, this, &SimpleImageApp::loadImage);
+        connect(ui.actionSaveImage, &QAction::triggered, this, &SimpleImageApp::saveImage);
+        connect(ui.actionUnloadImage, &QAction::triggered, this, &SimpleImageApp::unloadImage);
+        connect(ui.actionResetImage, &QAction::triggered, this, &SimpleImageApp::resetImage);
+        connect(ui.actionUndo, &QAction::triggered, this, &SimpleImageApp::undo);
+        connect(ui.actionRedo, &QAction::triggered, this, &SimpleImageApp::redo);
+        connect(ui.actionExit, &QAction::triggered, this, &QWidget::close);
+        connect(ui.actionGrayscale, &QAction::triggered, this, &SimpleImageApp::applyGrayscale);
+        connect(ui.actionBlackWhite, &QAction::triggered, this, &SimpleImageApp::applyBlackAndWhite);
+        connect(ui.actionInvert, &QAction::triggered, this, &SimpleImageApp::applyInvert);
+        connect(ui.actionMerge, &QAction::triggered, this, &SimpleImageApp::applyMerge);
+        connect(ui.actionFlip, &QAction::triggered, this, &SimpleImageApp::applyFlip);
+        connect(ui.actionRotate, &QAction::triggered, this, &SimpleImageApp::applyRotate);
+        connect(ui.actionCrop, &QAction::triggered, this, &SimpleImageApp::startCropMode);
+        connect(ui.actionDarkLight, &QAction::triggered, this, &SimpleImageApp::applyDarkAndLight);
+        connect(ui.actionFrame, &QAction::triggered, this, &SimpleImageApp::applyFrame);
+        connect(ui.actionEdgeDetection, &QAction::triggered, this, &SimpleImageApp::applyEdges);
+        connect(ui.actionResize, &QAction::triggered, this, &SimpleImageApp::applyResize);
+        connect(ui.actionBlur, &QAction::triggered, this, &SimpleImageApp::applyBlur);
+        connect(ui.actionInfrared, &QAction::triggered, this, &SimpleImageApp::applyInfrared);
+        connect(ui.actionPurpleFilter, &QAction::triggered, this, &SimpleImageApp::applyPurpleFilter);
+        connect(ui.actionTVFilter, &QAction::triggered, this, &SimpleImageApp::applyTVFilter);
         
         // Create status bar
         statusBar()->showMessage("Ready - Drag an image here or click 'Load Image'");
@@ -247,32 +148,32 @@ SimpleImageApp(QWidget *parent = nullptr) : QMainWindow(parent), hasImage(false)
         
         // Enable drag and drop
         setAcceptDrops(true);
-        imageLabel->setAcceptDrops(true);
-        scrollArea->setAcceptDrops(true);
+        ui.imageLabel->setAcceptDrops(true);
+        ui.scrollArea->setAcceptDrops(true);
         // Install event filter on imageLabel to capture mouse events for crop
-        imageLabel->installEventFilter(this);
+        ui.imageLabel->installEventFilter(this);
         
         // Initially disable filter buttons
-        saveButton->setEnabled(false);
-        unloadButton->setEnabled(false);
-        resetButton->setEnabled(false);
-        undoButton->setEnabled(false);
-        redoButton->setEnabled(false);
-        grayscaleButton->setEnabled(false);
-        blackWhiteButton->setEnabled(false);
-        invertButton->setEnabled(false);
-        mergeButton->setEnabled(false);
-        flipButton->setEnabled(false);
-        rotateButton->setEnabled(false);
-        cropButton->setEnabled(false);
-        darkLightButton->setEnabled(false);
-        frameButton->setEnabled(false);
-        edgesButton->setEnabled(false);
-        resizeButton->setEnabled(false);
-        blurButton->setEnabled(false);
-        infraredButton->setEnabled(false);
-        purpleButton->setEnabled(false);
-        tvFilterButton->setEnabled(false);
+        ui.saveButton->setEnabled(false);
+        ui.unloadButton->setEnabled(false);
+        ui.resetButton->setEnabled(false);
+        ui.undoButton->setEnabled(false);
+        ui.redoButton->setEnabled(false);
+        ui.grayscaleButton->setEnabled(false);
+        ui.blackWhiteButton->setEnabled(false);
+        ui.invertButton->setEnabled(false);
+        ui.mergeButton->setEnabled(false);
+        ui.flipButton->setEnabled(false);
+        ui.rotateButton->setEnabled(false);
+        ui.cropButton->setEnabled(false);
+        ui.darkLightButton->setEnabled(false);
+        ui.frameButton->setEnabled(false);
+        ui.edgesButton->setEnabled(false);
+        ui.resizeButton->setEnabled(false);
+        ui.blurButton->setEnabled(false);
+        ui.infraredButton->setEnabled(false);
+        ui.purpleButton->setEnabled(false);
+        ui.tvFilterButton->setEnabled(false);
     }
 
 private slots:
@@ -291,24 +192,25 @@ private slots:
                 hasUnsavedChanges = false; // New image is considered "saved"
                 
                 updateImageDisplay();
-                saveButton->setEnabled(true);
-                unloadButton->setEnabled(true);
-                resetButton->setEnabled(true);
-                grayscaleButton->setEnabled(true);
-                blackWhiteButton->setEnabled(true);
-                invertButton->setEnabled(true);
-                mergeButton->setEnabled(true);
-                flipButton->setEnabled(true);
-                rotateButton->setEnabled(true);
-                cropButton->setEnabled(true);
-                darkLightButton->setEnabled(true);
-                frameButton->setEnabled(true);
-                edgesButton->setEnabled(true);
-                resizeButton->setEnabled(true);
-                blurButton->setEnabled(true);
-                infraredButton->setEnabled(true);
-                purpleButton->setEnabled(true);
-                tvFilterButton->setEnabled(true);
+                updateMinimumWindowSize();
+                ui.saveButton->setEnabled(true);
+                ui.unloadButton->setEnabled(true);
+                ui.resetButton->setEnabled(true);
+                ui.grayscaleButton->setEnabled(true);
+                ui.blackWhiteButton->setEnabled(true);
+                ui.invertButton->setEnabled(true);
+                ui.mergeButton->setEnabled(true);
+                ui.flipButton->setEnabled(true);
+                ui.rotateButton->setEnabled(true);
+                ui.cropButton->setEnabled(true);
+                ui.darkLightButton->setEnabled(true);
+                ui.frameButton->setEnabled(true);
+                ui.edgesButton->setEnabled(true);
+                ui.resizeButton->setEnabled(true);
+                ui.blurButton->setEnabled(true);
+                ui.infraredButton->setEnabled(true);
+                ui.purpleButton->setEnabled(true);
+                ui.tvFilterButton->setEnabled(true);
                 
                 // Clear undo/redo stacks when loading new image
                 while (!undoStack.empty()) undoStack.pop();
@@ -407,30 +309,33 @@ private slots:
             while (!redoStack.empty()) redoStack.pop();
             
             // Reset image label
-            imageLabel->clear();
-            imageLabel->setText("No image loaded\nClick 'Load Image' or drag & drop an image here");
+            ui.imageLabel->clear();
+            ui.imageLabel->setText("No image loaded\nClick 'Load Image' or drag & drop an image here");
+            
+            // Reset minimum window size
+            updateMinimumWindowSize();
             
             // Disable all filter buttons
-            saveButton->setEnabled(false);
-            unloadButton->setEnabled(false);
-            resetButton->setEnabled(false);
-            undoButton->setEnabled(false);
-            redoButton->setEnabled(false);
-            grayscaleButton->setEnabled(false);
-            blackWhiteButton->setEnabled(false);
-            invertButton->setEnabled(false);
-            mergeButton->setEnabled(false);
-            flipButton->setEnabled(false);
-            rotateButton->setEnabled(false);
-            cropButton->setEnabled(false);
-            darkLightButton->setEnabled(false);
-            frameButton->setEnabled(false);
-            edgesButton->setEnabled(false);
-            resizeButton->setEnabled(false);
-            blurButton->setEnabled(false);
-            infraredButton->setEnabled(false);
-            purpleButton->setEnabled(false);
-            tvFilterButton->setEnabled(false);
+            ui.saveButton->setEnabled(false);
+            ui.unloadButton->setEnabled(false);
+            ui.resetButton->setEnabled(false);
+            ui.undoButton->setEnabled(false);
+            ui.redoButton->setEnabled(false);
+            ui.grayscaleButton->setEnabled(false);
+            ui.blackWhiteButton->setEnabled(false);
+            ui.invertButton->setEnabled(false);
+            ui.mergeButton->setEnabled(false);
+            ui.flipButton->setEnabled(false);
+            ui.rotateButton->setEnabled(false);
+            ui.cropButton->setEnabled(false);
+            ui.darkLightButton->setEnabled(false);
+            ui.frameButton->setEnabled(false);
+            ui.edgesButton->setEnabled(false);
+            ui.resizeButton->setEnabled(false);
+            ui.blurButton->setEnabled(false);
+            ui.infraredButton->setEnabled(false);
+            ui.purpleButton->setEnabled(false);
+            ui.tvFilterButton->setEnabled(false);
             
             // Update status bar
             statusBar()->showMessage("Image unloaded - Ready to load a new image");
@@ -447,10 +352,10 @@ private slots:
         saveStateForUndo();
         
         // Show progress UI
-        progressBar->setVisible(true);
-        progressBar->setRange(0, currentImage.height);
-        progressBar->setValue(0);
-        cancelButton->setVisible(true);
+        ui.progressBar->setVisible(true);
+        ui.progressBar->setRange(0, currentImage.height);
+        ui.progressBar->setValue(0);
+        ui.cancelButton->setVisible(true);
         
         statusBar()->showMessage("Applying Grayscale filter... (Click Cancel to stop)");
         QApplication::processEvents();
@@ -463,8 +368,8 @@ private slots:
                     currentImage = preFilterImage;
                     updateImageDisplay();
                     statusBar()->showMessage("Grayscale filter cancelled");
-                    progressBar->setVisible(false);
-                    cancelButton->setVisible(false);
+                    ui.progressBar->setVisible(false);
+                    ui.cancelButton->setVisible(false);
                     return;
                 }
                 
@@ -479,7 +384,7 @@ private slots:
                 }
                 
                 // Update progress
-                progressBar->setValue(y + 1);
+                ui.progressBar->setValue(y + 1);
                 if (y % 50 == 0) { // Update display every 50 rows
                     QApplication::processEvents();
                 }
@@ -491,8 +396,8 @@ private slots:
         }
         
         // Hide progress UI
-        progressBar->setVisible(false);
-        cancelButton->setVisible(false);
+        ui.progressBar->setVisible(false);
+        ui.cancelButton->setVisible(false);
     }
     
     void applyTVFilter()
@@ -505,10 +410,10 @@ private slots:
         saveStateForUndo();
         
         // Show progress UI
-        progressBar->setVisible(true);
-        progressBar->setRange(0, currentImage.height);
-        progressBar->setValue(0);
-        cancelButton->setVisible(true);
+        ui.progressBar->setVisible(true);
+        ui.progressBar->setRange(0, currentImage.height);
+        ui.progressBar->setValue(0);
+        ui.cancelButton->setVisible(true);
         
         statusBar()->showMessage("Applying TV/CRT filter... (Click Cancel to stop)");
         QApplication::processEvents();
@@ -525,8 +430,8 @@ private slots:
                     currentImage = preFilterImage;
                     updateImageDisplay();
                     statusBar()->showMessage("TV/CRT filter cancelled");
-                    progressBar->setVisible(false);
-                    cancelButton->setVisible(false);
+                    ui.progressBar->setVisible(false);
+                    ui.cancelButton->setVisible(false);
                     return;
                 }
                 
@@ -578,7 +483,7 @@ private slots:
                 }
                 
                 // Update progress
-                progressBar->setValue(y + 1);
+                ui.progressBar->setValue(y + 1);
                 if (y % 20 == 0) { // Update display every 20 rows
                     QApplication::processEvents();
                 }
@@ -590,8 +495,8 @@ private slots:
         }
         
         // Hide progress UI
-        progressBar->setVisible(false);
-        cancelButton->setVisible(false);
+        ui.progressBar->setVisible(false);
+        ui.cancelButton->setVisible(false);
     }
     
     void resetImage()
@@ -613,10 +518,10 @@ private slots:
         saveStateForUndo();
         
         // Show progress UI
-        progressBar->setVisible(true);
-        progressBar->setRange(0, currentImage.height);
-        progressBar->setValue(0);
-        cancelButton->setVisible(true);
+        ui.progressBar->setVisible(true);
+        ui.progressBar->setRange(0, currentImage.height);
+        ui.progressBar->setValue(0);
+        ui.cancelButton->setVisible(true);
         
         statusBar()->showMessage("Applying Black & White filter... (Click Cancel to stop)");
         QApplication::processEvents();
@@ -629,8 +534,8 @@ private slots:
                     currentImage = preFilterImage;
                     updateImageDisplay();
                     statusBar()->showMessage("Black & White filter cancelled");
-                    progressBar->setVisible(false);
-                    cancelButton->setVisible(false);
+                    ui.progressBar->setVisible(false);
+                    ui.cancelButton->setVisible(false);
                     return;
                 }
                 
@@ -646,7 +551,7 @@ private slots:
                 }
                 
                 // Update progress
-                progressBar->setValue(y + 1);
+                ui.progressBar->setValue(y + 1);
                 if (y % 50 == 0) { // Update display every 50 rows
                     QApplication::processEvents();
                 }
@@ -658,8 +563,8 @@ private slots:
         }
         
         // Hide progress UI
-        progressBar->setVisible(false);
-        cancelButton->setVisible(false);
+        ui.progressBar->setVisible(false);
+        ui.cancelButton->setVisible(false);
     }
     
     void applyInvert()
@@ -672,10 +577,10 @@ private slots:
         saveStateForUndo();
         
         // Show progress UI
-        progressBar->setVisible(true);
-        progressBar->setRange(0, currentImage.height);
-        progressBar->setValue(0);
-        cancelButton->setVisible(true);
+        ui.progressBar->setVisible(true);
+        ui.progressBar->setRange(0, currentImage.height);
+        ui.progressBar->setValue(0);
+        ui.cancelButton->setVisible(true);
         
         statusBar()->showMessage("Applying Invert filter... (Click Cancel to stop)");
         QApplication::processEvents();
@@ -687,8 +592,8 @@ private slots:
                     currentImage = preFilterImage;
                     updateImageDisplay();
                     statusBar()->showMessage("Invert filter cancelled");
-                    progressBar->setVisible(false);
-                    cancelButton->setVisible(false);
+                    ui.progressBar->setVisible(false);
+                    ui.cancelButton->setVisible(false);
                     return;
                 }
                 
@@ -699,7 +604,7 @@ private slots:
                 }
                 
                 // Update progress
-                progressBar->setValue(y + 1);
+                ui.progressBar->setValue(y + 1);
                 if (y % 50 == 0) { // Update display every 50 rows
                     QApplication::processEvents();
                 }
@@ -711,8 +616,8 @@ private slots:
         }
         
         // Hide progress UI
-        progressBar->setVisible(false);
-        cancelButton->setVisible(false);
+        ui.progressBar->setVisible(false);
+        ui.cancelButton->setVisible(false);
     }
     
     void applyMerge()
@@ -1056,47 +961,82 @@ private slots:
         QApplication::processEvents();
         
         try {
-            // BW threshold image
-            Image bw(currentImage.width, currentImage.height);
+            // Convert to grayscale first
+            Image gray(currentImage.width, currentImage.height);
             for (int y = 0; y < currentImage.height; y++) {
                 for (int x = 0; x < currentImage.width; x++) {
                     int r = currentImage(x, y, 0);
                     int g = currentImage(x, y, 1);
                     int b = currentImage(x, y, 2);
-                    int gray = (r + g + b) / 3;
-                    int bwVal = (gray > 128) ? 255 : 0;
-                    bw.setPixel(x, y, 0, bwVal);
-                    bw.setPixel(x, y, 1, bwVal);
-                    bw.setPixel(x, y, 2, bwVal);
+                    // Use weighted average for better grayscale conversion
+                    int grayVal = (int)(0.299 * r + 0.587 * g + 0.114 * b);
+                    gray.setPixel(x, y, 0, grayVal);
+                    gray.setPixel(x, y, 1, grayVal);
+                    gray.setPixel(x, y, 2, grayVal);
                 }
             }
 
-            Image edge(currentImage.width, currentImage.height);
-            for (int y = 0; y < edge.height; y++) {
-                for (int x = 0; x < edge.width; x++) {
-                    edge.setPixel(x, y, 0, 255);
-                    edge.setPixel(x, y, 1, 255);
-                    edge.setPixel(x, y, 2, 255);
-                }
-            }
+            // Apply Gaussian blur to reduce noise
+            Image blurred(currentImage.width, currentImage.height);
+            int kernel[5][5] = {
+                {1, 4, 6, 4, 1},
+                {4, 16, 24, 16, 4},
+                {6, 24, 36, 24, 6},
+                {4, 16, 24, 16, 4},
+                {1, 4, 6, 4, 1}
+            };
+            int kernelSum = 256; // Sum of all kernel values
 
-            for (int i = 0; i < bw.width - 1; ++i) {
-                for (int j = 0; j < bw.height - 1; ++j) {
-                    int current = bw(i, j, 0);
-                    int right   = bw(i + 1, j, 0);
-                    int down    = bw(i, j + 1, 0);
-                    int diff = std::abs(current - right) + std::abs(current - down);
-                    if (diff > 0) {
-                        edge.setPixel(i, j, 0, 0);
-                        edge.setPixel(i, j, 1, 0);
-                        edge.setPixel(i, j, 2, 0);
-                    } else {
-                        edge.setPixel(i, j, 0, 255);
-                        edge.setPixel(i, j, 1, 255);
-                        edge.setPixel(i, j, 2, 255);
+            for (int y = 2; y < currentImage.height - 2; y++) {
+                for (int x = 2; x < currentImage.width - 2; x++) {
+                    int sum = 0;
+                    for (int ky = -2; ky <= 2; ky++) {
+                        for (int kx = -2; kx <= 2; kx++) {
+                            sum += gray(x + kx, y + ky, 0) * kernel[ky + 2][kx + 2];
+                        }
                     }
+                    int blurredVal = sum / kernelSum;
+                    blurred.setPixel(x, y, 0, blurredVal);
+                    blurred.setPixel(x, y, 1, blurredVal);
+                    blurred.setPixel(x, y, 2, blurredVal);
                 }
             }
+
+            // Apply Sobel edge detection
+            Image edge(currentImage.width, currentImage.height);
+            
+            // Sobel kernels
+            int sobelX[3][3] = {{-1, 0, 1}, {-2, 0, 2}, {-1, 0, 1}};
+            int sobelY[3][3] = {{-1, -2, -1}, {0, 0, 0}, {1, 2, 1}};
+
+            for (int y = 1; y < currentImage.height - 1; y++) {
+                for (int x = 1; x < currentImage.width - 1; x++) {
+                    int gx = 0, gy = 0;
+                    
+                    // Apply Sobel kernels
+                    for (int ky = -1; ky <= 1; ky++) {
+                        for (int kx = -1; kx <= 1; kx++) {
+                            int pixelVal = blurred(x + kx, y + ky, 0);
+                            gx += pixelVal * sobelX[ky + 1][kx + 1];
+                            gy += pixelVal * sobelY[ky + 1][kx + 1];
+                        }
+                    }
+                    
+                    // Calculate gradient magnitude
+                    int magnitude = (int)std::sqrt(gx * gx + gy * gy);
+                    
+                    // Clamp to 0-255 range
+                    magnitude = std::min(255, std::max(0, magnitude));
+                    
+                    // Apply threshold to enhance edges (white edges on black background)
+                    int edgeVal = (magnitude > 50) ? 0 : 255;
+                    
+                    edge.setPixel(x, y, 0, edgeVal);
+                    edge.setPixel(x, y, 1, edgeVal);
+                    edge.setPixel(x, y, 2, edgeVal);
+                }
+            }
+            
             currentImage = edge;
             updateImageDisplay();
             statusBar()->showMessage("Edge Detection filter applied");
@@ -1160,10 +1100,10 @@ private slots:
         saveStateForUndo();
         
         // Show progress UI
-        progressBar->setVisible(true);
-        progressBar->setRange(0, currentImage.height);
-        progressBar->setValue(0);
-        cancelButton->setVisible(true);
+        ui.progressBar->setVisible(true);
+        ui.progressBar->setRange(0, currentImage.height);
+        ui.progressBar->setValue(0);
+        ui.cancelButton->setVisible(true);
         
         statusBar()->showMessage("Applying Blur filter... (Click Cancel to stop)");
         QApplication::processEvents();
@@ -1179,8 +1119,8 @@ private slots:
                     currentImage = preFilterImage;
                     updateImageDisplay();
                     statusBar()->showMessage("Blur filter cancelled");
-                    progressBar->setVisible(false);
-                    cancelButton->setVisible(false);
+                    ui.progressBar->setVisible(false);
+                    ui.cancelButton->setVisible(false);
                     return;
                 }
                 
@@ -1205,7 +1145,7 @@ private slots:
                 }
                 
                 // Update progress
-                progressBar->setValue(y + 1);
+                ui.progressBar->setValue(y + 1);
                 if (y % 10 == 0) { // Update display every 10 rows to avoid too much overhead
                     QApplication::processEvents();
                 }
@@ -1219,8 +1159,8 @@ private slots:
         }
         
         // Hide progress UI
-        progressBar->setVisible(false);
-        cancelButton->setVisible(false);
+        ui.progressBar->setVisible(false);
+        ui.cancelButton->setVisible(false);
     }
     
     void applyInfrared()
@@ -1233,10 +1173,10 @@ private slots:
         saveStateForUndo();
         
         // Show progress UI
-        progressBar->setVisible(true);
-        progressBar->setRange(0, currentImage.width);
-        progressBar->setValue(0);
-        cancelButton->setVisible(true);
+        ui.progressBar->setVisible(true);
+        ui.progressBar->setRange(0, currentImage.width);
+        ui.progressBar->setValue(0);
+        ui.cancelButton->setVisible(true);
         
         statusBar()->showMessage("Applying Infrared filter... (Click Cancel to stop)");
         QApplication::processEvents();
@@ -1248,8 +1188,8 @@ private slots:
                     currentImage = preFilterImage;
                     updateImageDisplay();
                     statusBar()->showMessage("Infrared filter cancelled");
-                    progressBar->setVisible(false);
-                    cancelButton->setVisible(false);
+                    ui.progressBar->setVisible(false);
+                    ui.cancelButton->setVisible(false);
                     return;
                 }
                 
@@ -1271,7 +1211,7 @@ private slots:
                 }
                 
                 // Update progress
-                progressBar->setValue(x + 1);
+                ui.progressBar->setValue(x + 1);
                 if (x % 50 == 0) { // Update display every 50 columns
                     QApplication::processEvents();
                 }
@@ -1283,8 +1223,8 @@ private slots:
         }
         
         // Hide progress UI
-        progressBar->setVisible(false);
-        cancelButton->setVisible(false);
+        ui.progressBar->setVisible(false);
+        ui.cancelButton->setVisible(false);
     }
     
     void applyPurpleFilter()
@@ -1297,10 +1237,10 @@ private slots:
         saveStateForUndo();
         
         // Show progress UI
-        progressBar->setVisible(true);
-        progressBar->setRange(0, currentImage.height);
-        progressBar->setValue(0);
-        cancelButton->setVisible(true);
+        ui.progressBar->setVisible(true);
+        ui.progressBar->setRange(0, currentImage.height);
+        ui.progressBar->setValue(0);
+        ui.cancelButton->setVisible(true);
         
         statusBar()->showMessage("Applying Purple filter... (Click Cancel to stop)");
         QApplication::processEvents();
@@ -1312,8 +1252,8 @@ private slots:
                     currentImage = preFilterImage;
                     updateImageDisplay();
                     statusBar()->showMessage("Purple filter cancelled");
-                    progressBar->setVisible(false);
-                    cancelButton->setVisible(false);
+                    ui.progressBar->setVisible(false);
+                    ui.cancelButton->setVisible(false);
                     return;
                 }
                 
@@ -1332,7 +1272,7 @@ private slots:
                 }
                 
                 // Update progress
-                progressBar->setValue(y + 1);
+                ui.progressBar->setValue(y + 1);
                 if (y % 50 == 0) { // Update display every 50 rows
                     QApplication::processEvents();
                 }
@@ -1344,15 +1284,15 @@ private slots:
         }
         
         // Hide progress UI
-        progressBar->setVisible(false);
-        cancelButton->setVisible(false);
+        ui.progressBar->setVisible(false);
+        ui.cancelButton->setVisible(false);
     }
     
     void startCropMode()
     {
         if (!hasImage) return;
         if (!rubberBand) {
-            rubberBand = new QRubberBand(QRubberBand::Rectangle, imageLabel);
+            rubberBand = new QRubberBand(QRubberBand::Rectangle, ui.imageLabel);
         }
         cropping = true;
         statusBar()->showMessage("Crop mode: drag to select area, release to crop");
@@ -1397,6 +1337,8 @@ private slots:
     }
 
 private:
+    Ui::MainWindow ui;
+    
     void saveStateForUndo()
     {
         if (!hasImage) return;
@@ -1428,8 +1370,70 @@ private:
     
     void updateUndoRedoButtons()
     {
-        undoButton->setEnabled(!undoStack.empty());
-        redoButton->setEnabled(!redoStack.empty());
+        ui.undoButton->setEnabled(!undoStack.empty());
+        ui.redoButton->setEnabled(!redoStack.empty());
+    }
+    
+    void updateMinimumWindowSize()
+    {
+        if (!hasImage) {
+            setMinimumSize(600, 400);
+            return;
+        }
+        
+        // Calculate the minimum size needed to display the image without scrollbars
+        // Account for window decorations, menu bar, status bar, and button area
+        
+        // Get the current window frame size
+        QSize currentSize = size();
+        QSize contentSize = ui.centralwidget->size();
+        
+        // Calculate the frame margins (window decorations)
+        int frameWidth = currentSize.width() - contentSize.width();
+        int frameHeight = currentSize.height() - contentSize.height();
+        
+        // Calculate the button area height
+        int buttonAreaHeight = ui.buttonLayout->sizeHint().height();
+        
+        // Calculate the minimum scroll area size needed for the image
+        QSize scrollAreaSize = ui.scrollArea->size();
+        QSize availableSize(scrollAreaSize.width() - 20, scrollAreaSize.height() - 20);
+        
+        // Calculate the image's natural display size
+        double imageAspectRatio = (double)currentImage.width / currentImage.height;
+        QSize minImageSize;
+        
+        // Determine minimum size to fit the image without scrollbars
+        if (imageAspectRatio > 1.0) {
+            // Wide image - fit to width
+            minImageSize.setWidth(availableSize.width());
+            minImageSize.setHeight((int)(availableSize.width() / imageAspectRatio));
+        } else {
+            // Tall image - fit to height
+            minImageSize.setHeight(availableSize.height());
+            minImageSize.setWidth((int)(availableSize.height() * imageAspectRatio));
+        }
+        
+        // Don't upscale beyond original image size
+        if (minImageSize.width() > currentImage.width || minImageSize.height() > currentImage.height) {
+            minImageSize = QSize(currentImage.width, currentImage.height);
+        }
+        
+        // Calculate minimum window size
+        int minWidth = minImageSize.width() + frameWidth + 20; // +20 for scroll area margins
+        int minHeight = minImageSize.height() + frameHeight + buttonAreaHeight + 20; // +20 for margins
+        
+        // Ensure minimum reasonable size
+        minWidth = std::max(minWidth, 600);
+        minHeight = std::max(minHeight, 400);
+        
+        // Set the new minimum size
+        setMinimumSize(minWidth, minHeight);
+        
+        // If current window is smaller than minimum, resize it
+        if (width() < minWidth || height() < minHeight) {
+            resize(std::max(width(), minWidth), std::max(height(), minHeight));
+        }
     }
     
 protected:
@@ -1538,24 +1542,25 @@ protected:
                         hasUnsavedChanges = false; // New image is considered "saved"
                         
                         updateImageDisplay();
-                        saveButton->setEnabled(true);
-                        unloadButton->setEnabled(true);
-                        resetButton->setEnabled(true);
-                        grayscaleButton->setEnabled(true);
-                        blackWhiteButton->setEnabled(true);
-                        invertButton->setEnabled(true);
-                        mergeButton->setEnabled(true);
-                        flipButton->setEnabled(true);
-                        rotateButton->setEnabled(true);
-                        cropButton->setEnabled(true);
-                        darkLightButton->setEnabled(true);
-                        frameButton->setEnabled(true);
-                        edgesButton->setEnabled(true);
-                        resizeButton->setEnabled(true);
-                        blurButton->setEnabled(true);
-                        infraredButton->setEnabled(true);
-                        purpleButton->setEnabled(true);
-                        tvFilterButton->setEnabled(true);
+                        updateMinimumWindowSize();
+                        ui.saveButton->setEnabled(true);
+                        ui.unloadButton->setEnabled(true);
+                        ui.resetButton->setEnabled(true);
+                        ui.grayscaleButton->setEnabled(true);
+                        ui.blackWhiteButton->setEnabled(true);
+                        ui.invertButton->setEnabled(true);
+                        ui.mergeButton->setEnabled(true);
+                        ui.flipButton->setEnabled(true);
+                        ui.rotateButton->setEnabled(true);
+                        ui.cropButton->setEnabled(true);
+                        ui.darkLightButton->setEnabled(true);
+                        ui.frameButton->setEnabled(true);
+                        ui.edgesButton->setEnabled(true);
+                        ui.resizeButton->setEnabled(true);
+                        ui.blurButton->setEnabled(true);
+                        ui.infraredButton->setEnabled(true);
+                        ui.purpleButton->setEnabled(true);
+                        ui.tvFilterButton->setEnabled(true);
                         
                         // Clear undo/redo stacks when loading new image
                         while (!undoStack.empty()) undoStack.pop();
@@ -1579,11 +1584,11 @@ protected:
     
     bool eventFilter(QObject *watched, QEvent *event) override
     {
-        if (watched == imageLabel && cropping && hasImage) {
+        if (watched == ui.imageLabel && cropping && hasImage) {
             if (event->type() == QEvent::MouseButtonPress) {
                 QMouseEvent *me = static_cast<QMouseEvent*>(event);
                 cropOrigin = me->pos();
-                if (!rubberBand) rubberBand = new QRubberBand(QRubberBand::Rectangle, imageLabel);
+                if (!rubberBand) rubberBand = new QRubberBand(QRubberBand::Rectangle, ui.imageLabel);
                 rubberBand->setGeometry(QRect(cropOrigin, QSize()));
                 rubberBand->show();
                 return true;
@@ -1623,21 +1628,50 @@ protected:
         QPixmap pixmap = QPixmap::fromImage(qimg);
         
         // Get the available space in the scroll area
-        QSize scrollAreaSize = scrollArea->size();
+         QSize scrollAreaSize = ui.scrollArea->size();
         QSize availableSize(scrollAreaSize.width() - 20, scrollAreaSize.height() - 20); // Account for scrollbars
         
-        // Scale the image to fit the available space while maintaining aspect ratio
-        QPixmap scaledPixmap = pixmap.scaled(availableSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        
-        imageLabel->setPixmap(scaledPixmap);
-        imageLabel->setText("");
+         // Calculate the aspect ratio of the image
+         double imageAspectRatio = (double)currentImage.width / currentImage.height;
+         double availableAspectRatio = (double)availableSize.width() / availableSize.height();
+         
+         QSize targetSize;
+         
+         // Determine the best fit size while maintaining aspect ratio
+         if (imageAspectRatio > availableAspectRatio) {
+             // Image is wider than available space - fit to width
+             targetSize.setWidth(availableSize.width());
+             targetSize.setHeight((int)(availableSize.width() / imageAspectRatio));
+         } else {
+             // Image is taller than available space - fit to height
+             targetSize.setHeight(availableSize.height());
+             targetSize.setWidth((int)(availableSize.height() * imageAspectRatio));
+         }
+         
+         // Ensure we don't exceed the original image size (don't upscale)
+         if (targetSize.width() > currentImage.width || targetSize.height() > currentImage.height) {
+             targetSize = QSize(currentImage.width, currentImage.height);
+         }
+         
+         // Scale the image with smooth transformation
+         QPixmap scaledPixmap = pixmap.scaled(targetSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+         
+         // Set the pixmap and ensure the label size matches the scaled image
+         ui.imageLabel->setPixmap(scaledPixmap);
+         ui.imageLabel->setText("");
+         ui.imageLabel->setScaledContents(false); // Disable automatic scaling
+         ui.imageLabel->resize(scaledPixmap.size()); // Resize label to match pixmap
+         
+         // Calculate minimum window size to prevent scrollbars
+         updateMinimumWindowSize();
         
         // Update status bar with image info
-        statusBar()->showMessage(QString("Image: %1x%2 | Display: %3x%4")
+         statusBar()->showMessage(QString("Image: %1x%2 | Display: %3x%4 | Aspect Ratio: %5")
             .arg(currentImage.width)
             .arg(currentImage.height)
             .arg(scaledPixmap.width())
-            .arg(scaledPixmap.height()));
+             .arg(scaledPixmap.height())
+             .arg(QString::number(imageAspectRatio, 'f', 2)));
     }
     
     void performCropFromSelection(const QRect &selectionOnLabel)
@@ -1646,9 +1680,30 @@ protected:
         if (selectionOnLabel.width() <= 1 || selectionOnLabel.height() <= 1) return;
         
         // Determine the scale used to draw the pixmap on the label
-        // We rendered a scaled pixmap that fits availableSize with KeepAspectRatio.
-        QSize scrollAreaSize = scrollArea->size();
+        QSize scrollAreaSize = ui.scrollArea->size();
         QSize availableSize(scrollAreaSize.width() - 20, scrollAreaSize.height() - 20);
+        
+        // Calculate the aspect ratio of the image
+        double imageAspectRatio = (double)currentImage.width / currentImage.height;
+        double availableAspectRatio = (double)availableSize.width() / availableSize.height();
+        
+        QSize targetSize;
+        
+        // Determine the best fit size while maintaining aspect ratio
+        if (imageAspectRatio > availableAspectRatio) {
+            // Image is wider than available space - fit to width
+            targetSize.setWidth(availableSize.width());
+            targetSize.setHeight((int)(availableSize.width() / imageAspectRatio));
+        } else {
+            // Image is taller than available space - fit to height
+            targetSize.setHeight(availableSize.height());
+            targetSize.setWidth((int)(availableSize.height() * imageAspectRatio));
+        }
+        
+        // Ensure we don't exceed the original image size (don't upscale)
+        if (targetSize.width() > currentImage.width || targetSize.height() > currentImage.height) {
+            targetSize = QSize(currentImage.width, currentImage.height);
+        }
         
         // Build the current displayed pixmap to get its actual size
         QImage qimg(currentImage.width, currentImage.height, QImage::Format_RGB888);
@@ -1661,10 +1716,10 @@ protected:
             }
         }
         QPixmap pixmap = QPixmap::fromImage(qimg);
-        QPixmap scaledPixmap = pixmap.scaled(availableSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        QPixmap scaledPixmap = pixmap.scaled(targetSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
         
         // The image is centered inside imageLabel.
-        QSize labelSize = imageLabel->size();
+        QSize labelSize = ui.imageLabel->size();
         int offsetX = (labelSize.width() - scaledPixmap.width()) / 2;
         int offsetY = (labelSize.height() - scaledPixmap.height()) / 2;
         
@@ -1699,32 +1754,6 @@ protected:
         currentImage = result;
         updateImageDisplay();
     }
-    
-    QLabel *imageLabel;
-    QScrollArea *scrollArea;
-    QPushButton *cropButton;
-    QPushButton *loadButton;
-    QPushButton *saveButton;
-    QPushButton *unloadButton;
-    QPushButton *resetButton;
-    QPushButton *undoButton;
-    QPushButton *redoButton;
-    QPushButton *grayscaleButton;
-    QPushButton *blackWhiteButton;
-    QPushButton *invertButton;
-    QPushButton *mergeButton;
-    QPushButton *flipButton;
-    QPushButton *rotateButton;
-    QPushButton *darkLightButton;
-    QPushButton *frameButton;
-    QPushButton *edgesButton;
-    QPushButton *resizeButton;
-    QPushButton *blurButton;
-    QPushButton *infraredButton;
-    QPushButton *purpleButton;
-    QPushButton *tvFilterButton;
-    QPushButton *cancelButton;
-    QProgressBar *progressBar;
     
     Image originalImage;
     Image currentImage;
@@ -1763,4 +1792,4 @@ int main(int argc, char *argv[])
     return app.exec();
 }
 
-#include "simple_qt_app.moc"
+#include "image_studio.moc"
