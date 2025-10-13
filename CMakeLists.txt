@@ -15,17 +15,25 @@ set(CMAKE_AUTORCC ON)
 
 # Include directories
 include_directories(src/core)
+include_directories(src/core/image)
+include_directories(src/core/filters)
+include_directories(src/core/history)
+include_directories(src/core/io)
 include_directories(third_party/stb)
 
 # Source files
 set(SOURCES
     src/gui/image_studio.cpp
-    src/core/ImageFilters.cpp
+    src/core/filters/ImageFilters.cpp
+    src/core/image/Image_Class.cpp
 )
 
 # Header files
 set(HEADERS
-    src/core/Image_Class.h
+    src/core/image/Image_Class.h
+    src/core/filters/ImageFilters.h
+    src/core/history/HistoryManager.h
+    src/core/io/ImageIO.h
 )
 
 # UI files

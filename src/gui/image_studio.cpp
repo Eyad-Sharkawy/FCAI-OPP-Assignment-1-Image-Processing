@@ -59,9 +59,11 @@
 #include <random>
 #include <chrono>
 #include <atomic>
-#include "../core/Image_Class.h"
-#include "../core/ImageFilters.h"
+#include "../core/image/Image_Class.h"
+#include "../core/filters/ImageFilters.h"
 #include "ui_mainwindow.h"
+#include "../core/history/HistoryManager.h"
+#include "../core/io/ImageIO.h"
 
 class SimpleImageApp : public QMainWindow
 {
@@ -194,7 +196,7 @@ private slots:
         
         if (!fileName.isEmpty()) {
             try {
-                originalImage.loadNewImage(fileName.toStdString());
+                originalImage = ImageIO::loadFromFile(fileName);
                 currentImage = originalImage;
                 hasImage = true;
                 currentFilePath = fileName;
@@ -221,9 +223,8 @@ private slots:
                 ui.purpleButton->setEnabled(true);
                 ui.tvFilterButton->setEnabled(true);
                 
-                // Clear undo/redo stacks when loading new image
-                while (!undoStack.empty()) undoStack.pop();
-                while (!redoStack.empty()) redoStack.pop();
+                // Clear undo/redo history when loading new image
+                history.clear();
                 updateUndoRedoButtons();
                 
                 statusBar()->showMessage(QString("Loaded: %1").arg(QFileInfo(fileName).fileName()));
@@ -248,7 +249,7 @@ private slots:
         
         if (!fileName.isEmpty()) {
             try {
-                currentImage.saveImage(fileName.toStdString());
+                ImageIO::saveToFile(currentImage, fileName);
                         hasUnsavedChanges = false; // Mark as saved
                 statusBar()->showMessage(QString("Saved: %1").arg(QFileInfo(fileName).fileName()));
             } catch (const std::exception& e) {
@@ -291,7 +292,7 @@ private slots:
             
             if (!fileName.isEmpty()) {
                 try {
-                    currentImage.saveImage(fileName.toStdString());
+                    ImageIO::saveToFile(currentImage, fileName);
                     hasUnsavedChanges = false; // Mark as saved
                     statusBar()->showMessage(QString("Saved: %1").arg(QFileInfo(fileName).fileName()));
                 } catch (const std::exception& e) {
@@ -313,9 +314,8 @@ private slots:
             currentFilePath.clear();
             hasUnsavedChanges = false;
             
-            // Clear undo/redo stacks
-            while (!undoStack.empty()) undoStack.pop();
-            while (!redoStack.empty()) redoStack.pop();
+            // Clear undo/redo history
+            history.clear();
             
             // Reset image label
             ui.imageLabel->clear();
@@ -681,14 +681,8 @@ private slots:
     
     void undo()
     {
-        if (!hasImage || undoStack.empty()) return;
-        
-        // Save current state to redo stack
-        redoStack.push(currentImage);
-        
-        // Restore previous state
-        currentImage = undoStack.top();
-        undoStack.pop();
+        if (!hasImage) return;
+        if (!history.undo(currentImage)) return;
         
         updateImageDisplay();
         updateUndoRedoButtons();
@@ -697,14 +691,8 @@ private slots:
     
     void redo()
     {
-        if (!hasImage || redoStack.empty()) return;
-        
-        // Save current state to undo stack
-        undoStack.push(currentImage);
-        
-        // Restore next state
-        currentImage = redoStack.top();
-        redoStack.pop();
+        if (!hasImage) return;
+        if (!history.redo(currentImage)) return;
         
         updateImageDisplay();
         updateUndoRedoButtons();
@@ -723,36 +711,18 @@ private:
     void saveStateForUndo()
     {
         if (!hasImage) return;
-        
-        // Save current state to undo stack
-        undoStack.push(currentImage);
-        
+        // Save current state to history
+        history.pushUndo(currentImage);
         // Mark as having unsaved changes
         hasUnsavedChanges = true;
-        
-        // Limit undo stack size to prevent excessive memory usage
-        if (undoStack.size() > MAX_UNDO_STEPS) {
-            // Remove oldest state (this is a simple approach)
-            std::stack<Image> tempStack;
-            for (int i = 0; i < MAX_UNDO_STEPS - 1; i++) {
-                tempStack.push(undoStack.top());
-                undoStack.pop();
-            }
-            undoStack = tempStack;
-        }
-        
-        // Clear redo stack when new action is performed
-        while (!redoStack.empty()) {
-            redoStack.pop();
-        }
         
         updateUndoRedoButtons();
     }
     
     void updateUndoRedoButtons()
     {
-        ui.undoButton->setEnabled(!undoStack.empty());
-        ui.redoButton->setEnabled(!redoStack.empty());
+        ui.undoButton->setEnabled(history.canUndo());
+        ui.redoButton->setEnabled(history.canRedo());
     }
     
     void updateMinimumWindowSize()
@@ -916,7 +886,7 @@ protected:
                     
                     // Load the dropped image
                     try {
-                        originalImage.loadNewImage(fileName.toStdString());
+                        originalImage = ImageIO::loadFromFile(fileName);
                         currentImage = originalImage;
                         hasImage = true;
                         currentFilePath = fileName;
@@ -943,9 +913,8 @@ protected:
                         ui.purpleButton->setEnabled(true);
                         ui.tvFilterButton->setEnabled(true);
                         
-                        // Clear undo/redo stacks when loading new image
-                        while (!undoStack.empty()) undoStack.pop();
-                        while (!redoStack.empty()) redoStack.pop();
+                        // Clear undo/redo history when loading new image
+                        history.clear();
                         updateUndoRedoButtons();
                         
                         statusBar()->showMessage(QString("Loaded via drag & drop: %1").arg(fileInfo.fileName()));
@@ -1146,9 +1115,7 @@ protected:
     Image preFilterImage; // Store image state before filter for cancellation
     
     // Undo/Redo system
-    std::stack<Image> undoStack;
-    std::stack<Image> redoStack;
-    static const int MAX_UNDO_STEPS = 20; // Limit memory usage
+    HistoryManager history{20};
     
     // Save state tracking
     bool hasUnsavedChanges = false;

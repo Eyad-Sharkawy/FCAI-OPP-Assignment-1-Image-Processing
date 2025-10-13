@@ -1,5 +1,9 @@
 #include "ImageFilters.h"
-#include "Image_Class.h"
+#include <QtWidgets/QProgressBar>
+#include <QtWidgets/QStatusBar>
+#include <QtWidgets/QApplication>
+#include <QtCore/QString>
+#include "image/Image_Class.h"
 
 ImageFilters::ImageFilters(QProgressBar* progressBar, QStatusBar* statusBar)
     : progressBar(progressBar), statusBar(statusBar)
@@ -403,7 +407,7 @@ void ImageFilters::applyDarkAndLight(Image& currentImage, const QString& choice)
         Image result(currentImage.width, currentImage.height);
         for (int i = 0; i < currentImage.width; ++i) {
             for (int j = 0; j < currentImage.height; ++j) {
-                for (int k = 0; k < currentImage.channels; ++k) {
+                for (int k = 0; k < 3; ++k) {
                     int p = currentImage(i, j, k);
                     if (choice == "dark") {
                     p = p / 3;
@@ -867,3 +871,5 @@ void ImageFilters::applyPurpleFilter(Image& currentImage, Image& preFilterImage,
         progressBar->setVisible(false);
     }
 }
+
+

@@ -20,7 +20,7 @@
 ### For Developers
 1. Clone the repository
 2. Install Qt 6.8.1+
-3. Build using CMake or qmake
+3. Build using CMake (recommended) or qmake
 4. Run the application
 
 ## 💻 System Requirements
@@ -152,7 +152,7 @@ brew install qt6 cmake
 
 ### Build Process
 
-#### Method 1: Qt Creator (Recommended)
+#### Method 1: Qt Creator (qmake project)
 1. Open Qt Creator
 2. Open `ImageStudio.pro`
 3. Configure project (select kit)
@@ -171,27 +171,25 @@ mingw32-make
 make
 ```
 
-#### Method 3: CMake
+#### Method 3: CMake (Recommended)
 ```bash
-# Create build directory
-mkdir build
-cd build
+# Configure + build (Windows, MinGW)
+cmake -S . -B cmake-build-release -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release
+cmake --build cmake-build-release -j 8
 
-# Configure
-cmake ..
+# Configure + build (Linux/macOS)
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build -j 8
 
-# Build
-cmake --build .
-
-# Run
-./ImageStudio  # Linux/macOS
-ImageStudio.exe  # Windows
+# Run (from build dir)
+./bin/ImageStudio    # Linux/macOS
+bin\ImageStudio.exe  # Windows
 ```
 
 #### Method 4: Build Scripts (Windows)
 ```bat
-scripts\build_release.bat    # Build to release\ImageStudio.exe
-scripts\build_portable.bat   # Build + deploy Qt DLLs + create ZIP
+scripts\build_release.bat    # CMake Release -> cmake-build-release\bin\ImageStudio.exe
+scripts\build_portable.bat   # Build + windeployqt + ZIP
 scripts\build_all.bat        # Clean, build, deploy, zip (one-click)
 scripts\test_app.bat         # Quick smoke test launcher
 ```
@@ -200,20 +198,16 @@ scripts\test_app.bat         # Quick smoke test launcher
 
 #### Debug Build
 ```bash
-# qmake
-qmake CONFIG+=debug ImageStudio.pro
-
 # CMake
-cmake -DCMAKE_BUILD_TYPE=Debug ..
+cmake -S . -B cmake-build-debug -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Debug
+cmake --build cmake-build-debug -j 8
 ```
 
 #### Release Build
 ```bash
-# qmake
-qmake CONFIG+=release ImageStudio.pro
-
 # CMake
-cmake -DCMAKE_BUILD_TYPE=Release ..
+cmake -S . -B cmake-build-release -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release
+cmake --build cmake-build-release -j 8
 ```
 
 #### Custom Configuration

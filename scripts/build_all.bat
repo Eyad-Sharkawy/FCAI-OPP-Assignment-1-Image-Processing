@@ -14,17 +14,19 @@ echo.
 REM Set Qt environment
 set PATH=C:\Qt\6.8.1\mingw_64\bin;C:\Qt\Tools\mingw1310_64\bin;%PATH%
 set QTDIR=C:\Qt\6.8.1\mingw_64
+set CMAKE_GENERATOR=MinGW Makefiles
 
 echo [1/4] Cleaning previous builds...
 if exist "build_release" rmdir /s /q build_release
 if exist "build_portable" rmdir /s /q build_portable
 if exist "release" rmdir /s /q release
+if exist "cmake-build-release" rmdir /s /q cmake-build-release
 echo ✓ Cleaned previous builds
 echo.
 
-echo [2/4] Building release version...
-qmake "%PROJ_DIR%ImageStudio.pro"
-mingw32-make -f Makefile.Release
+echo [2/4] Building release version with CMake...
+cmake -S . -B cmake-build-release -G "%CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release
+cmake --build cmake-build-release -j 8
 
 if %ERRORLEVEL% NEQ 0 (
     echo ✗ Release build failed!
@@ -39,7 +41,7 @@ echo [3/4] Creating portable package...
 mkdir build_portable\ImageStudio_Portable
 mkdir build_portable\ImageStudio_Portable\bin
 
-copy release\ImageStudio.exe build_portable\ImageStudio_Portable\bin\
+copy cmake-build-release\bin\ImageStudio.exe build_portable\ImageStudio_Portable\bin\
 
 cd build_portable\ImageStudio_Portable\bin
 windeployqt ImageStudio.exe

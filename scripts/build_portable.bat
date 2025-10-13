@@ -11,16 +11,15 @@ echo Building Image Studio (portable)...
 REM Set Qt environment
 set PATH=C:\Qt\6.8.1\mingw_64\bin;C:\Qt\Tools\mingw1310_64\bin;%PATH%
 set QTDIR=C:\Qt\6.8.1\mingw_64
+set CMAKE_GENERATOR=MinGW Makefiles
 
 REM Clean previous portable build
 if exist "build_portable" rmdir /s /q build_portable
-mkdir build_portable
+if exist "cmake-build-release" rmdir /s /q cmake-build-release
 
-REM Generate Makefile with qmake (use absolute path to .pro)
-qmake "%PROJ_DIR%ImageStudio.pro"
-
-REM Build the project using mingw32-make
-mingw32-make -f Makefile.Release
+REM Configure and build with CMake (Release)
+cmake -S . -B cmake-build-release -G "%CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release
+cmake --build cmake-build-release -j 8
 
 if %ERRORLEVEL% EQU 0 (
     echo.
@@ -31,7 +30,7 @@ if %ERRORLEVEL% EQU 0 (
     mkdir build_portable\ImageStudio_Portable\bin
     
     REM Copy executable
-    copy release\ImageStudio.exe build_portable\ImageStudio_Portable\bin\
+    copy cmake-build-release\bin\ImageStudio.exe build_portable\ImageStudio_Portable\bin\
     
     REM Use windeployqt to automatically deploy all Qt dependencies
     cd build_portable\ImageStudio_Portable\bin

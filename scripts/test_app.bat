@@ -9,25 +9,37 @@ pushd "%PROJ_DIR%"
 echo Testing Image Studio application...
 echo.
 
-REM Check if executable exists
-if exist "release\ImageStudio.exe" (
+REM Check if executable exists (prefer Release cmake output)
+if exist "cmake-build-release\bin\ImageStudio.exe" (
+    echo ✓ Executable found: cmake-build-release\bin\ImageStudio.exe
+    echo.
+    echo Starting application for 5 seconds to test...
+    echo (The application will close automatically)
+    echo.
+    
+    start "ImageStudioTest" "cmake-build-release\bin\ImageStudio.exe"
+    timeout /t 5 /nobreak >nul 2>&1
+    taskkill /fi "WINDOWTITLE eq ImageStudioTest" >nul 2>&1
+    echo.
+    echo ✓ Application started successfully!
+    echo   If you saw the Image Studio window, the test passed.
+    echo.
+) else if exist "release\ImageStudio.exe" (
     echo ✓ Executable found: release\ImageStudio.exe
     echo.
     echo Starting application for 5 seconds to test...
     echo (The application will close automatically)
     echo.
     
-    REM Start the application and wait 5 seconds
-    start /wait timeout /t 5 /nobreak >nul 2>&1
-    start "" "release\ImageStudio.exe"
-    
+    start "ImageStudioTest" "release\ImageStudio.exe"
+    timeout /t 5 /nobreak >nul 2>&1
+    taskkill /fi "WINDOWTITLE eq ImageStudioTest" >nul 2>&1
     echo.
     echo ✓ Application started successfully!
-    echo   If you see the Image Studio window, the test passed.
-    echo   You can close the application manually.
+    echo   If you saw the Image Studio window, the test passed.
     echo.
 ) else (
-    echo ✗ Executable not found: release\ImageStudio.exe
+    echo ✗ Executable not found.
     echo   Please run build_release.bat first.
     echo.
 )

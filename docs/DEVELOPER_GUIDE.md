@@ -17,7 +17,7 @@ Image Studio is a Qt6-based image processing application built with C++20. It pr
 ### Key Technologies
 - **Framework**: Qt 6.8.1
 - **Language**: C++20
-- **Build Systems**: Qt qmake + CMake
+- **Build Systems**: CMake (primary), qmake (legacy)
 - **Image Library**: STB (stb_image, stb_image_write)
 - **UI Design**: Qt Designer (.ui files)
 
@@ -74,7 +74,7 @@ Image Studio is a Qt6-based image processing application built with C++20. It pr
 - CMake 3.20+ (optional)
 - Windows 10/11 (64-bit)
 
-### Qt qmake Build
+### Qt qmake Build (Legacy)
 ```bash
 # Generate Makefile
 qmake ImageStudio.pro
@@ -86,7 +86,7 @@ mingw32-make
 make
 ```
 
-### CMake Build
+### CMake Build (Recommended)
 ```bash
 # Create build directory
 mkdir build
@@ -115,8 +115,16 @@ ImageStudio/
 │   │   ├── image_studio.cpp   # Main application class
 │   │   └── mainwindow.ui      # Qt Designer UI file
 │   └── core/                  # Core Functionality
-│       ├── ImageFilters.h/.cpp # Image processing filters (progress + cancel)
-│       └── Image_Class.h/.cpp  # Image container + STB-backed I/O
+│       ├── filters/           # Image processing filters (progress + cancel)
+│       │   ├── ImageFilters.h
+│       │   └── ImageFilters.cpp
+│       ├── image/             # Image container + STB-backed I/O
+│       │   ├── Image_Class.h
+│       │   └── Image_Class.cpp
+│       ├── history/           # Undo/redo management
+│       │   └── HistoryManager.h
+│       └── io/                # File I/O helpers
+│           └── ImageIO.h
 ├── third_party/               # External Libraries
 │   └── stb/                   # STB image library
 ├── docs/                      # Documentation
@@ -137,10 +145,9 @@ private:
     Ui::MainWindow ui;              // UI components
     Image currentImage;             // Current image data
     bool hasImage;                  // Image loaded flag
-    std::stack<Image> undoStack;    // Undo history
-    std::stack<Image> redoStack;    // Redo history
+    HistoryManager history{20};     // Undo/redo history abstraction
     
-    // Delegates to ImageFilters (see src/core/ImageFilters.h)
+    // Delegates to ImageFilters (see src/core/filters/ImageFilters.h)
 };
 ```
 
@@ -201,6 +208,23 @@ Image Image::yourNewFilter()
     
     return result;
 }
+### Undo/Redo and I/O Architecture (v2.0.0)
+
+To improve separation of concerns, the GUI delegates history and file I/O:
+
+- History is managed by `src/core/HistoryManager.h`.
+  - Call `history.pushUndo(currentImage)` immediately before any mutating filter.
+  - Invoke `history.undo(currentImage)` and `history.redo(currentImage)` from the corresponding slots.
+  - Reset history on new loads/unloads via `history.clear()`.
+
+- Image loading/saving is wrapped by `src/core/ImageIO.h`.
+  - Load: `originalImage = ImageIO::loadFromFile(path); currentImage = originalImage;`
+  - Save: `ImageIO::saveToFile(currentImage, path);`
+
+Benefits:
+- Single-responsibility, testability, and consistent behavior across load/unload/drag-drop.
+- Centralized bounds on history size to control memory usage.
+
 ```
 
 #### Step 3: Connect UI to Logic

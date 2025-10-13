@@ -42,6 +42,8 @@ extern "C" {
 
 #include <iostream>
 #include <exception>
+#include <cstring>
+#include <string.h>
 
 
 /**
@@ -57,12 +59,11 @@ private:
      * @return True if the filename has a valid extension, false otherwise.
      */
     bool isValidFilename(const std::string& filename) {
-        const char* extension = strrchr(filename.c_str(), '.');
-        if (extension == nullptr) {
+        std::size_t dotPos = filename.rfind('.');
+        if (dotPos == std::string::npos || dotPos == filename.size() - 1) {
             std::cerr << "Invalid filename: " << filename << std::endl;
             return false;
         }
-
         return true;
     }
 
@@ -74,16 +75,19 @@ private:
      */
 
     short getExtensionType(const char* extension) {
-        if (strcmp(extension, ".png") == 0) {
+        if (extension == nullptr) return UNSUPPORTED_TYPE;
+        std::string extStr(extension);
+        for (char& ch : extStr) ch = static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
+        if (extStr == ".png") {
             return PNG_TYPE;
         }
-        if (strcmp(extension, ".bmp") == 0) {
+        if (extStr == ".bmp") {
             return BMP_TYPE;
         }
-        if (strcmp(extension, ".tga") == 0) {
+        if (extStr == ".tga") {
             return TGA_TYPE;
         }
-        if (strcmp(extension, ".jpg") == 0 || strcmp(extension, ".jpeg") == 0) {
+        if (extStr == ".jpg" || extStr == ".jpeg") {
             return JPG_TYPE;
         }
 
@@ -188,8 +192,8 @@ public:
             throw std::invalid_argument("The file extension does not exist");
         }
 
-        const char* extension = strrchr(filename.c_str(), '.');
-        short extensionType = getExtensionType(extension);
+        std::size_t dotPos = filename.rfind('.');
+        short extensionType = getExtensionType(dotPos == std::string::npos ? nullptr : filename.c_str() + dotPos);
         if (extensionType == UNSUPPORTED_TYPE) {
             std::cerr << "Unsupported File Format" << '\n';
             throw std::invalid_argument("File Extension is not supported, Only .JPG, JPEG, .BMP, .PNG, .TGA are supported");
@@ -223,8 +227,8 @@ public:
         }
 
         // Determine image type based on filename extension
-        const char* extension = strrchr(outputFilename.c_str(), '.');
-        short extensionType = getExtensionType(extension);
+        std::size_t dotPos = outputFilename.rfind('.');
+        short extensionType = getExtensionType(dotPos == std::string::npos ? nullptr : outputFilename.c_str() + dotPos);
         if (extensionType == UNSUPPORTED_TYPE) {
             std::cerr << "File Extension is not supported, Only .JPG, JPEG, .BMP, .PNG, .TGA are supported" << '\n';
             throw std::invalid_argument("File Extension is not supported, Only .JPG, JPEG, .BMP, .PNG, .TGA are supported");
@@ -332,3 +336,5 @@ public:
 };
 
 #endif // _IMAGE_CLASS_H
+
+

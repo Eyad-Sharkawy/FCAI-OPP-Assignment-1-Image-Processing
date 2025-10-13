@@ -11,20 +11,20 @@ echo Building Image Studio (release)...
 REM Set Qt environment
 set PATH=C:\Qt\6.8.1\mingw_64\bin;C:\Qt\Tools\mingw1310_64\bin;%PATH%
 set QTDIR=C:\Qt\6.8.1\mingw_64
+set CMAKE_GENERATOR=MinGW Makefiles
 
-REM Clean previous release build
-if exist "build_release" rmdir /s /q build_release
-mkdir build_release
+REM Clean previous CMake release build
+if exist "cmake-build-release" rmdir /s /q cmake-build-release
 
-REM Generate Makefile with qmake (use absolute path to .pro)
-qmake "%PROJ_DIR%ImageStudio.pro"
+REM Configure with CMake (Release) using MinGW Makefiles
+cmake -S . -B cmake-build-release -G "%CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release
 
-REM Build the project using mingw32-make
-mingw32-make -f Makefile.Release
+REM Build with CMake (single-config generator)
+cmake --build cmake-build-release -j 8
 
 if %ERRORLEVEL% EQU 0 (
     echo.
-    echo Build successful! Executable should be in release/
+    echo Build successful! Executable should be in cmake-build-release\bin\
     echo.
 ) else (
     echo.

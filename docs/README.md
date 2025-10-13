@@ -112,17 +112,26 @@ Image Studio is a modern, feature-rich image processing application built with Q
 ```
 ImageStudio/
 ├── src/
-│   ├── gui/                   # GUI Components
-│   │   ├── image_studio.cpp   # Main application class
-│   │   └── mainwindow.ui      # Qt Designer UI file
-│   └── core/                  # Core Functionality
-│       └── Image_Class.h      # Image processing class
-├── third_party/               # External Libraries
-│   └── stb/                   # STB image library
-├── docs/                      # Documentation
-├── assets/                    # Resources
-├── scripts/                   # Build Scripts
-└── build_*/                   # Build Output
+│   ├── gui/                        # GUI Components
+│   │   ├── image_studio.cpp        # Main application class
+│   │   └── mainwindow.ui           # Qt Designer UI file
+│   └── core/                       # Core Functionality
+│       ├── image/                  # Image container + I/O
+│       │   ├── Image_Class.h
+│       │   └── Image_Class.cpp
+│       ├── filters/                # Image processing filters (Qt-aware)
+│       │   ├── ImageFilters.h
+│       │   └── ImageFilters.cpp
+│       ├── history/                # Undo/redo management
+│       │   └── HistoryManager.h
+│       └── io/                     # File I/O helpers
+│           └── ImageIO.h
+├── third_party/                    # External Libraries
+│   └── stb/                        # STB image library
+├── docs/                           # Documentation
+├── assets/                         # Resources
+├── scripts/                        # Build Scripts (Windows)
+└── cmake-build-*, build_portable/  # Build Output
 ```
 
 ## 🤝 Contributing
