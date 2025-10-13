@@ -1,3 +1,16 @@
+# Image Studio v2.0.0 - Qt Project File (qmake)
+# 
+# This qmake project file defines the build configuration for Image Studio
+# using Qt's qmake build system. It configures the project to use C++20,
+# Qt 6, and includes all necessary source files and dependencies.
+#
+# Note: This is the legacy build system. CMake is the recommended build system.
+#
+# Author: Image Studio Development Team
+# Institution: Faculty of Computers and Artificial Intelligence, Cairo University
+# Version: 2.0.0
+# Date: October 13, 2025
+
 QT += core widgets
 
 CONFIG += c++20

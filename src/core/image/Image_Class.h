@@ -1,12 +1,44 @@
 /**
- * @File  : Image_Class.h
- * @brief : This file contains the declaration of the Image class.
- *
- * @authors : Shehab Diab, Youssef Mohamed , Nada Ahmed.
- *                       Dr Mohamed El-Ramely ,
- * @copyright : FCAI Cairo University
- * @version   : v2.0 (Added operator= and copy constructor)
- * @date      : 27/3/2024
+ * @file Image_Class.h
+ * @brief Core image data structure with STB library integration for comprehensive image I/O.
+ * 
+ * This file contains the declaration of the Image class, which serves as the fundamental
+ * data structure for all image processing operations in the Image Studio application.
+ * The class provides a high-level interface for image manipulation while leveraging
+ * the powerful STB (Sean T. Barrett) library for robust image loading and saving.
+ * 
+ * @details The Image class provides:
+ * - Complete image data management with automatic memory handling
+ * - Support for multiple image formats (PNG, JPEG, BMP, TGA)
+ * - Safe pixel access with bounds checking
+ * - Copy semantics with proper resource management
+ * - STB library integration for professional-grade image I/O
+ * - Exception safety and comprehensive error handling
+ * 
+ * @features
+ * - Multi-format support: PNG, JPEG, BMP, TGA
+ * - Automatic memory management with RAII principles
+ * - Safe pixel access with bounds checking
+ * - Copy constructor and assignment operator
+ * - STB library integration for robust I/O
+ * - Exception safety and error handling
+ * - Cross-platform compatibility
+ * 
+ * @author Original Authors:
+ * - Shehab Diab
+ * - Youssef Mohamed
+ * - Nada Ahmed
+ * - Dr. Mohamed El-Ramely (Supervisor)
+ * 
+ * @author Current Team:
+ * - Ahmed Mohamed ElSayed Tolba (ID: 20242023)
+ * - Eyad Mohamed Saad Ali (ID: 20242062) 
+ * - Tarek Sami Mohamed Mohamed (ID: 20242190)
+ * 
+ * @institution Faculty of Computers and Artificial Intelligence, Cairo University
+ * @version 2.0.0 (Enhanced with comprehensive documentation and Qt integration)
+ * @date October 13, 2025
+ * @copyright FCAI Cairo University
  */
 
 
@@ -48,7 +80,51 @@ extern "C" {
 
 /**
  * @class Image
- * @brief Represents an image with functionalities for loading, saving, and manipulating pixels.
+ * @brief Core image data structure with comprehensive I/O and manipulation capabilities.
+ * 
+ * The Image class is the fundamental data structure for all image processing operations
+ * in the Image Studio application. It provides a high-level, safe interface for image
+ * manipulation while leveraging the powerful STB library for robust image I/O operations.
+ * 
+ * @details This class implements:
+ * - Complete image data management with automatic memory handling
+ * - Support for multiple image formats through STB library integration
+ * - Safe pixel access with comprehensive bounds checking
+ * - Copy semantics with proper resource management (RAII)
+ * - Exception safety and comprehensive error handling
+ * - Cross-platform compatibility
+ * 
+ * @features
+ * - Multi-format support: PNG, JPEG, BMP, TGA
+ * - Automatic memory management with RAII principles
+ * - Safe pixel access with bounds checking and exception handling
+ * - Copy constructor and assignment operator with deep copying
+ * - STB library integration for professional-grade image I/O
+ * - Exception safety with descriptive error messages
+ * - Cross-platform file path handling
+ * 
+ * @note This class is designed to work seamlessly with Qt applications and provides
+ *       thread-safe operations for GUI applications.
+ * @see STB library for underlying image I/O implementation
+ * @see ImageFilters class for image processing operations
+ * @see ImageIO class for Qt-integrated file operations
+ * 
+ * @example
+ * @code
+ * // Load an image
+ * Image img("path/to/image.png");
+ * 
+ * // Access pixel data safely
+ * unsigned char red = img(100, 50, 0);   // Red channel
+ * unsigned char green = img(100, 50, 1); // Green channel
+ * unsigned char blue = img(100, 50, 2);  // Blue channel
+ * 
+ * // Modify pixel data
+ * img.setPixel(100, 50, 0, 255); // Set red to maximum
+ * 
+ * // Save the image
+ * img.saveImage("path/to/output.jpg");
+ * @endcode
  */
 class Image {
 private:

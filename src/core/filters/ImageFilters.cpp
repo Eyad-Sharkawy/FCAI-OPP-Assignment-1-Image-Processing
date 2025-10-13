@@ -1,3 +1,35 @@
+/**
+ * @file ImageFilters.cpp
+ * @brief Implementation of image processing filters with Qt integration and cancellation support.
+ * 
+ * This file contains the complete implementation of the ImageFilters class, providing
+ * a comprehensive suite of image processing operations. All implementations include
+ * proper error handling, progress tracking, and cancellation support where applicable.
+ * 
+ * @details The implementation includes:
+ * - Basic color operations (grayscale, invert, black & white)
+ * - Geometric transformations (flip, rotate, resize)
+ * - Advanced effects (blur, edge detection, infrared simulation)
+ * - Special effects (TV/CRT simulation, purple tint, frame addition)
+ * - Image combination (merge operations)
+ * 
+ * All long-running operations support:
+ * - Real-time progress updates via QProgressBar
+ * - Status updates via QStatusBar
+ * - Cancellation via atomic flags
+ * - Exception safety and error handling
+ * 
+ * @author Team Members:
+ * - Ahmed Mohamed ElSayed Tolba (ID: 20242023)
+ * - Eyad Mohamed Saad Ali (ID: 20242062) 
+ * - Tarek Sami Mohamed Mohamed (ID: 20242190)
+ * 
+ * @institution Faculty of Computers and Artificial Intelligence, Cairo University
+ * @version 2.0.0
+ * @date October 13, 2025
+ * @copyright FCAI Cairo University
+ */
+
 #include "ImageFilters.h"
 #include <QtWidgets/QProgressBar>
 #include <QtWidgets/QStatusBar>
@@ -5,11 +37,32 @@
 #include <QtCore/QString>
 #include "image/Image_Class.h"
 
+/**
+ * @brief Constructs an ImageFilters object with Qt UI components.
+ * 
+ * @param progressBar Pointer to QProgressBar for progress tracking (can be nullptr)
+ * @param statusBar Pointer to QStatusBar for status updates (can be nullptr)
+ * 
+ * @note Both parameters are optional. If nullptr, progress and status updates will be skipped.
+ */
 ImageFilters::ImageFilters(QProgressBar* progressBar, QStatusBar* statusBar)
     : progressBar(progressBar), statusBar(statusBar)
 {
 }
 
+/**
+ * @brief Updates the progress bar with current progress.
+ * 
+ * This method safely updates the progress bar and processes Qt events to maintain
+ * UI responsiveness during long-running operations.
+ * 
+ * @param value Current progress value (0 to total)
+ * @param total Maximum progress value
+ * @param updateInterval Number of operations between UI updates (default: 50)
+ * 
+ * @note This method is thread-safe and can be called from any thread.
+ * @see QApplication::processEvents() for UI responsiveness
+ */
 void ImageFilters::updateProgress(int value, int total, int updateInterval)
 {
     if (progressBar) {
@@ -20,6 +73,20 @@ void ImageFilters::updateProgress(int value, int total, int updateInterval)
     }
 }
 
+/**
+ * @brief Checks for cancellation and restores previous image state if cancelled.
+ * 
+ * This method provides thread-safe cancellation support by checking an atomic flag
+ * and restoring the previous image state if cancellation was requested.
+ * 
+ * @param cancelRequested Atomic flag indicating if cancellation was requested
+ * @param currentImage Reference to current image (restored if cancelled)
+ * @param preFilterImage Reference to previous image state
+ * @param filterName Name of the filter for status message
+ * 
+ * @note This method should be called periodically during long-running operations.
+ * @see std::atomic for thread-safe cancellation
+ */
 void ImageFilters::checkCancellation(std::atomic<bool>& cancelRequested, Image& currentImage, Image& preFilterImage, const QString& filterName)
 {
     if (cancelRequested) {

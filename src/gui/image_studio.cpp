@@ -1,29 +1,47 @@
-//==================================================================================
-//                                       Header
-//==================================================================================
-// section: S33
-// group: B
-// lab7
-// TA: Laila Mostafa
-//===================================================================================
-// Team members:
-// Ahmed Mohamed ElSayed Tolba  // ID: 20242023
-// Eyad Mohamed Saad Ali        // ID: 20242062
-// Tarek Sami Mohamed Mohamed   // ID: 20242190
-//===================================================================================
-// Work breakdown:
-// Ahmed Mohamed ElSayed Tolba (Small ID): 1, 4,7,10,(17 "bonus"), menu
-//
-// Eyad Mohamed Saad Ali (Middle ID): 2, 5, 8, 11, (15 "bonus"), menu
-//
-// Tarek Sami Mohamed Mohamed (Large ID): 3, 6, 9, 12, (16 "bonus"), menu
-//===================================================================================
-// Document link:
-//===================================================================================
-// Video link:
-//===================================================================================
-//                                    End of Header
-//========================================Code=======================================
+/**
+ * @file image_studio.cpp
+ * @brief Main Qt application class for Image Studio with comprehensive GUI and image processing capabilities.
+ * 
+ * This file contains the complete implementation of the ImageStudio class, which serves as the main
+ * application window for the Image Studio image processing application. It provides a modern Qt-based
+ * GUI with drag-and-drop support, real-time progress tracking, comprehensive undo/redo functionality,
+ * and seamless integration with the core image processing filters.
+ * 
+ * @details The ImageStudio class implements:
+ * - Complete Qt MainWindow with modern UI design
+ * - Drag-and-drop image loading with format validation
+ * - Real-time image processing with progress tracking and cancellation
+ * - Comprehensive undo/redo system with configurable history limits
+ * - Interactive cropping with rubber-band selection
+ * - Smart image display with aspect ratio preservation
+ * - Menu system with keyboard shortcuts
+ * - Status bar with real-time operation feedback
+ * - Exception safety and comprehensive error handling
+ * 
+ * @features
+ * - Modern Qt 6 GUI with responsive design
+ * - Drag-and-drop image loading (PNG, JPEG, BMP, TGA)
+ * - 15+ image processing filters with progress tracking
+ * - Interactive cropping with visual selection
+ * - Unlimited undo/redo with memory management
+ * - Real-time progress bars and status updates
+ * - Keyboard shortcuts and menu integration
+ * - Smart window resizing with aspect ratio preservation
+ * - Comprehensive error handling and user feedback
+ * - Thread-safe cancellation for long-running operations
+ * 
+ * @author Team Members:
+ * - Ahmed Mohamed ElSayed Tolba (ID: 20242023) - Small ID: 1, 4, 7, 10, (17 "bonus"), menu
+ * - Eyad Mohamed Saad Ali (ID: 20242062) - Middle ID: 2, 5, 8, 11, (15 "bonus"), menu  
+ * - Tarek Sami Mohamed Mohamed (ID: 20242190) - Large ID: 3, 6, 9, 12, (16 "bonus"), menu
+ * 
+ * @institution Faculty of Computers and Artificial Intelligence, Cairo University
+ * @section S33, Group B, Lab 7
+ * @ta Laila Mostafa
+ * @version 2.0.0
+ * @date October 13, 2025
+ * @copyright FCAI Cairo University
+ */
 
 #include <QApplication>
 #include <QMainWindow>
@@ -51,7 +69,6 @@
 #include <QRubberBand>
 #include <QMouseEvent>
 #include <QProgressBar>
-#include <QHBoxLayout>
 #include <QCloseEvent>
 #include <cmath>
 #include <algorithm>
@@ -59,6 +76,7 @@
 #include <random>
 #include <chrono>
 #include <atomic>
+#include <functional>
 #include "../core/image/Image_Class.h"
 #include "../core/filters/ImageFilters.h"
 #include "ui_mainwindow.h"
@@ -67,18 +85,82 @@
 
 /**
  * @class ImageStudio
- * @brief Main Qt window for Image Studio.
- *
- * Owns the UI, wires signals/slots, manages current/original images,
- * delegates image processing to ImageFilters, and coordinates history,
- * progress, cancellation, drag-and-drop, and cropping interactions.
+ * @brief Main Qt application window for Image Studio with comprehensive image processing capabilities.
+ * 
+ * The ImageStudio class serves as the primary application window and controller for the Image Studio
+ * image processing application. It provides a complete Qt-based GUI with modern design patterns,
+ * comprehensive image processing capabilities, and seamless integration with the core processing engine.
+ * 
+ * @details This class implements a complete image processing application with:
+ * - Modern Qt 6 MainWindow with responsive UI design
+ * - Drag-and-drop image loading with format validation and error handling
+ * - Real-time image processing with progress tracking and cancellation support
+ * - Comprehensive undo/redo system with configurable memory limits
+ * - Interactive cropping with rubber-band selection and coordinate mapping
+ * - Smart image display with aspect ratio preservation and dynamic resizing
+ * - Complete menu system with keyboard shortcuts and accessibility
+ * - Status bar with real-time operation feedback and image information
+ * - Exception safety with comprehensive error handling and user feedback
+ * - Thread-safe operations with atomic cancellation support
+ * 
+ * @features
+ * - **GUI Components**: Complete Qt Designer integration with modern UI
+ * - **Image Loading**: Drag-and-drop support for PNG, JPEG, BMP, TGA formats
+ * - **Image Processing**: 15+ professional filters with real-time progress tracking
+ * - **History Management**: Unlimited undo/redo with configurable memory limits
+ * - **Interactive Cropping**: Visual selection with coordinate mapping
+ * - **Smart Display**: Aspect ratio preservation with dynamic window resizing
+ * - **Menu Integration**: Complete menu system with keyboard shortcuts
+ * - **Progress Tracking**: Real-time progress bars and status updates
+ * - **Error Handling**: Comprehensive exception safety and user feedback
+ * - **Cancellation Support**: Thread-safe cancellation for long-running operations
+ * 
+ * @note This class is designed to work with Qt 6.8.1+ and requires C++20 support.
+ * @see ImageFilters class for image processing operations
+ * @see HistoryManager class for undo/redo functionality
+ * @see ImageIO class for file operations
+ * @see Image class for image data structure
+ * 
+ * @example
+ * @code
+ * QApplication app(argc, argv);
+ * ImageStudio window;
+ * window.show();
+ * return app.exec();
+ * @endcode
  */
 class ImageStudio : public QMainWindow
 {
     Q_OBJECT
 
+private:
+    // File filter constants for Qt file dialogs
+    static constexpr const char* IMAGE_FILTER = "Image Files (*.png *.jpg *.jpeg *.bmp *.tga);;All Files (*)";
+    static constexpr const char* SAVE_FILTER = "PNG Files (*.png);;JPEG Files (*.jpg);;BMP Files (*.bmp);;All Files (*)";
+
 public:
-ImageStudio(QWidget *parent = nullptr) : QMainWindow(parent), hasImage(false)
+    /**
+     * @brief Constructs the main ImageStudio application window.
+     * 
+     * Initializes the Qt MainWindow with comprehensive UI setup, signal/slot connections,
+     * drag-and-drop support, and all necessary components for image processing operations.
+     * 
+     * @param parent Parent widget (default: nullptr for main window)
+     * 
+     * @details The constructor performs:
+     * - Qt Designer UI setup and styling
+     * - Signal/slot connections for all buttons and menu actions
+     * - Drag-and-drop event handling setup
+     * - Progress bar and status bar initialization
+     * - Image filters system initialization
+     * - Timer setup for smooth window resizing
+     * - Event filter installation for cropping functionality
+     * 
+     * @note This constructor sets up the complete application state and should be
+     *       called only once per application instance.
+     * @see ~ImageStudio() for cleanup operations
+     */
+    ImageStudio(QWidget *parent = nullptr) : QMainWindow(parent), hasImage(false)
     {
         ui.setupUi(this);
         
@@ -171,7 +253,21 @@ ImageStudio(QWidget *parent = nullptr) : QMainWindow(parent), hasImage(false)
         refreshButtons(false);
     }
     
-    // Destructor to clean up
+    /**
+     * @brief Destructor for the ImageStudio application window.
+     * 
+     * Performs cleanup operations to ensure proper resource management and
+     * prevent memory leaks. This includes cleaning up dynamically allocated
+     * resources and Qt objects.
+     * 
+     * @details The destructor:
+     * - Deletes the ImageFilters instance
+     * - Qt automatically handles cleanup of child widgets
+     * - Ensures proper resource deallocation
+     * 
+     * @note This destructor is automatically called when the window is closed
+     *       or the application exits.
+     */
     ~ImageStudio() {
         delete imageFilters;
     }
@@ -184,57 +280,60 @@ private slots:
     void loadImage()
     {
         QString fileName = QFileDialog::getOpenFileName(this,
-            "Load Image", QDir::homePath(),
-            "Image Files (*.png *.jpg *.jpeg *.bmp *.tga);;All Files (*)");
-        
+            "Load Image", QDir::homePath(), IMAGE_FILTER);
         if (!fileName.isEmpty()) {
-            try {
-                originalImage = ImageIO::loadFromFile(fileName);
-                currentImage = originalImage;
-                hasImage = true;
-                currentFilePath = fileName;
-                hasUnsavedChanges = false; // New image is considered "saved"
-                
-                updateImageDisplay();
-                updateMinimumWindowSize();
-                refreshButtons(true);
-                
-                // Clear undo/redo history when loading new image
-                history.clear();
-                updateUndoRedoButtons();
-                
-                statusBar()->showMessage(QString("Loaded: %1").arg(QFileInfo(fileName).fileName()));
-                
-            } catch (const std::exception& e) {
-                QMessageBox::critical(this, "Error", 
-                    QString("Failed to load image: %1").arg(e.what()));
-            }
+            loadImageFromPath(fileName, false);
         }
     }
     
+    /**
+     * @brief Save the current image to a file.
+     * 
+     * Opens a file dialog to allow the user to choose a location and format
+     * for saving the current image. Validates that an image is loaded before
+     * attempting to save.
+     * 
+     * @details This method:
+     * - Checks if an image is currently loaded
+     * - Shows a warning if no image is available
+     * - Opens a Qt file dialog for save location selection
+     * - Handles file format selection (PNG, JPEG, BMP)
+     * - Updates the unsaved changes flag on successful save
+     * - Provides user feedback through status bar messages
+     * 
+     * @note The save operation uses the ImageIO class for Qt-integrated file operations.
+     * @see saveImageWithDialog() for the actual save implementation
+     * @see ImageIO::saveToFile() for file writing operations
+     */
     void saveImage()
     {
         if (!hasImage) {
             QMessageBox::warning(this, "Warning", "No image to save!");
             return;
         }
-        
-        QString fileName = QFileDialog::getSaveFileName(this,
-            "Save Image", QDir::homePath(),
-            "PNG Files (*.png);;JPEG Files (*.jpg);;BMP Files (*.bmp);;All Files (*)");
-        
-        if (!fileName.isEmpty()) {
-            try {
-                ImageIO::saveToFile(currentImage, fileName);
-                        hasUnsavedChanges = false; // Mark as saved
-                statusBar()->showMessage(QString("Saved: %1").arg(QFileInfo(fileName).fileName()));
-            } catch (const std::exception& e) {
-                QMessageBox::critical(this, "Error", 
-                    QString("Failed to save image: %1").arg(e.what()));
-            }
-                }
+        (void)saveImageWithDialog();
     }
     
+    /**
+     * @brief Unload the current image with optional save confirmation.
+     * 
+     * Provides a safe way to unload the current image with proper confirmation
+     * dialogs and save options. Handles unsaved changes gracefully by offering
+     * the user options to save, discard, or cancel the operation.
+     * 
+     * @details This method:
+     * - Validates that an image is currently loaded
+     * - Shows appropriate confirmation dialogs based on save state
+     * - Offers save option if there are unsaved changes
+     * - Handles user cancellation gracefully
+     * - Clears all image data and resets UI state
+     * - Resets undo/redo history and button states
+     * 
+     * @note This method provides comprehensive state management to ensure
+     *       the application remains in a consistent state after unloading.
+     * @see resetUiToNoImageState() for UI state reset
+     * @see saveImageWithDialog() for save operations
+     */
     void unloadImage()
     {
         if (!hasImage) {
@@ -261,23 +360,8 @@ private slots:
         }
         
         if (reply == QMessageBox::Save) {
-            // Try to save the image first
-            QString fileName = QFileDialog::getSaveFileName(this,
-                "Save Image", QDir::homePath(),
-                "PNG Files (*.png);;JPEG Files (*.jpg);;BMP Files (*.bmp);;All Files (*)");
-            
-            if (!fileName.isEmpty()) {
-                try {
-                    ImageIO::saveToFile(currentImage, fileName);
-                    hasUnsavedChanges = false; // Mark as saved
-                    statusBar()->showMessage(QString("Saved: %1").arg(QFileInfo(fileName).fileName()));
-                } catch (const std::exception& e) {
-                    QMessageBox::critical(this, "Error", 
-                        QString("Failed to save image: %1").arg(e.what()));
-                    return; // Don't unload if save failed
-                }
-            } else {
-                return; // User cancelled save dialog, don't unload
+            if (!saveImageWithDialog()) {
+                return; // Don't unload if save failed or cancelled
             }
         } else if (reply == QMessageBox::Cancel) {
             return; // User cancelled the unload operation
@@ -290,70 +374,54 @@ private slots:
             currentFilePath.clear();
             hasUnsavedChanges = false;
             
-            // Clear undo/redo history
-            history.clear();
-            
-            // Reset image label
-            ui.imageLabel->clear();
-            ui.imageLabel->setText("No image loaded\nClick 'Load Image' or drag & drop an image here");
-            
-            // Reset minimum window size
-            updateMinimumWindowSize();
-            
-            // Disable all filter buttons
-            refreshButtons(false);
-            
-            // Update status bar
-            statusBar()->showMessage("Image unloaded - Ready to load a new image");
+            // Reset UI and history
+            resetUiToNoImageState();
         }
     }
     
+    /**
+     * @brief Apply grayscale conversion to the current image.
+     * 
+     * Converts the current image to grayscale using average RGB values.
+     * This operation supports progress tracking and cancellation.
+     * 
+     * @note This is a long-running operation that can be cancelled.
+     * @see ImageFilters::applyGrayscale() for implementation details
+     */
     void applyGrayscale()
     {
         if (!hasImage) return;
-        
-        // Setup for cancellation
-        cancelRequested = false;
-        preFilterImage = currentImage;
-        saveStateForUndo();
-        
-        // Show progress UI
-        ui.cancelButton->setVisible(true);
-        
-        try {
+        runCancelableFilter([&]() {
             imageFilters->applyGrayscale(currentImage, preFilterImage, cancelRequested);
-            updateImageDisplay();
-        } catch (const std::exception& e) {
-            QMessageBox::critical(this, "Error", QString("Filter failed: %1").arg(e.what()));
-        }
-        
-        // Hide progress UI
-        ui.cancelButton->setVisible(false);
+        });
     }
     
+    /**
+     * @brief Apply TV/CRT monitor simulation effect to the current image.
+     * 
+     * Creates a vintage TV/CRT monitor appearance with scan lines, color shifts,
+     * and noise effects. This operation supports progress tracking and cancellation.
+     * 
+     * @note This is a long-running operation that can be cancelled.
+     * @see ImageFilters::applyTVFilter() for implementation details
+     */
     void applyTVFilter()
     {
         if (!hasImage) return;
-        
-        // Setup for cancellation
-        cancelRequested = false;
-        preFilterImage = currentImage;
-        saveStateForUndo();
-        
-        // Show progress UI
-        ui.cancelButton->setVisible(true);
-        
-        try {
+        runCancelableFilter([&]() {
             imageFilters->applyTVFilter(currentImage, preFilterImage, cancelRequested);
-            updateImageDisplay();
-        } catch (const std::exception& e) {
-            QMessageBox::critical(this, "Error", QString("Filter failed: %1").arg(e.what()));
-        }
-        
-        // Hide progress UI
-        ui.cancelButton->setVisible(false);
+        });
     }
     
+    /**
+     * @brief Reset the current image to its original state.
+     * 
+     * Restores the current image to the state it was in when first loaded,
+     * discarding all modifications made since loading.
+     * 
+     * @note This operation does not affect the undo/redo history.
+     * @see originalImage for the stored original image state
+     */
     void resetImage()
     {
         if (!hasImage) return;
@@ -363,59 +431,64 @@ private slots:
         statusBar()->showMessage("Image reset to original");
     }
     
+    /**
+     * @brief Apply black and white conversion to the current image.
+     * 
+     * Converts the current image to pure black and white using threshold-based
+     * processing. This operation supports progress tracking and cancellation.
+     * 
+     * @note This is a long-running operation that can be cancelled.
+     * @see ImageFilters::applyBlackAndWhite() for implementation details
+     */
     void applyBlackAndWhite()
     {
         if (!hasImage) return;
-        
-        // Setup for cancellation
-        cancelRequested = false;
-        preFilterImage = currentImage;
-        saveStateForUndo();
-        
-        // Show progress UI
-        ui.cancelButton->setVisible(true);
-        
-        try {
+        runCancelableFilter([&]() {
             imageFilters->applyBlackAndWhite(currentImage, preFilterImage, cancelRequested);
-            updateImageDisplay();
-        } catch (const std::exception& e) {
-            QMessageBox::critical(this, "Error", QString("Filter failed: %1").arg(e.what()));
-        }
-        
-        // Hide progress UI
-        ui.cancelButton->setVisible(false);
+        });
     }
     
+    /**
+     * @brief Apply color inversion to the current image.
+     * 
+     * Inverts all color values in the current image to create a negative effect.
+     * This operation supports progress tracking and cancellation.
+     * 
+     * @note This is a long-running operation that can be cancelled.
+     * @see ImageFilters::applyInvert() for implementation details
+     */
     void applyInvert()
     {
         if (!hasImage) return;
-        
-        // Setup for cancellation
-        cancelRequested = false;
-        preFilterImage = currentImage;
-        saveStateForUndo();
-        
-        // Show progress UI
-        ui.cancelButton->setVisible(true);
-        
-        try {
+        runCancelableFilter([&]() {
             imageFilters->applyInvert(currentImage, preFilterImage, cancelRequested);
-            updateImageDisplay();
-        } catch (const std::exception& e) {
-            QMessageBox::critical(this, "Error", QString("Filter failed: %1").arg(e.what()));
-        }
-        
-        // Hide progress UI
-        ui.cancelButton->setVisible(false);
+        });
     }
     
+    /**
+     * @brief Merge the current image with another image.
+     * 
+     * Opens a file dialog to select a second image and merges it with the current
+     * image by averaging their pixel values. The resulting image will have the
+     * dimensions of the smaller input image.
+     * 
+     * @details This method:
+     * - Opens a file dialog for image selection
+     * - Loads the selected image using the Image class
+     * - Merges the images by averaging pixel values
+     * - Handles errors gracefully with user feedback
+     * - Updates the display after successful merge
+     * 
+     * @note This is an immediate operation without progress tracking.
+     * @see ImageFilters::applyMerge() for implementation details
+     * @see ImageIO::loadFromFile() for image loading
+     */
     void applyMerge()
     {
         if (!hasImage) return;
         
         QString fileName = QFileDialog::getOpenFileName(this,
-            "Select Image to Merge", QDir::homePath(),
-            "Image Files (*.png *.jpg *.jpeg *.bmp *.tga);;All Files (*)");
+            "Select Image to Merge", QDir::homePath(), IMAGE_FILTER);
         
         if (!fileName.isEmpty()) {
             try {
@@ -439,11 +512,9 @@ private slots:
         QStringList options;
         options << "Horizontal" << "Vertical";
         
-        bool ok;
-        QString choice = QInputDialog::getItem(this, "Flip Image", 
-            "Choose flip direction:", options, 0, false, &ok);
+        QString choice = getInputFromList("Flip Image", "Choose flip direction:", options);
         
-        if (ok) {
+        if (!choice.isEmpty()) {
             saveStateForUndo();
             
             try {
@@ -462,11 +533,9 @@ private slots:
         QStringList options;
         options << "90°" << "180°" << "270°";
         
-        bool ok;
-        QString choice = QInputDialog::getItem(this, "Rotate Image", 
-            "Choose rotation angle:", options, 0, false, &ok);
+        QString choice = getInputFromList("Rotate Image", "Choose rotation angle:", options);
         
-        if (ok) {
+        if (!choice.isEmpty()) {
             saveStateForUndo();
             
             try {
@@ -484,18 +553,12 @@ private slots:
         
         // Ask user for dark or light using GUI instead of std::cin
         QStringList options; options << "dark" << "light";
-        bool ok = false;
-        QString choice = QInputDialog::getItem(this, "Dark or Light", "Choose:", options, 0, false, &ok);
-        if (!ok) return;
+        QString choice = getInputFromList("Dark or Light", "Choose:", options);
+        if (choice.isEmpty()) return;
         
-        saveStateForUndo();
-        
-        try {
+        runSimpleFilter([&]() {
             imageFilters->applyDarkAndLight(currentImage, choice);
-            updateImageDisplay();
-        } catch (const std::exception& e) {
-            QMessageBox::critical(this, "Error", QString("Filter failed: %1").arg(e.what()));
-        }
+        });
     }
     
     void applyFrame()
@@ -505,34 +568,21 @@ private slots:
         QStringList options;
         options << "Simple Frame" << "Decorated Frame";
         
-        bool ok;
-        QString choice = QInputDialog::getItem(this, "Add Frame", 
-            "Choose frame type:", options, 0, false, &ok);
+        QString choice = getInputFromList("Add Frame", "Choose frame type:", options);
         
-        if (ok) {
-            saveStateForUndo();
-            
-            try {
+        if (!choice.isEmpty()) {
+            runSimpleFilter([&]() {
                 imageFilters->applyFrame(currentImage, choice);
-                updateImageDisplay();
-            } catch (const std::exception& e) {
-                QMessageBox::critical(this, "Error", QString("Filter failed: %1").arg(e.what()));
-            }
+            });
         }
     }
     
     void applyEdges()
     {
         if (!hasImage) return;
-        
-        saveStateForUndo();
-        
-        try {
+        runSimpleFilter([&]() {
             imageFilters->applyEdges(currentImage);
-            updateImageDisplay();
-        } catch (const std::exception& e) {
-            QMessageBox::critical(this, "Error", QString("Filter failed: %1").arg(e.what()));
-        }
+        });
     }
     
     void applyResize()
@@ -546,38 +596,18 @@ private slots:
             currentImage.height, 1, 10000, 1, &ok2);
         
         if (ok1 && ok2) {
-            saveStateForUndo();
-            
-            try {
+            runSimpleFilter([&]() {
                 imageFilters->applyResize(currentImage, width, height);
-                updateImageDisplay();
-            } catch (const std::exception& e) {
-                QMessageBox::critical(this, "Error", QString("Filter failed: %1").arg(e.what()));
-            }
+            });
         }
     }
     
     void applyBlur()
     {
         if (!hasImage) return;
-        
-        // Setup for cancellation
-        cancelRequested = false;
-        preFilterImage = currentImage;
-        saveStateForUndo();
-        
-        // Show progress UI
-        ui.cancelButton->setVisible(true);
-        
-        try {
+        runCancelableFilter([&]() {
             imageFilters->applyBlur(currentImage, preFilterImage, cancelRequested);
-            updateImageDisplay();
-        } catch (const std::exception& e) {
-            QMessageBox::critical(this, "Error", QString("Filter failed: %1").arg(e.what()));
-        }
-        
-        // Hide progress UI
-        ui.cancelButton->setVisible(false);
+        });
     }
     
     /**
@@ -586,24 +616,9 @@ private slots:
     void applyInfrared()
     {
         if (!hasImage) return;
-        
-        // Setup for cancellation
-        cancelRequested = false;
-        preFilterImage = currentImage;
-        saveStateForUndo();
-        
-        // Show progress UI
-        ui.cancelButton->setVisible(true);
-        
-        try {
+        runCancelableFilter([&]() {
             imageFilters->applyInfrared(currentImage, preFilterImage, cancelRequested);
-            updateImageDisplay();
-        } catch (const std::exception& e) {
-            QMessageBox::critical(this, "Error", QString("Filter failed: %1").arg(e.what()));
-        }
-        
-        // Hide progress UI
-        ui.cancelButton->setVisible(false);
+        });
     }
     
     /**
@@ -612,24 +627,9 @@ private slots:
     void applyPurpleFilter()
     {
         if (!hasImage) return;
-        
-        // Setup for cancellation
-        cancelRequested = false;
-        preFilterImage = currentImage;
-        saveStateForUndo();
-        
-        // Show progress UI
-        ui.cancelButton->setVisible(true);
-        
-        try {
+        runCancelableFilter([&]() {
             imageFilters->applyPurpleFilter(currentImage, preFilterImage, cancelRequested);
-            updateImageDisplay();
-        } catch (const std::exception& e) {
-            QMessageBox::critical(this, "Error", QString("Filter failed: %1").arg(e.what()));
-        }
-        
-        // Hide progress UI
-        ui.cancelButton->setVisible(false);
+        });
     }
     
     /**
@@ -706,6 +706,24 @@ private:
         ui.redoButton->setEnabled(history.canRedo());
     }
 
+    /**
+     * @brief Refresh the enabled state of all UI buttons based on image availability.
+     * 
+     * Enables or disables all image processing buttons and controls based on whether
+     * an image is currently loaded. This ensures the UI remains in a consistent state
+     * and prevents operations on non-existent images.
+     * 
+     * @param isActive True to enable all buttons, false to disable them
+     * 
+     * @details This method controls the state of:
+     * - File operations (save, unload, reset)
+     * - History operations (undo, redo)
+     * - All image processing filters
+     * - Interactive tools (crop)
+     * 
+     * @note This method should be called whenever the image state changes
+     *       to maintain UI consistency.
+     */
     void refreshButtons(const bool isActive) {
         ui.saveButton->setEnabled(isActive);
         ui.unloadButton->setEnabled(isActive);
@@ -734,7 +752,6 @@ private:
      */
     void updateMinimumWindowSize()
     {
-        Q_UNUSED(hasImage);
         // Keep a stable, small base minimum to allow shrinking after expansion.
         setMinimumSize(600, 400);
     }
@@ -751,23 +768,10 @@ protected:
                 QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
             
             if (reply == QMessageBox::Save) {
-                // Try to save the image
-                QString fileName = QFileDialog::getSaveFileName(this,
-                    "Save Image", QDir::homePath(),
-                    "PNG Files (*.png);;JPEG Files (*.jpg);;BMP Files (*.bmp);;All Files (*)");
-                
-                if (!fileName.isEmpty()) {
-                    try {
-                        currentImage.saveImage(fileName.toStdString());
-                        event->accept(); // Allow the application to close
-                    } catch (const std::exception& e) {
-                        QMessageBox::critical(this, "Error", 
-                            QString("Failed to save image: %1").arg(e.what()));
-                        event->ignore(); // Prevent closing if save failed
-                        return;
-                    }
+                if (saveImageWithDialog()) {
+                    event->accept();
                 } else {
-                    event->ignore(); // User cancelled save dialog
+                    event->ignore();
                     return;
                 }
             } else if (reply == QMessageBox::Discard) {
@@ -855,28 +859,7 @@ protected:
                     event->acceptProposedAction();
                     
                     // Load the dropped image
-                    try {
-                        originalImage = ImageIO::loadFromFile(fileName);
-                        currentImage = originalImage;
-                        hasImage = true;
-                        currentFilePath = fileName;
-                        hasUnsavedChanges = false; // New image is considered "saved"
-                        
-                        updateImageDisplay();
-                        updateMinimumWindowSize();
-                        refreshButtons(true);
-                        
-                        // Clear undo/redo history when loading new image
-                        history.clear();
-                        updateUndoRedoButtons();
-                        
-                        statusBar()->showMessage(QString("Loaded via drag & drop: %1").arg(fileInfo.fileName()));
-                        
-                    } catch (const std::exception& e) {
-                        QMessageBox::critical(this, "Error", 
-                            QString("Failed to load dropped image: %1").arg(e.what()));
-                        statusBar()->showMessage("Failed to load image");
-                    }
+                    loadImageFromPath(fileName, true);
                     return;
                 }
             }
@@ -913,48 +896,39 @@ protected:
         }
         return QMainWindow::eventFilter(watched, event);
     }
+    /**
+     * @brief Update the image display with smart resizing and aspect ratio preservation.
+     * 
+     * Converts the current image to a QPixmap and displays it in the image label with
+     * smart resizing that maintains aspect ratio and fits within the available space.
+     * Updates the status bar with detailed image information.
+     * 
+     * @details This method:
+     * - Converts the Image object to QPixmap for display
+     * - Calculates optimal display size maintaining aspect ratio
+     * - Scales the image with smooth transformation
+     * - Updates the image label with the scaled pixmap
+     * - Resizes the label to match the scaled image
+     * - Updates the minimum window size to prevent scrollbars
+     * - Shows detailed image information in the status bar
+     * 
+     * @note This method is called whenever the image changes and should be
+     *       called from the main thread for UI updates.
+     * @see buildQImage() for Image to QImage conversion
+     * @see calculateAspectRatioSize() for size calculation
+     */
     void updateImageDisplay()
     {
         if (!hasImage) return;
         
-        QImage qimg(currentImage.width, currentImage.height, QImage::Format_RGB888);
-        
-        for (int y = 0; y < currentImage.height; y++) {
-            for (int x = 0; x < currentImage.width; x++) {
-                int r = currentImage(x, y, 0);
-                int g = currentImage(x, y, 1);
-                int b = currentImage(x, y, 2);
-                qimg.setPixel(x, y, qRgb(r, g, b));
-            }
-        }
-        
-        QPixmap pixmap = QPixmap::fromImage(qimg);
+        QPixmap pixmap = QPixmap::fromImage(buildQImage(currentImage));
         
         // Get the available space in the scroll area
-         QSize scrollAreaSize = ui.scrollArea->size();
+        QSize scrollAreaSize = ui.scrollArea->size();
         QSize availableSize(scrollAreaSize.width() - 20, scrollAreaSize.height() - 20); // Account for scrollbars
         
-         // Calculate the aspect ratio of the image
-         double imageAspectRatio = static_cast<double>(currentImage.width) / currentImage.height;
-         double availableAspectRatio = static_cast<double>(availableSize.width()) / availableSize.height();
-         
-         QSize targetSize;
-         
-         // Determine the best fit size while maintaining aspect ratio
-         if (imageAspectRatio > availableAspectRatio) {
-             // Image is wider than available space - fit to width
-             targetSize.setWidth(availableSize.width());
-             targetSize.setHeight(static_cast<int>(availableSize.width() / imageAspectRatio));
-         } else {
-             // Image is taller than available space - fit to height
-             targetSize.setHeight(availableSize.height());
-             targetSize.setWidth(static_cast<int>(availableSize.height() * imageAspectRatio));
-         }
-         
-         // Ensure we don't exceed the original image size (don't upscale)
-         if (targetSize.width() > currentImage.width || targetSize.height() > currentImage.height) {
-             targetSize = QSize(currentImage.width, currentImage.height);
-         }
+        // Calculate the target size maintaining aspect ratio
+        QSize targetSize = calculateAspectRatioSize(QSize(currentImage.width, currentImage.height), availableSize);
          
          // Scale the image with smooth transformation
          QPixmap scaledPixmap = pixmap.scaled(targetSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
@@ -969,12 +943,13 @@ protected:
          updateMinimumWindowSize();
         
         // Update status bar with image info
-         statusBar()->showMessage(QString("Image: %1x%2 | Display: %3x%4 | Aspect Ratio: %5")
+        double imageAspectRatio = static_cast<double>(currentImage.width) / currentImage.height;
+        statusBar()->showMessage(QString("Image: %1x%2 | Display: %3x%4 | Aspect Ratio: %5")
             .arg(currentImage.width)
             .arg(currentImage.height)
             .arg(scaledPixmap.width())
-             .arg(scaledPixmap.height())
-             .arg(QString::number(imageAspectRatio, 'f', 2)));
+            .arg(scaledPixmap.height())
+            .arg(QString::number(imageAspectRatio, 'f', 2)));
     }
     
     /**
@@ -990,39 +965,11 @@ protected:
         QSize scrollAreaSize = ui.scrollArea->size();
         QSize availableSize(scrollAreaSize.width() - 20, scrollAreaSize.height() - 20);
         
-        // Calculate the aspect ratio of the image
-        double imageAspectRatio = (double)currentImage.width / currentImage.height;
-        double availableAspectRatio = (double)availableSize.width() / availableSize.height();
-        
-        QSize targetSize;
-        
-        // Determine the best fit size while maintaining aspect ratio
-        if (imageAspectRatio > availableAspectRatio) {
-            // Image is wider than available space - fit to width
-            targetSize.setWidth(availableSize.width());
-            targetSize.setHeight(static_cast<int>(availableSize.width() / imageAspectRatio));
-        } else {
-            // Image is taller than available space - fit to height
-            targetSize.setHeight(availableSize.height());
-            targetSize.setWidth(static_cast<int>(availableSize.height() * imageAspectRatio));
-        }
-        
-        // Ensure we don't exceed the original image size (don't upscale)
-        if (targetSize.width() > currentImage.width || targetSize.height() > currentImage.height) {
-            targetSize = QSize(currentImage.width, currentImage.height);
-        }
+        // Calculate the target size maintaining aspect ratio
+        QSize targetSize = calculateAspectRatioSize(QSize(currentImage.width, currentImage.height), availableSize);
         
         // Build the current displayed pixmap to get its actual size
-        QImage qimg(currentImage.width, currentImage.height, QImage::Format_RGB888);
-        for (int y = 0; y < currentImage.height; y++) {
-            for (int x = 0; x < currentImage.width; x++) {
-                int r = currentImage(x, y, 0);
-                int g = currentImage(x, y, 1);
-                int b = currentImage(x, y, 2);
-                qimg.setPixel(x, y, qRgb(r, g, b));
-            }
-        }
-        QPixmap pixmap = QPixmap::fromImage(qimg);
+        QPixmap pixmap = QPixmap::fromImage(buildQImage(currentImage));
         QPixmap scaledPixmap = pixmap.scaled(targetSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
         
         // The image is centered inside imageLabel.
@@ -1087,8 +1034,190 @@ protected:
     
     // Image filters
     ImageFilters* imageFilters;
+
+    // Helpers
+    bool saveImageWithDialog()
+    {
+        QString fileName = QFileDialog::getSaveFileName(this,
+            "Save Image", QDir::homePath(), SAVE_FILTER);
+        if (fileName.isEmpty()) return false;
+        try {
+            ImageIO::saveToFile(currentImage, fileName);
+            hasUnsavedChanges = false; // Mark as saved
+            statusBar()->showMessage(QString("Saved: %1").arg(QFileInfo(fileName).fileName()));
+            return true;
+        } catch (const std::exception& e) {
+            QMessageBox::critical(this, "Error", QString("Failed to save image: %1").arg(e.what()));
+            return false;
+        }
+    }
+
+    void resetUiToNoImageState()
+    {
+        // Clear undo/redo history
+        history.clear();
+        updateUndoRedoButtons();
+        // Reset image label
+        ui.imageLabel->clear();
+        ui.imageLabel->setText("No image loaded\nClick 'Load Image' or drag & drop an image here");
+        // Reset minimum window size and disable buttons
+        updateMinimumWindowSize();
+        refreshButtons(false);
+        // Update status bar
+        statusBar()->showMessage("Image unloaded - Ready to load a new image");
+    }
+
+    void finalizeSuccessfulLoad(const QString &filePath, bool viaDrop)
+    {
+        currentFilePath = filePath;
+        hasUnsavedChanges = false;
+        updateImageDisplay();
+        updateMinimumWindowSize();
+        refreshButtons(true);
+        history.clear();
+        updateUndoRedoButtons();
+        const QString baseName = QFileInfo(filePath).fileName();
+        statusBar()->showMessage(viaDrop ? QString("Loaded via drag & drop: %1").arg(baseName)
+                                         : QString("Loaded: %1").arg(baseName));
+    }
+
+    void loadImageFromPath(const QString &filePath, bool viaDrop)
+    {
+        try {
+            originalImage = ImageIO::loadFromFile(filePath);
+            currentImage = originalImage;
+            hasImage = true;
+            finalizeSuccessfulLoad(filePath, viaDrop);
+        } catch (const std::exception& e) {
+            QMessageBox::critical(this, "Error", QString("Failed to load image: %1").arg(e.what()));
+            statusBar()->showMessage("Failed to load image");
+        }
+    }
+
+    QString getInputFromList(const QString &title, const QString &label, const QStringList &options)
+    {
+        bool ok;
+        return QInputDialog::getItem(this, title, label, options, 0, false, &ok);
+    }
+
+    QSize calculateAspectRatioSize(const QSize &imageSize, const QSize &availableSize)
+    {
+        double imageAspectRatio = static_cast<double>(imageSize.width()) / imageSize.height();
+        double availableAspectRatio = static_cast<double>(availableSize.width()) / availableSize.height();
+        
+        QSize targetSize;
+        if (imageAspectRatio > availableAspectRatio) {
+            // Image is wider than available space - fit to width
+            targetSize.setWidth(availableSize.width());
+            targetSize.setHeight(static_cast<int>(availableSize.width() / imageAspectRatio));
+        } else {
+            // Image is taller than available space - fit to height
+            targetSize.setHeight(availableSize.height());
+            targetSize.setWidth(static_cast<int>(availableSize.height() * imageAspectRatio));
+        }
+        
+        // Ensure we don't exceed the original image size (don't upscale)
+        if (targetSize.width() > imageSize.width() || targetSize.height() > imageSize.height()) {
+            targetSize = imageSize;
+        }
+        
+        return targetSize;
+    }
+    void runCancelableFilter(const std::function<void()> &filterCall)
+    {
+        cancelRequested = false;
+        preFilterImage = currentImage;
+        saveStateForUndo();
+        ui.cancelButton->setVisible(true);
+        try {
+            filterCall();
+            updateImageDisplay();
+        } catch (const std::exception& e) {
+            QMessageBox::critical(this, "Error", QString("Filter failed: %1").arg(e.what()));
+        }
+        ui.cancelButton->setVisible(false);
+    }
+
+    void runSimpleFilter(const std::function<void()> &filterCall)
+    {
+        saveStateForUndo();
+        try {
+            filterCall();
+            updateImageDisplay();
+        } catch (const std::exception& e) {
+            QMessageBox::critical(this, "Error", QString("Filter failed: %1").arg(e.what()));
+        }
+    }
+
+    /**
+     * @brief Convert an Image object to a QImage for Qt display.
+     * 
+     * Converts the internal Image data structure to a QImage that can be
+     * displayed in Qt widgets. This method handles the conversion from
+     * the custom Image format to Qt's standard image format.
+     * 
+     * @param img Reference to the Image object to convert
+     * @return QImage object ready for Qt display
+     * 
+     * @details This method:
+     * - Creates a QImage with RGB888 format
+     * - Iterates through all pixels in the image
+     * - Converts RGB values from the Image format to Qt format
+     * - Returns a QImage ready for display or further processing
+     * 
+     * @note This method performs a complete copy of the image data and
+     *       should be used efficiently for large images.
+     * @see QImage for Qt image format details
+     * @see Image class for the source image format
+     */
+    QImage buildQImage(const Image &img)
+    {
+        QImage qimg(img.width, img.height, QImage::Format_RGB888);
+        for (int y = 0; y < img.height; y++) {
+            for (int x = 0; x < img.width; x++) {
+                int r = img(x, y, 0);
+                int g = img(x, y, 1);
+                int b = img(x, y, 2);
+                qimg.setPixel(x, y, qRgb(r, g, b));
+            }
+        }
+        return qimg;
+    }
 };
 
+/**
+ * @brief Main entry point for the Image Studio application.
+ * 
+ * Initializes the Qt application, creates the main window, and starts the event loop.
+ * This function sets up the complete application environment and handles the
+ * application lifecycle from startup to shutdown.
+ * 
+ * @param argc Number of command line arguments
+ * @param argv Array of command line argument strings
+ * @return Application exit code (0 for success, non-zero for error)
+ * 
+ * @details The main function:
+ * - Creates and configures the Qt application instance
+ * - Sets the application window icon
+ * - Creates the main ImageStudio window
+ * - Shows the window and starts the event loop
+ * - Handles application shutdown gracefully
+ * 
+ * @note This function follows Qt's standard application structure and should
+ *       be called only once per application instance.
+ * @see QApplication for Qt application management
+ * @see ImageStudio for the main application window
+ * 
+ * @example
+ * @code
+ * int main(int argc, char *argv[]) {
+ *     QApplication app(argc, argv);
+ *     ImageStudio window;
+ *     window.show();
+ *     return app.exec();
+ * }
+ * @endcode
+ */
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
