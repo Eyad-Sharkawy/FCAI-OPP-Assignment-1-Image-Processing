@@ -414,3 +414,32 @@ mingw32-make
 **Happy Coding!** 🚀
 
 For questions or support, please open an issue on the project repository.
+
+## 📗 Generating API Documentation (Doxygen)
+
+### Overview
+Use Doxygen to generate browsable documentation from in-source comments.
+
+### Install
+- Windows (recommended): `choco install doxygen.graphviz`
+- Manual: download from `https://www.doxygen.nl/download.html`
+
+### Configure
+```bash
+# In repository root
+doxygen -g Doxyfile
+```
+Edit `Doxyfile`:
+- `PROJECT_NAME = "Image Studio"`
+- `OUTPUT_DIRECTORY = docs/api`
+- `RECURSIVE = YES`
+- `EXTRACT_ALL = YES`
+- `GENERATE_HTML = YES`
+- `GENERATE_LATEX = NO`
+- `INPUT = src docs/README.md README.md`
+
+### Generate
+```bash
+doxygen Doxyfile
+```
+Open `docs/api/html/index.html` in your browser.

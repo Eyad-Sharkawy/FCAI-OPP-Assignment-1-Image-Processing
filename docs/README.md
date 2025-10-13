@@ -183,13 +183,13 @@ This project is developed as part of a C++ Object-Oriented Programming assignmen
 
 ## 🔗 Links
 
-- **GitHub Repository**: [Image Studio on GitHub](https://github.com/your-repo/image-studio)
-- **Releases**: [Latest Releases](https://github.com/your-repo/image-studio/releases)
-- **Issues**: [Report Issues](https://github.com/your-repo/image-studio/issues)
-- **Discussions**: [Community Discussions](https://github.com/your-repo/image-studio/discussions)
+- **GitHub Repository**: [Image Studio on GitHub](https://github.com/Eyad-Sharkawy/FCAI-OPP-Assignment-1-Image-Processing)
+- **Releases**: [Latest Releases](https://github.com/Eyad-Sharkawy/FCAI-OPP-Assignment-1-Image-Processing/releases)
+- **Issues**: [Report Issues](https://github.com/Eyad-Sharkawy/FCAI-OPP-Assignment-1-Image-Processing/issues)
+- **Discussions**: [Community Discussions](https://github.com/Eyad-Sharkawy/FCAI-OPP-Assignment-1-Image-Processing/discussions)
 
 ---
 
 **Image Studio v2.0.0** - Professional Image Processing Made Simple! 🎨
 
-*Last updated: October 13, 2024*
+*Last updated: October 13, 2025*

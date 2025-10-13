@@ -131,6 +131,13 @@ Essential documentation is available in the `docs/` folder:
 - **[Installation Guide](docs/INSTALLATION.md)** - Installation instructions for all platforms
 - **[Documentation Hub](docs/README.md)** - Central documentation index
 
+### API/Doxygen
+- Add API docs locally with Doxygen:
+  1. Install Doxygen (Windows installer or `choco install doxygen.graphviz`)
+  2. In repo root: `doxygen -g` then edit `Doxyfile` (set `RECURSIVE=YES`, `EXTRACT_ALL=YES`)
+  3. Run `doxygen` to generate `html/` in `docs/api/` (set `OUTPUT_DIRECTORY = docs/api`)
+  4. Open `docs/api/html/index.html`
+
 ## 📝 License
 
 This project is part of a C++ assignment and is for educational purposes.

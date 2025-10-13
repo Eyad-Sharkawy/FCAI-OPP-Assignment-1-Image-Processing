@@ -65,6 +65,14 @@
 #include "../core/history/HistoryManager.h"
 #include "../core/io/ImageIO.h"
 
+/**
+ * @class SimpleImageApp
+ * @brief Main Qt window for Image Studio.
+ *
+ * Owns the UI, wires signals/slots, manages current/original images,
+ * delegates image processing to ImageFilters, and coordinates history,
+ * progress, cancellation, drag-and-drop, and cropping interactions.
+ */
 class SimpleImageApp : public QMainWindow
 {
     Q_OBJECT
@@ -188,6 +196,10 @@ SimpleImageApp(QWidget *parent = nullptr) : QMainWindow(parent), hasImage(false)
     }
 
 private slots:
+    /**
+     * @brief Open file dialog and load an image into the application.
+     * @details Enables image actions, initializes history and UI state.
+     */
     void loadImage()
     {
         QString fileName = QFileDialog::getOpenFileName(this,
@@ -623,6 +635,9 @@ private slots:
         ui.cancelButton->setVisible(false);
     }
     
+    /**
+     * @brief Apply the Infrared effect with progress and cancellation support.
+     */
     void applyInfrared()
     {
         if (!hasImage) return;
@@ -646,6 +661,9 @@ private slots:
         ui.cancelButton->setVisible(false);
     }
     
+    /**
+     * @brief Apply the Purple color filter with progress and cancellation.
+     */
     void applyPurpleFilter()
     {
         if (!hasImage) return;
@@ -669,6 +687,9 @@ private slots:
         ui.cancelButton->setVisible(false);
     }
     
+    /**
+     * @brief Enter interactive crop mode using a rubber-band selection.
+     */
     void startCropMode()
     {
         if (!hasImage) return;
@@ -679,6 +700,9 @@ private slots:
         statusBar()->showMessage("Crop mode: drag to select area, release to crop");
     }
     
+    /**
+     * @brief Undo the last image modification.
+     */
     void undo()
     {
         if (!hasImage) return;
@@ -689,6 +713,9 @@ private slots:
         statusBar()->showMessage("Undo applied");
     }
     
+    /**
+     * @brief Redo the last undone image modification.
+     */
     void redo()
     {
         if (!hasImage) return;
@@ -699,6 +726,9 @@ private slots:
         statusBar()->showMessage("Redo applied");
     }
     
+    /**
+     * @brief Request cancellation for a long-running filter.
+     */
     void cancelFilter()
     {
         cancelRequested = true;
@@ -708,6 +738,9 @@ private slots:
 private:
     Ui::MainWindow ui;
     
+    /**
+     * @brief Push current image state onto the undo stack and mark unsaved changes.
+     */
     void saveStateForUndo()
     {
         if (!hasImage) return;
@@ -719,12 +752,18 @@ private:
         updateUndoRedoButtons();
     }
     
+    /**
+     * @brief Refresh enabled state of Undo/Redo buttons based on history.
+     */
     void updateUndoRedoButtons()
     {
         ui.undoButton->setEnabled(history.canUndo());
         ui.redoButton->setEnabled(history.canRedo());
     }
     
+    /**
+     * @brief Compute and enforce a minimum window size to avoid scrollbars for the current image.
+     */
     void updateMinimumWindowSize()
     {
         if (!hasImage) {
@@ -788,6 +827,9 @@ private:
     }
     
 protected:
+    /**
+     * @brief Intercept window close to prompt for saving unsaved changes.
+     */
     void closeEvent(QCloseEvent *event) override
     {
         if (hasImage && hasUnsavedChanges) {
@@ -826,6 +868,9 @@ protected:
         QMainWindow::closeEvent(event);
     }
     
+    /**
+     * @brief Throttle image re-layout on window resize using a timer.
+     */
     void resizeEvent(QResizeEvent *event) override
     {
         QMainWindow::resizeEvent(event);
@@ -835,6 +880,9 @@ protected:
         }
     }
     
+    /**
+     * @brief Accept drag if it contains a supported image file.
+     */
     void dragEnterEvent(QDragEnterEvent *event) override
     {
         if (event->mimeData()->hasUrls()) {
@@ -856,6 +904,9 @@ protected:
         event->ignore();
     }
     
+    /**
+     * @brief Allow drag move within the window for image files.
+     */
     void dragMoveEvent(QDragMoveEvent *event) override
     {
         if (event->mimeData()->hasUrls()) {
@@ -863,12 +914,18 @@ protected:
         }
     }
     
+    /**
+     * @brief Restore status message when a drag leaves the window.
+     */
     void dragLeaveEvent(QDragLeaveEvent *event) override
     {
         Q_UNUSED(event)
         statusBar()->showMessage(hasImage ? "Ready" : "Ready - Drag an image here or click 'Load Image'");
     }
     
+    /**
+     * @brief Load an image when a supported file is dropped onto the window.
+     */
     void dropEvent(QDropEvent *event) override
     {
         if (event->mimeData()->hasUrls()) {
@@ -1024,6 +1081,10 @@ protected:
              .arg(QString::number(imageAspectRatio, 'f', 2)));
     }
     
+    /**
+     * @brief Crop the current image using a selection rectangle relative to the label.
+     * @param selectionOnLabel The selection bounds in label coordinates.
+     */
     void performCropFromSelection(const QRect &selectionOnLabel)
     {
         if (!hasImage) return;
