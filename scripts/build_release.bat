@@ -15,7 +15,6 @@ set QTDIR=C:\Qt\6.8.1\mingw_64
 REM Clean previous release build
 if exist "build_release" rmdir /s /q build_release
 mkdir build_release
-pushd build_release
 
 REM Generate Makefile with qmake (use absolute path to .pro)
 qmake "%PROJ_DIR%ImageStudio.pro"
@@ -25,7 +24,7 @@ mingw32-make -f Makefile.Release
 
 if %ERRORLEVEL% EQU 0 (
     echo.
-    echo Build successful! Executable should be in build_release/release/
+    echo Build successful! Executable should be in release/
     echo.
 ) else (
     echo.
@@ -33,7 +32,6 @@ if %ERRORLEVEL% EQU 0 (
     echo.
 )
 
-popd
 popd
 
 pause

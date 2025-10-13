@@ -198,9 +198,9 @@
 - **Real-time**: Changes apply immediately
 
 ### Progress Tracking
-- **Progress Bar**: Shows during long operations
-- **Status Updates**: Real-time status messages
-- **Cancellation**: Some operations can be cancelled
+-- **Progress Bar**: Shows during long operations
+-- **Status Updates**: Real-time status messages
+-- **Cancellation**: Long-running filters (e.g., Grayscale, Blur, Infrared, Purple, TV) can be cancelled via the Cancel button
 
 ## ⌨️ Keyboard Shortcuts
 

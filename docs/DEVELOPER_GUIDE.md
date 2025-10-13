@@ -102,6 +102,8 @@ cmake --build .
 ### Build Scripts
 - `scripts/build_release.bat` - Release build
 - `scripts/build_portable.bat` - Portable build with ZIP creation
+- `scripts/build_all.bat` - Clean, build, deploy Qt libraries, and zip
+- `scripts/test_app.bat` - Quick smoke test runner
 
 ## 📁 Code Structure
 
@@ -113,7 +115,8 @@ ImageStudio/
 │   │   ├── image_studio.cpp   # Main application class
 │   │   └── mainwindow.ui      # Qt Designer UI file
 │   └── core/                  # Core Functionality
-│       └── Image_Class.h      # Image processing class
+│       ├── ImageFilters.h/.cpp # Image processing filters (progress + cancel)
+│       └── Image_Class.h/.cpp  # Image container + STB-backed I/O
 ├── third_party/               # External Libraries
 │   └── stb/                   # STB image library
 ├── docs/                      # Documentation
@@ -137,11 +140,7 @@ private:
     std::stack<Image> undoStack;    // Undo history
     std::stack<Image> redoStack;    // Redo history
     
-    // Image processing methods
-    void applyGrayscale();
-    void applyEdges();
-    void applyBlur();
-    // ... more filter methods
+    // Delegates to ImageFilters (see src/core/ImageFilters.h)
 };
 ```
 

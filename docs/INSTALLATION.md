@@ -188,15 +188,12 @@ cmake --build .
 ImageStudio.exe  # Windows
 ```
 
-#### Method 4: Build Scripts
-```bash
-# Windows
-scripts\build_release.bat
-scripts\build_portable.bat
-
-# Linux/macOS (future)
-./scripts/build_release.sh
-./scripts/build_portable.sh
+#### Method 4: Build Scripts (Windows)
+```bat
+scripts\build_release.bat    # Build to release\ImageStudio.exe
+scripts\build_portable.bat   # Build + deploy Qt DLLs + create ZIP
+scripts\build_all.bat        # Clean, build, deploy, zip (one-click)
+scripts\test_app.bat         # Quick smoke test launcher
 ```
 
 ### Build Configuration Options

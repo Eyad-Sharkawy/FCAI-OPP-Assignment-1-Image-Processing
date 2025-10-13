@@ -23,12 +23,22 @@
 #define UNSUPPORTED_TYPE -1
 
 
-// stb_image header definitions
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image_write.h"
+// Forward declarations for STB library
+// Implementation will be in Image_Class.cpp
 #define pixel unsigned int
+
+// Forward declarations for STB functions
+extern "C" {
+    unsigned char *stbi_load(char const *filename, int *x, int *y, int *channels_in_file, int desired_channels);
+    void stbi_image_free(void *retval_from_stbi_load);
+    int stbi_write_png(char const *filename, int w, int h, int comp, const void *data, int stride_in_bytes);
+    int stbi_write_bmp(char const *filename, int w, int h, int comp, const void *data);
+    int stbi_write_tga(char const *filename, int w, int h, int comp, const void *data);
+    int stbi_write_jpg(char const *filename, int w, int h, int comp, const void *data, int quality);
+}
+
+// STB constants
+#define STBI_rgb 3
 
 #include <iostream>
 #include <exception>

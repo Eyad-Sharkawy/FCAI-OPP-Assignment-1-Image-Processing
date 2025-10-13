@@ -42,6 +42,7 @@ Image Studio is a modern, feature-rich image processing application built with Q
   - Architecture details
   - Build system
   - Code structure
+  - ImageFilters design and cancellation/progress patterns
   - Adding new features
   - Testing
   - Debugging

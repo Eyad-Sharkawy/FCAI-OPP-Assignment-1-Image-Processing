@@ -20,6 +20,7 @@ include_directories(third_party/stb)
 # Source files
 set(SOURCES
     src/gui/image_studio.cpp
+    src/core/ImageFilters.cpp
 )
 
 # Header files

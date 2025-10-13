@@ -5,9 +5,12 @@ CONFIG += c++20
 TARGET = ImageStudio
 TEMPLATE = app
 
-SOURCES += src/gui/image_studio.cpp
+SOURCES += src/gui/image_studio.cpp \
+           src/core/ImageFilters.cpp \
+           src/core/Image_Class.cpp
 
-HEADERS += src/core/Image_Class.h
+HEADERS += src/core/Image_Class.h \
+           src/core/ImageFilters.h
 
 FORMS += src/gui/mainwindow.ui
 

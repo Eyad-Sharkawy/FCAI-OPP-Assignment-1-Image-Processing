@@ -24,8 +24,10 @@ ImageStudio/
 │   ├── DEVELOPER_GUIDE.md     # Development documentation
 │   └── INSTALLATION.md        # Installation guide
 ├── scripts/                   # Build scripts
-│   ├── build_release.bat
-│   └── build_portable.bat
+│   ├── build_release.bat      # Release build
+│   ├── build_portable.bat     # Portable package + ZIP
+│   ├── build_all.bat          # Clean, build, deploy, and zip (one-click)
+│   └── test_app.bat           # Quick smoke test
 ├── build_release/             # Release build output
 ├── build_portable/            # Portable build output
 ├── CMakeLists.txt            # CMake build configuration
@@ -78,6 +80,14 @@ qmake ImageStudio.pro
 make
 ```
 
+### Using Windows build scripts
+```bat
+scripts\build_release.bat   
+scripts\build_portable.bat  
+scripts\build_all.bat       
+scripts\test_app.bat        
+```
+
 ## 📋 Requirements
 
 - Qt 6.8.1 or later
@@ -96,7 +106,9 @@ The application uses Qt Designer for UI layout, providing:
 ## 🔧 Technical Details
 
 - **Framework**: Qt 6 with C++20
-- **Image Processing**: Custom Image_Class with STB library
+- **Image Processing**:
+  - `src/core/ImageFilters.h/.cpp` — filter algorithms, progress + cancellation
+  - `src/core/Image_Class.h/.cpp` — image container and STB-backed I/O
 - **UI**: Qt Designer (.ui files)
 - **Build System**: CMake + Qt qmake
 - **Architecture**: MVC pattern with separation of concerns

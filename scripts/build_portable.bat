@@ -15,7 +15,6 @@ set QTDIR=C:\Qt\6.8.1\mingw_64
 REM Clean previous portable build
 if exist "build_portable" rmdir /s /q build_portable
 mkdir build_portable
-pushd build_portable
 
 REM Generate Makefile with qmake (use absolute path to .pro)
 qmake "%PROJ_DIR%ImageStudio.pro"
@@ -28,46 +27,46 @@ if %ERRORLEVEL% EQU 0 (
     echo Build successful! Creating portable package...
     
     REM Create portable directory structure
-    mkdir ImageStudio_Portable
-    mkdir ImageStudio_Portable\bin
+    mkdir build_portable\ImageStudio_Portable
+    mkdir build_portable\ImageStudio_Portable\bin
     
     REM Copy executable
-    copy release\ImageStudio.exe ImageStudio_Portable\bin\
+    copy release\ImageStudio.exe build_portable\ImageStudio_Portable\bin\
     
     REM Use windeployqt to automatically deploy all Qt dependencies
-    cd ImageStudio_Portable\bin
+    cd build_portable\ImageStudio_Portable\bin
     windeployqt ImageStudio.exe
-    cd ..\..
+    cd ..\..\..
     
     REM Copy assets
     if exist "%PROJ_DIR%assets" (
-        xcopy "%PROJ_DIR%assets" ImageStudio_Portable\assets\ /E /I
+        xcopy "%PROJ_DIR%assets" build_portable\ImageStudio_Portable\assets\ /E /I
     )
     
     REM Create launcher script
-    echo @echo off > ImageStudio_Portable\ImageStudio.bat
-    echo cd /d "%%~dp0bin" >> ImageStudio_Portable\ImageStudio.bat
-    echo echo Starting ImageStudio... >> ImageStudio_Portable\ImageStudio.bat
-    echo ImageStudio.exe %%* >> ImageStudio_Portable\ImageStudio.bat
+    echo @echo off > build_portable\ImageStudio_Portable\ImageStudio.bat
+    echo cd /d "%%~dp0bin" >> build_portable\ImageStudio_Portable\ImageStudio.bat
+    echo echo Starting ImageStudio... >> build_portable\ImageStudio_Portable\ImageStudio.bat
+    echo ImageStudio.exe %%* >> build_portable\ImageStudio_Portable\ImageStudio.bat
     
     REM Create README for portable version
-    echo Image Studio - Portable Version > ImageStudio_Portable\README.txt
-    echo. >> ImageStudio_Portable\README.txt
-    echo This is a portable version of Image Studio that includes all necessary >> ImageStudio_Portable\README.txt
-    echo Qt libraries and dependencies. >> ImageStudio_Portable\README.txt
-    echo. >> ImageStudio_Portable\README.txt
-    echo To run: >> ImageStudio_Portable\README.txt
-    echo 1. Double-click ImageStudio.bat >> ImageStudio_Portable\README.txt
-    echo 2. Or run bin\ImageStudio.exe directly >> ImageStudio_Portable\README.txt
-    echo. >> ImageStudio_Portable\README.txt
-    echo Features: >> ImageStudio_Portable\README.txt
-    echo - All image processing filters >> ImageStudio_Portable\README.txt
-    echo - Drag and drop image loading >> ImageStudio_Portable\README.txt
-    echo - Undo/Redo functionality >> ImageStudio_Portable\README.txt
-    echo - Responsive UI >> ImageStudio_Portable\README.txt
-    echo - Professional interface >> ImageStudio_Portable\README.txt
-    echo. >> ImageStudio_Portable\README.txt
-    echo No installation required! >> ImageStudio_Portable\README.txt
+    echo Image Studio - Portable Version > build_portable\ImageStudio_Portable\README.txt
+    echo. >> build_portable\ImageStudio_Portable\README.txt
+    echo This is a portable version of Image Studio that includes all necessary >> build_portable\ImageStudio_Portable\README.txt
+    echo Qt libraries and dependencies. >> build_portable\ImageStudio_Portable\README.txt
+    echo. >> build_portable\ImageStudio_Portable\README.txt
+    echo To run: >> build_portable\ImageStudio_Portable\README.txt
+    echo 1. Double-click ImageStudio.bat >> build_portable\ImageStudio_Portable\README.txt
+    echo 2. Or run bin\ImageStudio.exe directly >> build_portable\ImageStudio_Portable\README.txt
+    echo. >> build_portable\ImageStudio_Portable\README.txt
+    echo Features: >> build_portable\ImageStudio_Portable\README.txt
+    echo - All image processing filters >> build_portable\ImageStudio_Portable\README.txt
+    echo - Drag and drop image loading >> build_portable\ImageStudio_Portable\README.txt
+    echo - Undo/Redo functionality >> build_portable\ImageStudio_Portable\README.txt
+    echo - Responsive UI >> build_portable\ImageStudio_Portable\README.txt
+    echo - Professional interface >> build_portable\ImageStudio_Portable\README.txt
+    echo. >> build_portable\ImageStudio_Portable\README.txt
+    echo No installation required! >> build_portable\ImageStudio_Portable\README.txt
     
     echo.
     echo Portable package created in: build_portable\ImageStudio_Portable\
@@ -76,23 +75,23 @@ if %ERRORLEVEL% EQU 0 (
     
     REM Create ZIP file with version number
     set VERSION=2.0.0
-    set ZIP_NAME=ImageStudio_Portable_v%VERSION%-gui.zip
+    set ZIP_NAME=build_portable\ImageStudio_Portable_v%VERSION%-gui.zip
     
     REM Remove existing ZIP if it exists
     if exist "%ZIP_NAME%" del "%ZIP_NAME%"
     
     REM Create ZIP using PowerShell
-    powershell -Command "Compress-Archive -Path 'ImageStudio_Portable' -DestinationPath 'ImageStudio_Portable_v2.0.0-gui.zip' -Force"
+    powershell -Command "Compress-Archive -Path 'build_portable\ImageStudio_Portable' -DestinationPath 'build_portable\ImageStudio_Portable_v2.0.0-gui.zip' -Force"
     
     if %ERRORLEVEL% EQU 0 (
         echo.
-        echo ✓ ZIP file created successfully: ImageStudio_Portable_v2.0.0-gui.zip
+        echo ✓ ZIP file created successfully: build_portable\ImageStudio_Portable_v2.0.0-gui.zip
         echo ✓ Portable package ready for distribution!
     ) else (
         echo.
         echo ⚠ Warning: Could not create ZIP file automatically.
         echo   You can create it manually by running:
-        echo   powershell Compress-Archive -Path "ImageStudio_Portable" -DestinationPath "ImageStudio_Portable_v2.0.0-gui.zip"
+        echo   powershell Compress-Archive -Path "build_portable\ImageStudio_Portable" -DestinationPath "build_portable\ImageStudio_Portable_v2.0.0-gui.zip"
     )
     echo.
 ) else (
@@ -101,7 +100,6 @@ if %ERRORLEVEL% EQU 0 (
     echo.
 )
 
-popd
 popd
 
 pause
