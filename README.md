@@ -7,32 +7,41 @@ A modern Qt-based image processing application with a clean, intuitive interface
 ```
 ImageStudio/
 ├── src/
-│   ├── gui/                    # GUI-related source files
-│   │   ├── image_studio.cpp   # Main application class
-│   │   └── mainwindow.ui      # Qt Designer UI file
-│   └── core/                  # Core functionality
-│       └── Image_Class.h      # Image processing class
-├── third_party/               # Third-party libraries
-│   └── stb/                   # STB image library
+│   ├── gui/                        # GUI-related source files
+│   │   ├── image_studio.cpp        # Main application class
+│   │   └── mainwindow.ui           # Qt Designer UI file
+│   └── core/                       # Core functionality
+│       ├── image/                  # Image container + STB-backed I/O
+│       │   ├── Image_Class.h
+│       │   └── Image_Class.cpp
+│       ├── filters/                # Filters (progress + cancellation, Qt-aware)
+│       │   ├── ImageFilters.h
+│       │   └── ImageFilters.cpp
+│       ├── history/                # Undo/redo management
+│       │   └── HistoryManager.h
+│       └── io/                     # File I/O helpers
+│           └── ImageIO.h
+├── third_party/                    # Third-party libraries
+│   └── stb/                        # STB image library
 │       ├── stb_image.h
 │       └── stb_image_write.h
-├── assets/                    # Application assets
-│   └── icons/                 # Icon files
-├── docs/                      # Essential documentation
-│   ├── README.md              # Documentation hub
-│   ├── USER_GUIDE.md          # Complete user manual
-│   ├── DEVELOPER_GUIDE.md     # Development documentation
-│   └── INSTALLATION.md        # Installation guide
-├── scripts/                   # Build scripts
-│   ├── build_release.bat      # Release build
-│   ├── build_portable.bat     # Portable package + ZIP
-│   ├── build_all.bat          # Clean, build, deploy, and zip (one-click)
-│   └── test_app.bat           # Quick smoke test
-├── build_release/             # Release build output
-├── build_portable/            # Portable build output
-├── CMakeLists.txt            # CMake build configuration
-├── ImageStudio.pro           # Qt project file
-└── README.md                 # This file
+├── assets/                         # Application assets
+│   └── icons/                      # Icon files
+├── docs/                           # Essential documentation
+│   ├── README.md                   # Documentation hub
+│   ├── USER_GUIDE.md               # Complete user manual
+│   ├── DEVELOPER_GUIDE.md          # Development documentation
+│   └── INSTALLATION.md             # Installation guide
+├── scripts/                        # Build scripts (Windows)
+│   ├── build_release.bat           # CMake Release build
+│   ├── build_portable.bat          # Build + deploy + ZIP
+│   ├── build_all.bat               # Clean, build, deploy, zip (one-click)
+│   └── test_app.bat                # Quick smoke test
+├── cmake-build-*/                  # CMake build outputs
+├── build_portable/                 # Portable build output
+├── CMakeLists.txt                  # CMake build configuration
+├── ImageStudio.pro                 # Qt project file (legacy)
+└── README.md                       # This file
 ```
 
 ## 🚀 Features
@@ -107,10 +116,10 @@ The application uses Qt Designer for UI layout, providing:
 
 - **Framework**: Qt 6 with C++20
 - **Image Processing**:
-  - `src/core/ImageFilters.h/.cpp` — filter algorithms, progress + cancellation
-  - `src/core/Image_Class.h/.cpp` — image container and STB-backed I/O
+  - `src/core/filters/ImageFilters.h/.cpp` — filter algorithms, progress + cancellation
+  - `src/core/image/Image_Class.h/.cpp` — image container and STB-backed I/O
 - **UI**: Qt Designer (.ui files)
-- **Build System**: CMake + Qt qmake
+- **Build System**: CMake (primary), qmake (legacy)
 - **Architecture**: MVC pattern with separation of concerns
 
 ## 📚 Documentation
