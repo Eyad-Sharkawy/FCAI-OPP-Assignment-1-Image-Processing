@@ -734,64 +734,9 @@ private:
      */
     void updateMinimumWindowSize()
     {
-        if (!hasImage) {
-            setMinimumSize(600, 400);
-            return;
-        }
-        
-        // Calculate the minimum size needed to display the image without scrollbars
-        // Account for window decorations, menu bar, status bar, and button area
-        
-        // Get the current window frame size
-        QSize currentSize = size();
-        QSize contentSize = ui.centralwidget->size();
-        
-        // Calculate the frame margins (window decorations)
-        int frameWidth = currentSize.width() - contentSize.width();
-        int frameHeight = currentSize.height() - contentSize.height();
-        
-        // Calculate the button area height
-        int buttonAreaHeight = ui.buttonLayout->sizeHint().height();
-        
-        // Calculate the minimum scroll area size needed for the image
-        QSize scrollAreaSize = ui.scrollArea->size();
-        QSize availableSize(scrollAreaSize.width() - 20, scrollAreaSize.height() - 20);
-        
-        // Calculate the image's natural display size
-        double imageAspectRatio = static_cast<double>(currentImage.width / currentImage.height);
-        QSize minImageSize;
-        
-        // Determine minimum size to fit the image without scrollbars
-        if (imageAspectRatio > 1.0) {
-            // Wide image - fit to width
-            minImageSize.setWidth(availableSize.width());
-            minImageSize.setHeight(static_cast<int>(availableSize.width() / imageAspectRatio));
-        } else {
-            // Tall image - fit to height
-            minImageSize.setHeight(availableSize.height());
-            minImageSize.setWidth(static_cast<int>(availableSize.height() * imageAspectRatio));
-        }
-        
-        // Don't upscale beyond original image size
-        if (minImageSize.width() > currentImage.width || minImageSize.height() > currentImage.height) {
-            minImageSize = QSize(currentImage.width, currentImage.height);
-        }
-        
-        // Calculate minimum window size
-        int minWidth = minImageSize.width() + frameWidth + 20; // +20 for scroll area margins
-        int minHeight = minImageSize.height() + frameHeight + buttonAreaHeight + 20; // +20 for margins
-        
-        // Ensure minimum reasonable size
-        minWidth = std::max(minWidth, 600);
-        minHeight = std::max(minHeight, 400);
-        
-        // Set the new minimum size
-        setMinimumSize(minWidth, minHeight);
-        
-        // If current window is smaller than minimum, resize it
-        if (width() < minWidth || height() < minHeight) {
-            resize(std::max(width(), minWidth), std::max(height(), minHeight));
-        }
+        Q_UNUSED(hasImage);
+        // Keep a stable, small base minimum to allow shrinking after expansion.
+        setMinimumSize(600, 400);
     }
     
 protected:
