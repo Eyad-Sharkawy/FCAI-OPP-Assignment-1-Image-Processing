@@ -168,26 +168,7 @@ SimpleImageApp(QWidget *parent = nullptr) : QMainWindow(parent), hasImage(false)
         imageFilters = new ImageFilters(ui.progressBar, statusBar());
         
         // Initially disable filter buttons
-        ui.saveButton->setEnabled(false);
-        ui.unloadButton->setEnabled(false);
-        ui.resetButton->setEnabled(false);
-        ui.undoButton->setEnabled(false);
-        ui.redoButton->setEnabled(false);
-        ui.grayscaleButton->setEnabled(false);
-        ui.blackWhiteButton->setEnabled(false);
-        ui.invertButton->setEnabled(false);
-        ui.mergeButton->setEnabled(false);
-        ui.flipButton->setEnabled(false);
-        ui.rotateButton->setEnabled(false);
-        ui.cropButton->setEnabled(false);
-        ui.darkLightButton->setEnabled(false);
-        ui.frameButton->setEnabled(false);
-        ui.edgesButton->setEnabled(false);
-        ui.resizeButton->setEnabled(false);
-        ui.blurButton->setEnabled(false);
-        ui.infraredButton->setEnabled(false);
-        ui.purpleButton->setEnabled(false);
-        ui.tvFilterButton->setEnabled(false);
+        refreshButtons(false);
     }
     
     // Destructor to clean up
@@ -216,24 +197,7 @@ private slots:
                 
                 updateImageDisplay();
                 updateMinimumWindowSize();
-                ui.saveButton->setEnabled(true);
-                ui.unloadButton->setEnabled(true);
-                ui.resetButton->setEnabled(true);
-                ui.grayscaleButton->setEnabled(true);
-                ui.blackWhiteButton->setEnabled(true);
-                ui.invertButton->setEnabled(true);
-                ui.mergeButton->setEnabled(true);
-                ui.flipButton->setEnabled(true);
-                ui.rotateButton->setEnabled(true);
-                ui.cropButton->setEnabled(true);
-                ui.darkLightButton->setEnabled(true);
-                ui.frameButton->setEnabled(true);
-                ui.edgesButton->setEnabled(true);
-                ui.resizeButton->setEnabled(true);
-                ui.blurButton->setEnabled(true);
-                ui.infraredButton->setEnabled(true);
-                ui.purpleButton->setEnabled(true);
-                ui.tvFilterButton->setEnabled(true);
+                refreshButtons(true);
                 
                 // Clear undo/redo history when loading new image
                 history.clear();
@@ -337,26 +301,7 @@ private slots:
             updateMinimumWindowSize();
             
             // Disable all filter buttons
-            ui.saveButton->setEnabled(false);
-            ui.unloadButton->setEnabled(false);
-            ui.resetButton->setEnabled(false);
-            ui.undoButton->setEnabled(false);
-            ui.redoButton->setEnabled(false);
-            ui.grayscaleButton->setEnabled(false);
-            ui.blackWhiteButton->setEnabled(false);
-            ui.invertButton->setEnabled(false);
-            ui.mergeButton->setEnabled(false);
-            ui.flipButton->setEnabled(false);
-            ui.rotateButton->setEnabled(false);
-            ui.cropButton->setEnabled(false);
-            ui.darkLightButton->setEnabled(false);
-            ui.frameButton->setEnabled(false);
-            ui.edgesButton->setEnabled(false);
-            ui.resizeButton->setEnabled(false);
-            ui.blurButton->setEnabled(false);
-            ui.infraredButton->setEnabled(false);
-            ui.purpleButton->setEnabled(false);
-            ui.tvFilterButton->setEnabled(false);
+            refreshButtons(false);
             
             // Update status bar
             statusBar()->showMessage("Image unloaded - Ready to load a new image");
@@ -760,7 +705,30 @@ private:
         ui.undoButton->setEnabled(history.canUndo());
         ui.redoButton->setEnabled(history.canRedo());
     }
-    
+
+    void refreshButtons(const bool isActive) {
+        ui.saveButton->setEnabled(isActive);
+        ui.unloadButton->setEnabled(isActive);
+        ui.resetButton->setEnabled(isActive);
+        ui.undoButton->setEnabled(isActive);
+        ui.redoButton->setEnabled(isActive);
+        ui.grayscaleButton->setEnabled(isActive);
+        ui.blackWhiteButton->setEnabled(isActive);
+        ui.invertButton->setEnabled(isActive);
+        ui.mergeButton->setEnabled(isActive);
+        ui.flipButton->setEnabled(isActive);
+        ui.rotateButton->setEnabled(isActive);
+        ui.cropButton->setEnabled(isActive);
+        ui.darkLightButton->setEnabled(isActive);
+        ui.frameButton->setEnabled(isActive);
+        ui.edgesButton->setEnabled(isActive);
+        ui.resizeButton->setEnabled(isActive);
+        ui.blurButton->setEnabled(isActive);
+        ui.infraredButton->setEnabled(isActive);
+        ui.purpleButton->setEnabled(isActive);
+        ui.tvFilterButton->setEnabled(isActive);
+    }
+
     /**
      * @brief Compute and enforce a minimum window size to avoid scrollbars for the current image.
      */
@@ -790,18 +758,18 @@ private:
         QSize availableSize(scrollAreaSize.width() - 20, scrollAreaSize.height() - 20);
         
         // Calculate the image's natural display size
-        double imageAspectRatio = (double)currentImage.width / currentImage.height;
+        double imageAspectRatio = static_cast<double>(currentImage.width / currentImage.height);
         QSize minImageSize;
         
         // Determine minimum size to fit the image without scrollbars
         if (imageAspectRatio > 1.0) {
             // Wide image - fit to width
             minImageSize.setWidth(availableSize.width());
-            minImageSize.setHeight((int)(availableSize.width() / imageAspectRatio));
+            minImageSize.setHeight(static_cast<int>(availableSize.width() / imageAspectRatio));
         } else {
             // Tall image - fit to height
             minImageSize.setHeight(availableSize.height());
-            minImageSize.setWidth((int)(availableSize.height() * imageAspectRatio));
+            minImageSize.setWidth(static_cast<int>(availableSize.height() * imageAspectRatio));
         }
         
         // Don't upscale beyond original image size
@@ -951,24 +919,7 @@ protected:
                         
                         updateImageDisplay();
                         updateMinimumWindowSize();
-                        ui.saveButton->setEnabled(true);
-                        ui.unloadButton->setEnabled(true);
-                        ui.resetButton->setEnabled(true);
-                        ui.grayscaleButton->setEnabled(true);
-                        ui.blackWhiteButton->setEnabled(true);
-                        ui.invertButton->setEnabled(true);
-                        ui.mergeButton->setEnabled(true);
-                        ui.flipButton->setEnabled(true);
-                        ui.rotateButton->setEnabled(true);
-                        ui.cropButton->setEnabled(true);
-                        ui.darkLightButton->setEnabled(true);
-                        ui.frameButton->setEnabled(true);
-                        ui.edgesButton->setEnabled(true);
-                        ui.resizeButton->setEnabled(true);
-                        ui.blurButton->setEnabled(true);
-                        ui.infraredButton->setEnabled(true);
-                        ui.purpleButton->setEnabled(true);
-                        ui.tvFilterButton->setEnabled(true);
+                        refreshButtons(true);
                         
                         // Clear undo/redo history when loading new image
                         history.clear();
