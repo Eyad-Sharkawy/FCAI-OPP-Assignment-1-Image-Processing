@@ -50,11 +50,15 @@
 #include <QMimeData>
 #include <QRubberBand>
 #include <QMouseEvent>
+#include <QProgressBar>
+#include <QHBoxLayout>
+#include <QCloseEvent>
 #include <cmath>
 #include <algorithm>
 #include <stack>
 #include <random>
 #include <chrono>
+#include <atomic>
 #include "Image_Class.h"
 
 class SimpleImageApp : public QMainWindow
@@ -101,6 +105,7 @@ SimpleImageApp(QWidget *parent = nullptr) : QMainWindow(parent), hasImage(false)
         // File operations
         loadButton = new QPushButton("Load Image");
         saveButton = new QPushButton("Save Image");
+        unloadButton = new QPushButton("Unload Image");
         resetButton = new QPushButton("Reset");
         undoButton = new QPushButton("Undo");
         redoButton = new QPushButton("Redo");
@@ -126,10 +131,18 @@ SimpleImageApp(QWidget *parent = nullptr) : QMainWindow(parent), hasImage(false)
         purpleButton = new QPushButton("Purple Filter");
         tvFilterButton = new QPushButton("TV/CRT Filter");
         
+        // Cancel button and progress bar
+        cancelButton = new QPushButton("Cancel");
+        progressBar = new QProgressBar();
+        progressBar->setVisible(false);
+        cancelButton->setVisible(false);
+        progressBar->setTextVisible(false); // Disable progress bar text to avoid overlap
+        
         // Add buttons to grid
         int row = 0, col = 0;
         buttonLayout->addWidget(loadButton, row, col++);
         buttonLayout->addWidget(saveButton, row, col++);
+        buttonLayout->addWidget(unloadButton, row, col++);
         buttonLayout->addWidget(resetButton, row, col++);
         buttonLayout->addWidget(undoButton, row, col++);
         buttonLayout->addWidget(redoButton, row, col++);
@@ -157,11 +170,20 @@ SimpleImageApp(QWidget *parent = nullptr) : QMainWindow(parent), hasImage(false)
         buttonLayout->addWidget(purpleButton, row, col++);
         buttonLayout->addWidget(tvFilterButton, row, col++);
         
+        // Add progress bar and cancel button in a separate row with horizontal layout
+        row++; col = 0;
+        QHBoxLayout *progressLayout = new QHBoxLayout();
+        progressLayout->addWidget(progressBar);
+        progressLayout->addWidget(cancelButton);
+        progressLayout->setSpacing(10); // Add some spacing between progress bar and cancel button
+        buttonLayout->addLayout(progressLayout, row, col, 1, 4);
+        
         layout->addLayout(buttonLayout);
         
         // Connect signals
         connect(loadButton, &QPushButton::clicked, this, &SimpleImageApp::loadImage);
         connect(saveButton, &QPushButton::clicked, this, &SimpleImageApp::saveImage);
+        connect(unloadButton, &QPushButton::clicked, this, &SimpleImageApp::unloadImage);
         connect(resetButton, &QPushButton::clicked, this, &SimpleImageApp::resetImage);
         connect(undoButton, &QPushButton::clicked, this, &SimpleImageApp::undo);
         connect(redoButton, &QPushButton::clicked, this, &SimpleImageApp::redo);
@@ -180,12 +202,14 @@ SimpleImageApp(QWidget *parent = nullptr) : QMainWindow(parent), hasImage(false)
         connect(infraredButton, &QPushButton::clicked, this, &SimpleImageApp::applyInfrared);
         connect(purpleButton, &QPushButton::clicked, this, &SimpleImageApp::applyPurpleFilter);
         connect(tvFilterButton, &QPushButton::clicked, this, &SimpleImageApp::applyTVFilter);
+        connect(cancelButton, &QPushButton::clicked, this, &SimpleImageApp::cancelFilter);
         
         // Create menu bar
         QMenuBar *menuBar = this->menuBar();
         QMenu *fileMenu = menuBar->addMenu("File");
         fileMenu->addAction("Load Image", this, &SimpleImageApp::loadImage);
         fileMenu->addAction("Save Image", this, &SimpleImageApp::saveImage);
+        fileMenu->addAction("Unload Image", this, &SimpleImageApp::unloadImage);
         fileMenu->addAction("Reset Image", this, &SimpleImageApp::resetImage);
         fileMenu->addSeparator();
         fileMenu->addAction("Undo", this, &SimpleImageApp::undo, QKeySequence::Undo);
@@ -230,6 +254,7 @@ SimpleImageApp(QWidget *parent = nullptr) : QMainWindow(parent), hasImage(false)
         
         // Initially disable filter buttons
         saveButton->setEnabled(false);
+        unloadButton->setEnabled(false);
         resetButton->setEnabled(false);
         undoButton->setEnabled(false);
         redoButton->setEnabled(false);
@@ -239,6 +264,7 @@ SimpleImageApp(QWidget *parent = nullptr) : QMainWindow(parent), hasImage(false)
         mergeButton->setEnabled(false);
         flipButton->setEnabled(false);
         rotateButton->setEnabled(false);
+        cropButton->setEnabled(false);
         darkLightButton->setEnabled(false);
         frameButton->setEnabled(false);
         edgesButton->setEnabled(false);
@@ -262,9 +288,11 @@ private slots:
                 currentImage = originalImage;
                 hasImage = true;
                 currentFilePath = fileName;
+                hasUnsavedChanges = false; // New image is considered "saved"
                 
                 updateImageDisplay();
                 saveButton->setEnabled(true);
+                unloadButton->setEnabled(true);
                 resetButton->setEnabled(true);
                 grayscaleButton->setEnabled(true);
                 blackWhiteButton->setEnabled(true);
@@ -272,6 +300,7 @@ private slots:
                 mergeButton->setEnabled(true);
                 flipButton->setEnabled(true);
                 rotateButton->setEnabled(true);
+                cropButton->setEnabled(true);
                 darkLightButton->setEnabled(true);
                 frameButton->setEnabled(true);
                 edgesButton->setEnabled(true);
@@ -309,11 +338,102 @@ private slots:
         if (!fileName.isEmpty()) {
             try {
                 currentImage.saveImage(fileName.toStdString());
+                        hasUnsavedChanges = false; // Mark as saved
                 statusBar()->showMessage(QString("Saved: %1").arg(QFileInfo(fileName).fileName()));
             } catch (const std::exception& e) {
                 QMessageBox::critical(this, "Error", 
                     QString("Failed to save image: %1").arg(e.what()));
             }
+                }
+    }
+    
+    void unloadImage()
+    {
+        if (!hasImage) {
+            QMessageBox::warning(this, "Warning", "No image to unload!");
+            return;
+        }
+        
+        // Ask for confirmation with save option (only if there are unsaved changes)
+        QMessageBox::StandardButton reply;
+        if (hasUnsavedChanges) {
+            reply = QMessageBox::question(this, "Unload Image",
+                "The image has unsaved changes. Do you want to save before unloading?",
+                QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+        } else {
+            reply = QMessageBox::question(this, "Unload Image",
+                "Are you sure you want to unload the current image?",
+                QMessageBox::Yes | QMessageBox::No);
+            // Convert Yes/No to Save/Discard for consistent handling
+            if (reply == QMessageBox::Yes) {
+                reply = QMessageBox::Discard;
+            } else {
+                reply = QMessageBox::Cancel;
+            }
+        }
+        
+        if (reply == QMessageBox::Save) {
+            // Try to save the image first
+            QString fileName = QFileDialog::getSaveFileName(this,
+                "Save Image", QDir::homePath(),
+                "PNG Files (*.png);;JPEG Files (*.jpg);;BMP Files (*.bmp);;All Files (*)");
+            
+            if (!fileName.isEmpty()) {
+                try {
+                    currentImage.saveImage(fileName.toStdString());
+                    hasUnsavedChanges = false; // Mark as saved
+                    statusBar()->showMessage(QString("Saved: %1").arg(QFileInfo(fileName).fileName()));
+                } catch (const std::exception& e) {
+                    QMessageBox::critical(this, "Error", 
+                        QString("Failed to save image: %1").arg(e.what()));
+                    return; // Don't unload if save failed
+                }
+            } else {
+                return; // User cancelled save dialog, don't unload
+            }
+        } else if (reply == QMessageBox::Cancel) {
+            return; // User cancelled the unload operation
+        }
+        
+        // Proceed with unload (either after successful save or user chose Discard)
+        if (reply == QMessageBox::Save || reply == QMessageBox::Discard) {
+            // Clear image data
+            hasImage = false;
+            currentFilePath.clear();
+            hasUnsavedChanges = false;
+            
+            // Clear undo/redo stacks
+            while (!undoStack.empty()) undoStack.pop();
+            while (!redoStack.empty()) redoStack.pop();
+            
+            // Reset image label
+            imageLabel->clear();
+            imageLabel->setText("No image loaded\nClick 'Load Image' or drag & drop an image here");
+            
+            // Disable all filter buttons
+            saveButton->setEnabled(false);
+            unloadButton->setEnabled(false);
+            resetButton->setEnabled(false);
+            undoButton->setEnabled(false);
+            redoButton->setEnabled(false);
+            grayscaleButton->setEnabled(false);
+            blackWhiteButton->setEnabled(false);
+            invertButton->setEnabled(false);
+            mergeButton->setEnabled(false);
+            flipButton->setEnabled(false);
+            rotateButton->setEnabled(false);
+            cropButton->setEnabled(false);
+            darkLightButton->setEnabled(false);
+            frameButton->setEnabled(false);
+            edgesButton->setEnabled(false);
+            resizeButton->setEnabled(false);
+            blurButton->setEnabled(false);
+            infraredButton->setEnabled(false);
+            purpleButton->setEnabled(false);
+            tvFilterButton->setEnabled(false);
+            
+            // Update status bar
+            statusBar()->showMessage("Image unloaded - Ready to load a new image");
         }
     }
     
@@ -321,14 +441,33 @@ private slots:
     {
         if (!hasImage) return;
         
+        // Setup for cancellation
+        cancelRequested = false;
+        preFilterImage = currentImage;
         saveStateForUndo();
         
-        statusBar()->showMessage("Applying Grayscale filter...");
+        // Show progress UI
+        progressBar->setVisible(true);
+        progressBar->setRange(0, currentImage.height);
+        progressBar->setValue(0);
+        cancelButton->setVisible(true);
+        
+        statusBar()->showMessage("Applying Grayscale filter... (Click Cancel to stop)");
         QApplication::processEvents();
         
         try {
-            // Simple grayscale conversion
+            // Simple grayscale conversion with cancellation support
             for (int y = 0; y < currentImage.height; y++) {
+                // Check for cancellation
+                if (cancelRequested) {
+                    currentImage = preFilterImage;
+                    updateImageDisplay();
+                    statusBar()->showMessage("Grayscale filter cancelled");
+                    progressBar->setVisible(false);
+                    cancelButton->setVisible(false);
+                    return;
+                }
+                
                 for (int x = 0; x < currentImage.width; x++) {
                     int r = currentImage(x, y, 0);
                     int g = currentImage(x, y, 1);
@@ -338,21 +477,40 @@ private slots:
                     currentImage.setPixel(x, y, 1, gray);
                     currentImage.setPixel(x, y, 2, gray);
                 }
+                
+                // Update progress
+                progressBar->setValue(y + 1);
+                if (y % 50 == 0) { // Update display every 50 rows
+                    QApplication::processEvents();
+                }
             }
             updateImageDisplay();
             statusBar()->showMessage("Grayscale filter applied");
         } catch (const std::exception& e) {
             QMessageBox::critical(this, "Error", QString("Filter failed: %1").arg(e.what()));
         }
+        
+        // Hide progress UI
+        progressBar->setVisible(false);
+        cancelButton->setVisible(false);
     }
     
     void applyTVFilter()
     {
         if (!hasImage) return;
         
+        // Setup for cancellation
+        cancelRequested = false;
+        preFilterImage = currentImage;
         saveStateForUndo();
         
-        statusBar()->showMessage("Applying TV/CRT filter...");
+        // Show progress UI
+        progressBar->setVisible(true);
+        progressBar->setRange(0, currentImage.height);
+        progressBar->setValue(0);
+        cancelButton->setVisible(true);
+        
+        statusBar()->showMessage("Applying TV/CRT filter... (Click Cancel to stop)");
         QApplication::processEvents();
         
         try {
@@ -360,8 +518,18 @@ private slots:
             auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
             std::mt19937 rng(seed);
             std::uniform_int_distribution<int> noise_dist(-10, 10);
-            
+
             for (int y = 0; y < currentImage.height; y++) {
+                // Check for cancellation
+                if (cancelRequested) {
+                    currentImage = preFilterImage;
+                    updateImageDisplay();
+                    statusBar()->showMessage("TV/CRT filter cancelled");
+                    progressBar->setVisible(false);
+                    cancelButton->setVisible(false);
+                    return;
+                }
+                
                 for (int x = 0; x < currentImage.width; x++) {
                     // Get original pixel values
                     int r = currentImage(x, y, 0);
@@ -408,12 +576,22 @@ private slots:
                     currentImage.setPixel(x, y, 1, g);
                     currentImage.setPixel(x, y, 2, b);
                 }
+                
+                // Update progress
+                progressBar->setValue(y + 1);
+                if (y % 20 == 0) { // Update display every 20 rows
+                    QApplication::processEvents();
+                }
             }
             updateImageDisplay();
             statusBar()->showMessage("TV/CRT filter applied");
         } catch (const std::exception& e) {
             QMessageBox::critical(this, "Error", QString("Filter failed: %1").arg(e.what()));
         }
+        
+        // Hide progress UI
+        progressBar->setVisible(false);
+        cancelButton->setVisible(false);
     }
     
     void resetImage()
@@ -429,14 +607,33 @@ private slots:
     {
         if (!hasImage) return;
         
+        // Setup for cancellation
+        cancelRequested = false;
+        preFilterImage = currentImage;
         saveStateForUndo();
         
-        statusBar()->showMessage("Applying Black & White filter...");
+        // Show progress UI
+        progressBar->setVisible(true);
+        progressBar->setRange(0, currentImage.height);
+        progressBar->setValue(0);
+        cancelButton->setVisible(true);
+        
+        statusBar()->showMessage("Applying Black & White filter... (Click Cancel to stop)");
         QApplication::processEvents();
         
         try {
-            // Pure black and white conversion
+            // Pure black and white conversion with cancellation support
             for (int y = 0; y < currentImage.height; y++) {
+                // Check for cancellation
+                if (cancelRequested) {
+                    currentImage = preFilterImage;
+                    updateImageDisplay();
+                    statusBar()->showMessage("Black & White filter cancelled");
+                    progressBar->setVisible(false);
+                    cancelButton->setVisible(false);
+                    return;
+                }
+                
                 for (int x = 0; x < currentImage.width; x++) {
                     int r = currentImage(x, y, 0);
                     int g = currentImage(x, y, 1);
@@ -447,29 +644,64 @@ private slots:
                     currentImage.setPixel(x, y, 1, bw);
                     currentImage.setPixel(x, y, 2, bw);
                 }
+                
+                // Update progress
+                progressBar->setValue(y + 1);
+                if (y % 50 == 0) { // Update display every 50 rows
+                    QApplication::processEvents();
+                }
             }
             updateImageDisplay();
             statusBar()->showMessage("Black & White filter applied");
         } catch (const std::exception& e) {
             QMessageBox::critical(this, "Error", QString("Filter failed: %1").arg(e.what()));
         }
+        
+        // Hide progress UI
+        progressBar->setVisible(false);
+        cancelButton->setVisible(false);
     }
     
     void applyInvert()
     {
         if (!hasImage) return;
         
+        // Setup for cancellation
+        cancelRequested = false;
+        preFilterImage = currentImage;
         saveStateForUndo();
         
-        statusBar()->showMessage("Applying Invert filter...");
+        // Show progress UI
+        progressBar->setVisible(true);
+        progressBar->setRange(0, currentImage.height);
+        progressBar->setValue(0);
+        cancelButton->setVisible(true);
+        
+        statusBar()->showMessage("Applying Invert filter... (Click Cancel to stop)");
         QApplication::processEvents();
         
         try {
             for (int y = 0; y < currentImage.height; y++) {
+                // Check for cancellation
+                if (cancelRequested) {
+                    currentImage = preFilterImage;
+                    updateImageDisplay();
+                    statusBar()->showMessage("Invert filter cancelled");
+                    progressBar->setVisible(false);
+                    cancelButton->setVisible(false);
+                    return;
+                }
+                
                 for (int x = 0; x < currentImage.width; x++) {
                     currentImage.setPixel(x, y, 0, 255 - currentImage(x, y, 0));
                     currentImage.setPixel(x, y, 1, 255 - currentImage(x, y, 1));
                     currentImage.setPixel(x, y, 2, 255 - currentImage(x, y, 2));
+                }
+                
+                // Update progress
+                progressBar->setValue(y + 1);
+                if (y % 50 == 0) { // Update display every 50 rows
+                    QApplication::processEvents();
                 }
             }
             updateImageDisplay();
@@ -477,6 +709,10 @@ private slots:
         } catch (const std::exception& e) {
             QMessageBox::critical(this, "Error", QString("Filter failed: %1").arg(e.what()));
         }
+        
+        // Hide progress UI
+        progressBar->setVisible(false);
+        cancelButton->setVisible(false);
     }
     
     void applyMerge()
@@ -641,7 +877,7 @@ private slots:
         bool ok = false;
         QString choice = QInputDialog::getItem(this, "Dark or Light", "Choose:", options, 0, false, &ok);
         if (!ok) return;
-
+        
         saveStateForUndo();
         
         statusBar()->showMessage("Applying Dark & Light filter...");
@@ -690,30 +926,12 @@ private slots:
             
             try {
                 if (choice == "Simple Frame") {
-                    // Blue simple frame
-                    int frameSize = 10;
-                    Image result(currentImage.width + 2 * frameSize, currentImage.height + 2 * frameSize);
-                    for (int y = 0; y < result.height; y++) {
-                        for (int x = 0; x < result.width; x++) {
-                            result.setPixel(x, y, 0, 0);
-                            result.setPixel(x, y, 1, 0);
-                            result.setPixel(x, y, 2, 255);
-                        }
-                    }
-                    for (int y = 0; y < currentImage.height; y++) {
-                        for (int x = 0; x < currentImage.width; x++) {
-                            for (int c = 0; c < 3; c++) {
-                                result.setPixel(x + frameSize, y + frameSize, c, currentImage(x, y, c));
-                            }
-                        }
-                    }
-                    currentImage = result;
-                } else {
-                    // Decorated frame: blue outer + inner white border
+                    // Simple frame with blue outer and inner white border
                     int frameSize = 10;
                     int innerFrame = 5;
-                    int gap = 5;
                     Image result(currentImage.width + 2 * frameSize, currentImage.height + 2 * frameSize);
+                    
+                    // Fill with blue frame
                     for (int y = 0; y < result.height; y++) {
                         for (int x = 0; x < result.width; x++) {
                             result.setPixel(x, y, 0, 0);
@@ -721,6 +939,8 @@ private slots:
                             result.setPixel(x, y, 2, 255);
                         }
                     }
+                    
+                    // Copy original image
                     for (int y = 0; y < currentImage.height; y++) {
                         for (int x = 0; x < currentImage.width; x++) {
                             for (int c = 0; c < 3; c++) {
@@ -728,6 +948,9 @@ private slots:
                             }
                         }
                     }
+                    
+                    // Add inner white border
+                    int gap = 5;
                     for (int y = frameSize + gap; y < frameSize + currentImage.height - gap; y++) {
                         for (int x = frameSize + gap; x < frameSize + currentImage.width - gap; x++) {
                             bool isWhiteBorder =
@@ -736,13 +959,84 @@ private slots:
                                  y < frameSize + gap + innerFrame ||
                                  y >= frameSize + currentImage.height - gap - innerFrame);
                             if (isWhiteBorder) {
-                                result.setPixel(x, y, 0, 255);
-                                result.setPixel(x, y, 1, 255);
-                                result.setPixel(x, y, 2, 255);
+                            result.setPixel(x, y, 0, 255);
+                            result.setPixel(x, y, 1, 255);
+                            result.setPixel(x, y, 2, 255);
+                        }
+                    }
+                    }
+                    currentImage = result;
+                } else {
+                    // Decorated frame with brown/beige design and accent patterns
+                    int frameWidth = 25;
+                    int outerColor[3] = {100, 70, 50};
+                    int innerColor[3] = {235, 225, 210};
+                    int accentColor[3] = {180, 140, 80};
+                    
+                    int originalWidth = currentImage.width;
+                    int originalHeight = currentImage.height;
+                    int newWidth = originalWidth + 2 * frameWidth;
+                    int newHeight = originalHeight + 2 * frameWidth;
+                    
+                    Image result(newWidth, newHeight);
+                    
+                    // Copy original image
+                    for (int y = 0; y < originalHeight; y++) {
+                        for (int x = 0; x < originalWidth; x++) {
+                            for (int c = 0; c < 3; c++) {
+                                result.setPixel(x + frameWidth, y + frameWidth, c, currentImage(x, y, c));
                             }
                         }
                     }
-                    currentImage = result;
+                    
+                    // Create decorated frame
+                    for (int y = 0; y < newHeight; y++) {
+                        for (int x = 0; x < newWidth; x++) {
+                            if (x < frameWidth || x >= newWidth - frameWidth ||
+                                y < frameWidth || y >= newHeight - frameWidth) {
+                                
+                                int distFromEdge = std::min({x, y, newWidth - 1 - x, newHeight - 1 - y});
+                                
+                                if (distFromEdge < 3) {
+                                    for (int c = 0; c < 3; c++) {
+                                        result.setPixel(x, y, c, outerColor[c]);
+                                    }
+                                }
+                                else if (distFromEdge == 12 || distFromEdge == 15 || distFromEdge == 9) {
+                                    for (int c = 0; c < 3; c++) {
+                                        result.setPixel(x, y, c, accentColor[c]);
+                                    }
+                                }
+                                else if (distFromEdge < frameWidth - 4) {
+                                    for (int c = 0; c < 3; c++) {
+                                        result.setPixel(x, y, c, innerColor[c]);
+                                    }
+                                    
+                                    int cornerDist = std::min(std::min(x, newWidth - 1 - x),
+                                                             std::min(y, newHeight - 1 - y));
+                                    
+                                    if (cornerDist < frameWidth) {
+                                        if ((x + y) % 12 == 0) {
+                                            for (int c = 0; c < 3; c++) {
+                                                result.setPixel(x, y, c, accentColor[c]);
+                                            }
+                                        }
+                                    }
+                                }
+                                else if (distFromEdge >= frameWidth - 4 && distFromEdge < frameWidth - 1) {
+                                    for (int c = 0; c < 3; c++) {
+                                        result.setPixel(x, y, c, accentColor[c]);
+                                    }
+                                }
+                                else {
+                                    for (int c = 0; c < 3; c++) {
+                                        result.setPixel(x, y, c, outerColor[c]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                currentImage = result;
                 }
                 updateImageDisplay();
                 statusBar()->showMessage("Frame filter applied");
@@ -860,16 +1154,36 @@ private slots:
     {
         if (!hasImage) return;
         
+        // Setup for cancellation
+        cancelRequested = false;
+        preFilterImage = currentImage;
         saveStateForUndo();
         
-        statusBar()->showMessage("Applying Blur filter...");
+        // Show progress UI
+        progressBar->setVisible(true);
+        progressBar->setRange(0, currentImage.height);
+        progressBar->setValue(0);
+        cancelButton->setVisible(true);
+        
+        statusBar()->showMessage("Applying Blur filter... (Click Cancel to stop)");
         QApplication::processEvents();
         
         try {
-            // Radius-15 average blur
+            // Radius-15 average blur with cancellation support
             int blurSize = 15;
             Image result(currentImage.width, currentImage.height);
+            
             for (int y = 0; y < currentImage.height; y++) {
+                // Check for cancellation
+                if (cancelRequested) {
+                    currentImage = preFilterImage;
+                    updateImageDisplay();
+                    statusBar()->showMessage("Blur filter cancelled");
+                    progressBar->setVisible(false);
+                    cancelButton->setVisible(false);
+                    return;
+                }
+                
                 for (int x = 0; x < currentImage.width; x++) {
                     int R = 0, G = 0, B = 0;
                     int count = 0;
@@ -889,26 +1203,56 @@ private slots:
                     result.setPixel(x, y, 1, G / count);
                     result.setPixel(x, y, 2, B / count);
                 }
+                
+                // Update progress
+                progressBar->setValue(y + 1);
+                if (y % 10 == 0) { // Update display every 10 rows to avoid too much overhead
+                    QApplication::processEvents();
+                }
             }
+            
             currentImage = result;
             updateImageDisplay();
             statusBar()->showMessage("Blur filter applied");
         } catch (const std::exception& e) {
             QMessageBox::critical(this, "Error", QString("Filter failed: %1").arg(e.what()));
         }
+        
+        // Hide progress UI
+        progressBar->setVisible(false);
+        cancelButton->setVisible(false);
     }
     
     void applyInfrared()
     {
         if (!hasImage) return;
         
+        // Setup for cancellation
+        cancelRequested = false;
+        preFilterImage = currentImage;
         saveStateForUndo();
         
-        statusBar()->showMessage("Applying Infrared filter...");
+        // Show progress UI
+        progressBar->setVisible(true);
+        progressBar->setRange(0, currentImage.width);
+        progressBar->setValue(0);
+        cancelButton->setVisible(true);
+        
+        statusBar()->showMessage("Applying Infrared filter... (Click Cancel to stop)");
         QApplication::processEvents();
         
         try {
             for (int x = 0; x < currentImage.width; ++x) {
+                // Check for cancellation
+                if (cancelRequested) {
+                    currentImage = preFilterImage;
+                    updateImageDisplay();
+                    statusBar()->showMessage("Infrared filter cancelled");
+                    progressBar->setVisible(false);
+                    cancelButton->setVisible(false);
+                    return;
+                }
+                
                 for (int y = 0; y < currentImage.height; ++y) {
                     int red   = currentImage(x, y, 0);
                     int green = currentImage(x, y, 1);
@@ -925,25 +1269,54 @@ private slots:
                     currentImage(x, y, 1) = G;
                     currentImage(x, y, 2) = B;
                 }
+                
+                // Update progress
+                progressBar->setValue(x + 1);
+                if (x % 50 == 0) { // Update display every 50 columns
+                    QApplication::processEvents();
+                }
             }
             updateImageDisplay();
             statusBar()->showMessage("Infrared filter applied");
         } catch (const std::exception& e) {
             QMessageBox::critical(this, "Error", QString("Filter failed: %1").arg(e.what()));
         }
+        
+        // Hide progress UI
+        progressBar->setVisible(false);
+        cancelButton->setVisible(false);
     }
     
     void applyPurpleFilter()
     {
         if (!hasImage) return;
         
+        // Setup for cancellation
+        cancelRequested = false;
+        preFilterImage = currentImage;
         saveStateForUndo();
         
-        statusBar()->showMessage("Applying Purple filter...");
+        // Show progress UI
+        progressBar->setVisible(true);
+        progressBar->setRange(0, currentImage.height);
+        progressBar->setValue(0);
+        cancelButton->setVisible(true);
+        
+        statusBar()->showMessage("Applying Purple filter... (Click Cancel to stop)");
         QApplication::processEvents();
         
         try {
             for (int y = 0; y < currentImage.height; y++) {
+                // Check for cancellation
+                if (cancelRequested) {
+                    currentImage = preFilterImage;
+                    updateImageDisplay();
+                    statusBar()->showMessage("Purple filter cancelled");
+                    progressBar->setVisible(false);
+                    cancelButton->setVisible(false);
+                    return;
+                }
+                
                 for (int x = 0; x < currentImage.width; x++) {
                     int r = currentImage(x, y, 0);
                     int g = currentImage(x, y, 1);
@@ -957,12 +1330,22 @@ private slots:
                     currentImage.setPixel(x, y, 1, g);
                     currentImage.setPixel(x, y, 2, b);
                 }
+                
+                // Update progress
+                progressBar->setValue(y + 1);
+                if (y % 50 == 0) { // Update display every 50 rows
+                    QApplication::processEvents();
+                }
             }
             updateImageDisplay();
             statusBar()->showMessage("Purple filter applied");
         } catch (const std::exception& e) {
             QMessageBox::critical(this, "Error", QString("Filter failed: %1").arg(e.what()));
         }
+        
+        // Hide progress UI
+        progressBar->setVisible(false);
+        cancelButton->setVisible(false);
     }
     
     void startCropMode()
@@ -1006,6 +1389,12 @@ private slots:
         updateUndoRedoButtons();
         statusBar()->showMessage("Redo applied");
     }
+    
+    void cancelFilter()
+    {
+        cancelRequested = true;
+        statusBar()->showMessage("Cancelling filter...");
+    }
 
 private:
     void saveStateForUndo()
@@ -1014,6 +1403,9 @@ private:
         
         // Save current state to undo stack
         undoStack.push(currentImage);
+        
+        // Mark as having unsaved changes
+        hasUnsavedChanges = true;
         
         // Limit undo stack size to prevent excessive memory usage
         if (undoStack.size() > MAX_UNDO_STEPS) {
@@ -1041,6 +1433,44 @@ private:
     }
     
 protected:
+    void closeEvent(QCloseEvent *event) override
+    {
+        if (hasImage && hasUnsavedChanges) {
+            QMessageBox::StandardButton reply = QMessageBox::question(this, "Save Changes",
+                "The image has unsaved changes. Do you want to save before exiting?",
+                QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+            
+            if (reply == QMessageBox::Save) {
+                // Try to save the image
+                QString fileName = QFileDialog::getSaveFileName(this,
+                    "Save Image", QDir::homePath(),
+                    "PNG Files (*.png);;JPEG Files (*.jpg);;BMP Files (*.bmp);;All Files (*)");
+                
+                if (!fileName.isEmpty()) {
+                    try {
+                        currentImage.saveImage(fileName.toStdString());
+                        event->accept(); // Allow the application to close
+                    } catch (const std::exception& e) {
+                        QMessageBox::critical(this, "Error", 
+                            QString("Failed to save image: %1").arg(e.what()));
+                        event->ignore(); // Prevent closing if save failed
+                        return;
+                    }
+                } else {
+                    event->ignore(); // User cancelled save dialog
+                    return;
+                }
+            } else if (reply == QMessageBox::Discard) {
+                event->accept(); // Allow the application to close without saving
+            } else {
+                event->ignore(); // User cancelled the exit
+                return;
+            }
+        }
+        
+        QMainWindow::closeEvent(event);
+    }
+    
     void resizeEvent(QResizeEvent *event) override
     {
         QMainWindow::resizeEvent(event);
@@ -1105,9 +1535,11 @@ protected:
                         currentImage = originalImage;
                         hasImage = true;
                         currentFilePath = fileName;
+                        hasUnsavedChanges = false; // New image is considered "saved"
                         
                         updateImageDisplay();
                         saveButton->setEnabled(true);
+                        unloadButton->setEnabled(true);
                         resetButton->setEnabled(true);
                         grayscaleButton->setEnabled(true);
                         blackWhiteButton->setEnabled(true);
@@ -1115,6 +1547,7 @@ protected:
                         mergeButton->setEnabled(true);
                         flipButton->setEnabled(true);
                         rotateButton->setEnabled(true);
+                        cropButton->setEnabled(true);
                         darkLightButton->setEnabled(true);
                         frameButton->setEnabled(true);
                         edgesButton->setEnabled(true);
@@ -1272,6 +1705,7 @@ protected:
     QPushButton *cropButton;
     QPushButton *loadButton;
     QPushButton *saveButton;
+    QPushButton *unloadButton;
     QPushButton *resetButton;
     QPushButton *undoButton;
     QPushButton *redoButton;
@@ -1289,16 +1723,25 @@ protected:
     QPushButton *infraredButton;
     QPushButton *purpleButton;
     QPushButton *tvFilterButton;
+    QPushButton *cancelButton;
+    QProgressBar *progressBar;
     
     Image originalImage;
     Image currentImage;
     bool hasImage;
     QString currentFilePath;
     
+    // Cancel mechanism
+    std::atomic<bool> cancelRequested{false};
+    Image preFilterImage; // Store image state before filter for cancellation
+    
     // Undo/Redo system
     std::stack<Image> undoStack;
     std::stack<Image> redoStack;
     static const int MAX_UNDO_STEPS = 20; // Limit memory usage
+    
+    // Save state tracking
+    bool hasUnsavedChanges = false;
     
     // Resize handling
     QTimer *resizeTimer;

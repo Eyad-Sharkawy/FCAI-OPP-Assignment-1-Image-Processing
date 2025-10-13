@@ -30,23 +30,14 @@ if %ERRORLEVEL% EQU 0 (
     REM Create portable directory structure
     mkdir ImageStudio_Portable
     mkdir ImageStudio_Portable\bin
-    mkdir ImageStudio_Portable\platforms
-    mkdir ImageStudio_Portable\styles
     
     REM Copy executable
     copy release\ImageStudio.exe ImageStudio_Portable\bin\
     
-    REM Copy Qt DLLs
-    copy "C:\Qt\6.8.1\mingw_64\bin\Qt6Core.dll" ImageStudio_Portable\bin\
-    copy "C:\Qt\6.8.1\mingw_64\bin\Qt6Gui.dll" ImageStudio_Portable\bin\
-    copy "C:\Qt\6.8.1\mingw_64\bin\Qt6Widgets.dll" ImageStudio_Portable\bin\
-    copy "C:\Qt\6.8.1\mingw_64\bin\libgcc_s_seh-1.dll" ImageStudio_Portable\bin\
-    copy "C:\Qt\6.8.1\mingw_64\bin\libstdc++-6.dll" ImageStudio_Portable\bin\
-    copy "C:\Qt\6.8.1\mingw_64\bin\libwinpthread-1.dll" ImageStudio_Portable\bin\
-    
-    REM Copy Qt plugins
-    copy "C:\Qt\6.8.1\mingw_64\plugins\platforms\qwindows.dll" ImageStudio_Portable\platforms\
-    copy "C:\Qt\6.8.1\mingw_64\plugins\styles\qwindowsvistastyle.dll" ImageStudio_Portable\styles\
+    REM Use windeployqt to automatically deploy all Qt dependencies
+    cd ImageStudio_Portable\bin
+    windeployqt ImageStudio.exe
+    cd ..\..
     
     REM Copy assets
     if exist "%PROJ_DIR%assets" (
@@ -56,7 +47,7 @@ if %ERRORLEVEL% EQU 0 (
     REM Create launcher script
     echo @echo off > ImageStudio_Portable\ImageStudio.bat
     echo cd /d "%%~dp0bin" >> ImageStudio_Portable\ImageStudio.bat
-    echo set QT_PLUGIN_PATH=%%~dp0platforms;%%~dp0styles >> ImageStudio_Portable\ImageStudio.bat
+    echo echo Starting ImageStudio... >> ImageStudio_Portable\ImageStudio.bat
     echo ImageStudio.exe %%* >> ImageStudio_Portable\ImageStudio.bat
     
     REM Create README for portable version

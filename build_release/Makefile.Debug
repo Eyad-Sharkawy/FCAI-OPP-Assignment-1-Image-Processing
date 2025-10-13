@@ -16,7 +16,7 @@ CXX           = g++
 DEFINES       = -DUNICODE -D_UNICODE -DWIN32 -DMINGW_HAS_SECURE_API=1 -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQT_NEEDS_QMAIN
 CFLAGS        = -fno-keep-inline-dllexport -g -Wall -Wextra -Wextra $(DEFINES)
 CXXFLAGS      = -fno-keep-inline-dllexport -std=c++20 -Wno-missing-field-initializers -g -std=gnu++2a -Wall -Wextra -Wextra -fexceptions -mthreads $(DEFINES)
-INCPATH       = -I../../assignment-1 -I. -I../include -I../third_party/stb -IC:/Qt/6.8.1/mingw_64/include -IC:/Qt/6.8.1/mingw_64/include/QtWidgets -IC:/Qt/6.8.1/mingw_64/include/QtGui -IC:/Qt/6.8.1/mingw_64/include/QtCore -Idebug -I/include -IC:/Qt/6.8.1/mingw_64/mkspecs/win32-g++ 
+INCPATH       = -I"../../Image-studio gui" -I. -I../include -I../third_party/stb -IC:/Qt/6.8.1/mingw_64/include -IC:/Qt/6.8.1/mingw_64/include/QtWidgets -IC:/Qt/6.8.1/mingw_64/include/QtGui -IC:/Qt/6.8.1/mingw_64/include/QtCore -Idebug -I/include -IC:/Qt/6.8.1/mingw_64/mkspecs/win32-g++ 
 LINKER      =        g++
 LFLAGS        =        -Wl,-subsystem,windows -mthreads
 LIBS        =        C:/Qt/6.8.1/mingw_64/lib/libQt6Widgets.a C:/Qt/6.8.1/mingw_64/lib/libQt6Gui.a C:/Qt/6.8.1/mingw_64/lib/libQt6Core.a -lmingw32 C:/Qt/6.8.1/mingw_64/lib/libQt6EntryPoint.a -lshell32  
@@ -362,12 +362,15 @@ debug/simple_qt_app.moc: ../src/simple_qt_app.cpp \
 		C:/Qt/6.8.1/mingw_64/include/QtWidgets/QRubberBand \
 		C:/Qt/6.8.1/mingw_64/include/QtWidgets/qrubberband.h \
 		C:/Qt/6.8.1/mingw_64/include/QtGui/QMouseEvent \
+		C:/Qt/6.8.1/mingw_64/include/QtWidgets/QProgressBar \
+		C:/Qt/6.8.1/mingw_64/include/QtWidgets/qprogressbar.h \
+		C:/Qt/6.8.1/mingw_64/include/QtGui/QCloseEvent \
 		../include/Image_Class.h \
 		../third_party/stb/stb_image.h \
 		../third_party/stb/stb_image_write.h \
 		debug/moc_predefs.h \
 		C:/Qt/6.8.1/mingw_64/bin/moc.exe
-	'C:\Qt\6.8.1\mingw_64\bin\moc.exe' $(DEFINES) --include C:/Users/eyadd/Documents/CPP/assignment-1/build_release/debug/moc_predefs.h -IC:/Qt/6.8.1/mingw_64/mkspecs/win32-g++ -IC:/Users/eyadd/Documents/CPP/assignment-1 -IC:/Users/eyadd/Documents/CPP/assignment-1/include -IC:/Users/eyadd/Documents/CPP/assignment-1/third_party/stb -IC:/Qt/6.8.1/mingw_64/include -IC:/Qt/6.8.1/mingw_64/include/QtWidgets -IC:/Qt/6.8.1/mingw_64/include/QtGui -IC:/Qt/6.8.1/mingw_64/include/QtCore -I. -IC:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++ -IC:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/x86_64-w64-mingw32 -IC:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/backward -IC:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include -IC:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include-fixed -IC:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include ../src/simple_qt_app.cpp -o debug/simple_qt_app.moc
+	'C:\Qt\6.8.1\mingw_64\bin\moc.exe' $(DEFINES) --include 'C:/Users/eyadd/Documents/CPP/assignment-1/Image-studio gui/build_release/debug/moc_predefs.h' -IC:/Qt/6.8.1/mingw_64/mkspecs/win32-g++ -I'C:/Users/eyadd/Documents/CPP/assignment-1/Image-studio gui' -I'C:/Users/eyadd/Documents/CPP/assignment-1/Image-studio gui/include' -I'C:/Users/eyadd/Documents/CPP/assignment-1/Image-studio gui/third_party/stb' -IC:/Qt/6.8.1/mingw_64/include -IC:/Qt/6.8.1/mingw_64/include/QtWidgets -IC:/Qt/6.8.1/mingw_64/include/QtGui -IC:/Qt/6.8.1/mingw_64/include/QtCore -I. -IC:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++ -IC:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/x86_64-w64-mingw32 -IC:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/backward -IC:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include -IC:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include-fixed -IC:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include ../src/simple_qt_app.cpp -o debug/simple_qt_app.moc
 
 compiler_uic_make_all:
 compiler_uic_clean:
@@ -636,6 +639,9 @@ debug/simple_qt_app.o: ../src/simple_qt_app.cpp C:/Qt/6.8.1/mingw_64/include/QtW
 		C:/Qt/6.8.1/mingw_64/include/QtWidgets/QRubberBand \
 		C:/Qt/6.8.1/mingw_64/include/QtWidgets/qrubberband.h \
 		C:/Qt/6.8.1/mingw_64/include/QtGui/QMouseEvent \
+		C:/Qt/6.8.1/mingw_64/include/QtWidgets/QProgressBar \
+		C:/Qt/6.8.1/mingw_64/include/QtWidgets/qprogressbar.h \
+		C:/Qt/6.8.1/mingw_64/include/QtGui/QCloseEvent \
 		../include/Image_Class.h \
 		../third_party/stb/stb_image.h \
 		../third_party/stb/stb_image_write.h \
