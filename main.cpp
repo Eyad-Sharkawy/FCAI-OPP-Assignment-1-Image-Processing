@@ -209,6 +209,9 @@ Image infraredbonus(Image &image); //Ahmed
 //TV/CRT Filter
 Image tvFilter(Image &image); //Eyad
 
+// Skew Filter
+Image skewFilter(Image &image); // Tarek
+
 static void clearStack(std::stack<Image> &s) {
     while (!s.empty()) s.pop();
 }
@@ -287,11 +290,12 @@ int main() {
         std::cout << "  13. infrared\n";
         std::cout << "  14. purpleFilter\n";
         std::cout << "  15. TV/CRT Filter\n";
-        std::cout << "  16. Reset to Original\n";
-        std::cout << "  17. Undo\n";
-        std::cout << "  18. Redo\n";
-        std::cout << "  19. Save current image\n";
-        std::cout << "  20. Exit\n";
+        std::cout << "  16. SKEW Filter\n";
+        std::cout << "  17. Reset to Original\n";
+        std::cout << "  18. Undo\n";
+        std::cout << "  19. Redo\n";
+        std::cout << "  20. Save current image\n";
+        std::cout << "  21. Exit\n";
         int choice = readIntInRange("Enter your choice: ", 0, 20);
         switch (choice) {
             case 0: {
@@ -623,7 +627,21 @@ int main() {
                     std::cout << "=============================================\n";
                 }
                 break;
-            case 16: { // Reset
+            case 16:
+                if (hasImage) {
+                    saveStateForUndo(undoStack, redoStack, result);
+                    result = skewFilter(result);
+                    unsavedChanges = true;
+                    std::cout << "Applied SKEW.\n";
+                    std::cout << "=============================================\n";
+                } else {
+                    std::cout << "=============================================\n";
+                    std::cout << "error" << std::endl;
+                    std::cout << "please load an image" << std::endl;
+                    std::cout << "=============================================\n";
+                }
+                break;
+            case 17: { // Reset
                         if (hasImage) {
                             saveStateForUndo(undoStack, redoStack, result);
                             result = image; // restore to original loaded image
@@ -635,7 +653,7 @@ int main() {
                             std::cout << "please load an image" << std::endl;
                         }
                         break; }
-            case 17: { // Undo
+            case 18: { // Undo
                         if (hasImage) {
                             if (doUndo(undoStack, redoStack, result)) {
                                 unsavedChanges = true;
@@ -649,7 +667,7 @@ int main() {
                             std::cout << "please load an image" << std::endl;
                         }
                         break; }
-            case 18: { // Redo
+            case 19: { // Redo
                         if (hasImage) {
                             if (doRedo(undoStack, redoStack, result)) {
                                 unsavedChanges = true;
@@ -663,7 +681,7 @@ int main() {
                             std::cout << "please load an image" << std::endl;
                         }
                         break; }
-            case 19:
+            case 20:
                         if (hasImage) {
                             char ans = readCharChoice("Save to same file or new file? (s/n): ", "sn");
                             std::string savePath;
@@ -699,7 +717,7 @@ int main() {
                             std::cout << "please load an image" << std::endl;
                         }
                     break;
-                    case 20: {
+                    case 21: {
                         if (unsavedChanges) {
                             char ans = readCharChoice("You have unsaved changes. Save before exiting? (y/n): ",
                                                       "yn");
@@ -1262,4 +1280,36 @@ Image tvFilter(Image &image) {
     }
     
     return result;
+}
+
+// SKEW Filter
+Image skewFilter(Image &image) {
+    double angle = 40.0;
+    double angleRad = angle * M_PI / 180.0;
+
+    int newWidth = image.width + std::tan(angleRad) * image.height;
+    Image skewed(newWidth, image.height);
+
+
+    for (int y = 0; y < image.height; y++) {
+        for (int x = 0; x < newWidth; x++) {
+            skewed.setPixel(x, y, 0, 255);
+            skewed.setPixel(x, y, 1, 255);
+            skewed.setPixel(x, y, 2, 255);
+        }
+    }
+
+    for (int y = 0; y < image.height; y++) {
+        int shift = std::tan(angleRad) * y;
+
+        for (int x = 0; x < image.width; x++) {
+            int newX = x + shift;
+            if (newX >= 0 && newX < newWidth) {
+                skewed.setPixel(newX, y, 0, image(x, y, 0));
+                skewed.setPixel(newX, y, 1, image(x, y, 1));
+                skewed.setPixel(newX, y, 2, image(x, y, 2));
+            }
+        }
+    }
+    return skewed;
 }
