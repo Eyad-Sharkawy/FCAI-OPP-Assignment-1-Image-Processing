@@ -270,7 +270,7 @@ public:
      * @note This destructor is automatically called when the window is closed
      *       or the application exits.
      */
-    ~ImageStudio() {
+    ~PhotoSmith() {
         delete imageFilters;
     }
 
@@ -1808,4 +1808,4 @@ int main(int argc, char *argv[])
     return app.exec();
 }
 
-#include "image_studio.moc"
+#include "photo_smith.moc"

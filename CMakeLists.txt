@@ -74,6 +74,14 @@ if(WIN32)
 endif()
 
 # Compiler flags
-target_compile_options(${PROJECT_NAME} PRIVATE
-    -Wno-missing-field-initializers
-)
+if(MSVC)
+    target_compile_options(${PROJECT_NAME} PRIVATE
+        /W3
+        /Zc:__cplusplus
+        /permissive-
+    )
+else()
+    target_compile_options(${PROJECT_NAME} PRIVATE
+        -Wno-missing-field-initializers
+    )
+endif()
