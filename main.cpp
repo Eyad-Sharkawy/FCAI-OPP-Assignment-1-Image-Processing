@@ -200,23 +200,32 @@ Image resize(Image image, size_t w, size_t h);//Eyad
 //Filter 12
 Image blurImage(Image &image);// Tarek
 
+//Filter 13 (bonus)
+Image enhanceSunlight(const Image &img); //Ahmed
+
+//Filter 14 (bonus)
+Image oilPainting(const Image &image, int radius , int intensity ); //Ahmed
+
+//Filter 15 (bonus)
+Image tvFilter(Image &image); //Eyad
+
 //Filetr 16 (bonus)
 Image purpleFilter(Image &image);// Tarek
 
 //Filter 17 (bonus)
 Image infraredbonus(Image &image); //Ahmed
 
-//TV/CRT Filter
-Image tvFilter(Image &image); //Eyad
-
-// Skew Filter
+// Filter 18 (bonus)
 Image skewFilter(Image &image); // Tarek
 
 // emboss Filter
 Image embossFilter(Image &image); // Eyad
 
 // Double Vision Filter
-Image doubleVisionFilter(Image &image); // Ahmed
+Image doubleVisionFilter(Image &image); // Tarek
+
+// fishEyeFilter
+Image fishEyeFilter(const Image &image); // Eyad
 
 static void clearStack(std::stack<Image> &s) {
     while (!s.empty()) s.pop();
@@ -293,18 +302,21 @@ int main() {
         std::cout << "  10. Detect Image Edges\n";
         std::cout << "  11. Resizing Images\n";
         std::cout << "  12. Blur Images\n";
-        std::cout << "  13. infrared\n";
-        std::cout << "  14. purpleFilter\n";
+        std::cout << "  13. enhanceSunlight\n";
+        std::cout << "  14. oilPainting\n";
         std::cout << "  15. TV/CRT Filter\n";
-        std::cout << "  16. SKEW Filter\n";
-        std::cout << "  17. Emboss Filter\n";
-        std::cout << "  18. Double Vision Filter\n";
-        std::cout << "  19. Reset to Original\n";
-        std::cout << "  20. Undo\n";
-        std::cout << "  21. Redo\n";
-        std::cout << "  22. Save current image\n";
-        std::cout << "  23. Exit\n";
-        int choice = readIntInRange("Enter your choice: ", 0, 20);
+        std::cout << "  16. purpleFilter\n";
+        std::cout << "  17. infrared\n";
+        std::cout << "  18. SKEW Filter\n";
+        std::cout << "  19. Emboss Filter\n";
+        std::cout << "  20. Double Vision Filter\n";
+        std::cout << "  21. Fish Eye Filter\n";
+        std::cout << "  22. Reset to Original\n";
+        std::cout << "  23. Undo\n";
+        std::cout << "  24. Redo\n";
+        std::cout << "  25. Save current image\n";
+        std::cout << "  26. Exit\n";
+        int choice = readIntInRange("Enter your choice: ", 0, 26);
         switch (choice) {
             case 0: {
                 if (unsavedChanges) {
@@ -596,6 +608,34 @@ int main() {
             case 13:
                 if (hasImage) {
                     saveStateForUndo(undoStack, redoStack, result);
+                    result = enhanceSunlight(result);
+                    unsavedChanges = true;
+                    std::cout << "Applied sunlight.\n";
+                    std::cout << "=============================================\n";
+                } else {
+                    std::cout << "=============================================\n";
+                    std::cout << "error" << std::endl;
+                    std::cout << "please load an image" << std::endl;
+                    std::cout << "=============================================\n";
+                }
+            break;
+            case 14:
+                if (hasImage) {
+                    saveStateForUndo(undoStack, redoStack, result);
+                    result = oilPainting(result,3,30);
+                    unsavedChanges = true;
+                    std::cout << "Applied oilpaint .\n";
+                    std::cout << "=============================================\n";
+                } else {
+                    std::cout << "=============================================\n";
+                    std::cout << "error" << std::endl;
+                    std::cout << "please load an image" << std::endl;
+                    std::cout << "=============================================\n";
+                }
+            break;
+            case 17:
+                if (hasImage) {
+                    saveStateForUndo(undoStack, redoStack, result);
                     result = infraredbonus(result);
                     unsavedChanges = true;
                     std::cout << "Applied infrared.\n";
@@ -607,7 +647,7 @@ int main() {
                     std::cout << "=============================================\n";
                 }
             break;
-            case 14:
+            case 16:
                 if (hasImage) {
                     saveStateForUndo(undoStack, redoStack, result);
                     result = purpleFilter(result);
@@ -635,7 +675,7 @@ int main() {
                     std::cout << "=============================================\n";
                 }
                 break;
-            case 16:
+            case 18:
                 if (hasImage) {
                     saveStateForUndo(undoStack, redoStack, result);
                     result = skewFilter(result);
@@ -649,7 +689,7 @@ int main() {
                     std::cout << "=============================================\n";
                 }
                 break;
-            case 17:
+            case 19:
                 if (hasImage) {
                     saveStateForUndo(undoStack, redoStack, result);
                     result = embossFilter(result);
@@ -663,7 +703,7 @@ int main() {
                     std::cout << "=============================================\n";
                 }
                 break;
-            case 18:
+            case 20:
                 if (hasImage) {
                     saveStateForUndo(undoStack, redoStack, result);
                     result = doubleVisionFilter(result);
@@ -677,7 +717,21 @@ int main() {
                     std::cout << "=============================================\n";
                 }
                 break;
-            case 19: { // Reset
+            case 21:
+                if (hasImage) {
+                    saveStateForUndo(undoStack, redoStack, result);
+                    result = fishEyeFilter(result);
+                    unsavedChanges = true;
+                    std::cout << "Applied fisheye.\n";
+                    std::cout << "=============================================\n";
+                } else {
+                    std::cout << "=============================================\n";
+                    std::cout << "error" << std::endl;
+                    std::cout << "please load an image" << std::endl;
+                    std::cout << "=============================================\n";
+                }
+            break;
+            case 22: { // Reset
                         if (hasImage) {
                             saveStateForUndo(undoStack, redoStack, result);
                             result = image; // restore to original loaded image
@@ -689,7 +743,7 @@ int main() {
                             std::cout << "please load an image" << std::endl;
                         }
                         break; }
-            case 20: { // Undo
+            case 23: { // Undo
                         if (hasImage) {
                             if (doUndo(undoStack, redoStack, result)) {
                                 unsavedChanges = true;
@@ -703,7 +757,7 @@ int main() {
                             std::cout << "please load an image" << std::endl;
                         }
                         break; }
-            case 21: { // Redo
+            case 24: { // Redo
                         if (hasImage) {
                             if (doRedo(undoStack, redoStack, result)) {
                                 unsavedChanges = true;
@@ -717,9 +771,9 @@ int main() {
                             std::cout << "please load an image" << std::endl;
                         }
                         break; }
-            case 22:
+            case 25:
                         if (hasImage) {
-                            char ans = readCharChoice("Save to same file or new file? (s/n): ", "sn");
+                            char ans = readCharChoice("Save to same file or new file?  same or new (s/n): ", "sn");
                             std::string savePath;
                             if (ans == 's') {
                                 savePath = imagePath;
@@ -753,7 +807,7 @@ int main() {
                             std::cout << "please load an image" << std::endl;
                         }
                     break;
-                    case 23: {
+                    case 26: {
                         if (unsavedChanges) {
                             char ans = readCharChoice("You have unsaved changes. Save before exiting? (y/n): ",
                                                       "yn");
@@ -1420,3 +1474,107 @@ Image doubleVisionFilter(Image &image) {
         }
         return vision;
     }
+
+Image oilPainting(const Image &image, int radius = 3, int intensity = 30) {
+  Image result(image.width, image.height);
+
+  for (int i = 0; i < image.width; ++i) {
+    for (int j = 0; j < image.height; ++j) {
+
+      int colorCount[256] = {0};
+      int redSum[256] = {0};
+      int greenSum[256] = {0};
+      int blueSum[256] = {0};
+
+      for (int dy = -radius; dy <= radius; ++dy) {
+        for (int dx = -radius; dx <= radius; ++dx) {
+          int nx = i + dx;
+          int ny = j + dy;
+
+          if (nx >= 0 && nx < image.width && ny >= 0 && ny < image.height) {
+
+            int r = image(nx, ny, 0);
+            int g = image(nx, ny, 1);
+            int b = image(nx, ny, 2);
+
+            int avg = (r + g + b) / 3;
+            int level = avg / intensity;
+
+            colorCount[level]++;
+            redSum[level] += r;
+            greenSum[level] += g;
+            blueSum[level] += b;
+          }
+        }
+      }
+
+      int maxCount = 0;
+      int maxLevel = 0;
+      for (int k = 0; k < 256; ++k) {
+        if (colorCount[k] > maxCount) {
+          maxCount = colorCount[k];
+          maxLevel = k;
+        }
+      }
+
+      result(i, j, 0) = redSum[maxLevel] / colorCount[maxLevel];
+      result(i, j, 1) = greenSum[maxLevel] / colorCount[maxLevel];
+      result(i, j, 2) = blueSum[maxLevel] / colorCount[maxLevel];
+    }
+  }
+
+  return result;
+}
+//enhanceSunlight Filter
+Image enhanceSunlight(const Image &img) {
+  Image result(img.width, img.height);
+
+  for (int x = 0; x < img.width; x++) {
+    for (int y = 0; y < img.height; y++) {
+      for (int c = 0; c < img.channels; c++) {
+        int pixell = img(x, y, c);
+
+        if (c == 0) pixell = std::min(255, int(pixell * 1.4));
+        if (c == 1) pixell = std::min(255, int(pixell * 1.4));
+
+        result(x, y, c) = pixell;
+      }
+    }
+  }
+  return result;
+}
+
+Image fishEyeFilter(const Image &image) {
+    Image fishEye(image.width, image.height);
+
+    float centerX = image.width / 2.0;
+    float centerY = image.height / 2.0;
+    float radius = std::min(centerX, centerY);
+
+    for (int y = 0; y < image.height; y++) {
+        for (int x = 0; x < image.width; x++) {
+
+            float dx = (x - centerX) / radius;
+            float dy = (y - centerY) / radius;
+            float distance = sqrt(dx * dx + dy * dy);
+
+            if (distance < 1.0) {
+                float factor = 1.0;
+                float newDist = pow(distance, factor * 0.75);
+
+                float nx = centerX + dx / distance * newDist * radius;
+                float ny = centerY + dy / distance * newDist * radius;
+
+                if (nx >= 0 && nx < image.width && ny >= 0 && ny < image.height) {
+                    for (int c = 0; c < 3; c++) {
+                        int pixelValue = image(nx, ny, c);
+                        fishEye.setPixel(x, y, c, pixelValue);
+                    }
+                }
+            }
+        }
+    }
+
+
+    return fishEye;
+}
