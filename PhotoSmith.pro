@@ -18,7 +18,7 @@ CONFIG += c++20
 TARGET = PhotoSmith
 TEMPLATE = app
 
-SOURCES += src/gui/image_studio.cpp \
+SOURCES += src/gui/photo_smith.cpp \
            src/core/ImageFilters.cpp \
            src/core/Image_Class.cpp
 
@@ -36,7 +36,8 @@ QMAKE_CXXFLAGS += -std=c++20
 # Disable warnings for STB library
 QMAKE_CXXFLAGS += -Wno-missing-field-initializers
 
-# Windows: embed executable icon if .ico exists
-win32:exists(assets/icon.ico) {
-    RC_ICONS = assets/icon.ico
+# Windows: embed executable icon if .png exists
+win32:exists(assets/icons/logo.png) {
+    # Note: Qt can use PNG directly as icon
+    ICON = assets/icons/logo.png
 }

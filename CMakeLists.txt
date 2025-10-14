@@ -34,7 +34,7 @@ include_directories(third_party/stb)
 
 # Source files
 set(SOURCES
-    src/gui/image_studio.cpp
+    src/gui/photo_smith.cpp
     src/core/filters/ImageFilters.cpp
     src/core/image/Image_Class.cpp
 )
@@ -71,6 +71,17 @@ if(WIN32)
     set_target_properties(${PROJECT_NAME} PROPERTIES
         WIN32_EXECUTABLE TRUE
     )
+    
+    # Set application icon if it exists
+    if(EXISTS "${CMAKE_SOURCE_DIR}/assets/icons/logo.png")
+        # Convert PNG to ICO for Windows (requires ImageMagick or similar)
+        # For now, we'll just copy the PNG as the icon
+        configure_file(
+            "${CMAKE_SOURCE_DIR}/assets/icons/logo.png"
+            "${CMAKE_BINARY_DIR}/bin/icon.png"
+            COPYONLY
+        )
+    endif()
 endif()
 
 # Compiler flags

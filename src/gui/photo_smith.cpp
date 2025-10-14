@@ -167,7 +167,7 @@ public:
         ui.setupUi(this);
         
         setWindowTitle("Photo Smith");
-        setWindowIcon(QIcon("assets/icon.jpg"));
+        setWindowIcon(QIcon("assets/icons/logo.png"));
         setMinimumSize(600, 400);
         
         // Set up the image label styling
@@ -270,7 +270,7 @@ public:
      * @note This destructor is automatically called when the window is closed
      *       or the application exits.
      */
-    ~ImageStudio() {
+    ~PhotoSmith() {
         delete imageFilters;
     }
 
@@ -1800,7 +1800,7 @@ protected:
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-    app.setWindowIcon(QIcon("assets/icon.jpg"));
+    app.setWindowIcon(QIcon("assets/icons/logo.png"));
     
     PhotoSmith window;
     window.show();
@@ -1808,4 +1808,4 @@ int main(int argc, char *argv[])
     return app.exec();
 }
 
-#include "image_studio.moc"
+#include "photo_smith.moc"
