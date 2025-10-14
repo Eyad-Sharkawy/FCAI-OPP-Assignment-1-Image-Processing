@@ -498,6 +498,45 @@ void ImageFilters::applyDarkAndLight(Image& currentImage, const QString& choice)
     }
 }
 
+void ImageFilters::applyDarkAndLight(Image& currentImage, const QString& choice, int percent)
+{
+    if (statusBar) {
+        statusBar->showMessage("Applying Dark & Light (custom %) filter...");
+    }
+    QApplication::processEvents();
+
+    percent = std::max(0, std::min(100, percent));
+    const double factor = (choice == "dark")
+        ? std::max(0.0, 1.0 - (percent / 100.0))
+        : (1.0 + (percent / 100.0));
+
+    try {
+        Image result(currentImage.width, currentImage.height);
+        for (int i = 0; i < currentImage.width; ++i) {
+            for (int j = 0; j < currentImage.height; ++j) {
+                for (int k = 0; k < 3; ++k) {
+                    int p = currentImage(i, j, k);
+                    double v = p * factor;
+                    if (v < 0.0) v = 0.0;
+                    if (v > 255.0) v = 255.0;
+                    result.setPixel(i, j, k, static_cast<unsigned char>(v));
+                }
+            }
+        }
+        currentImage = result;
+
+        if (statusBar) {
+            statusBar->showMessage(QString("Dark & Light (%1%, %2) applied")
+                                   .arg(percent)
+                                   .arg(choice));
+        }
+    } catch (const std::exception& e) {
+        if (statusBar) {
+            statusBar->showMessage(QString("Filter failed: %1").arg(e.what()));
+        }
+    }
+}
+
 void ImageFilters::applyFrame(Image& currentImage, const QString& frameType)
 {
     if (statusBar) {
@@ -547,7 +586,113 @@ void ImageFilters::applyFrame(Image& currentImage, const QString& frameType)
             }
         }
             currentImage = result;
+    } else if (frameType == "Double Border - White") {
+        // White double border frame
+        int outer = 14; int inner = 6; int gap = 4;
+        int newWidth = currentImage.width + 2 * (outer + inner + gap);
+        int newHeight = currentImage.height + 2 * (outer + inner + gap);
+        Image result(newWidth, newHeight);
+        // Fill with dark background
+        for (int y = 0; y < newHeight; ++y)
+            for (int x = 0; x < newWidth; ++x) {
+                result.setPixel(x, y, 0, 20); result.setPixel(x, y, 1, 20); result.setPixel(x, y, 2, 20);
+            }
+        // Outer white
+        for (int y = 0; y < newHeight; ++y)
+            for (int x = 0; x < newWidth; ++x) {
+                bool border = (x < outer || x >= newWidth - outer || y < outer || y >= newHeight - outer);
+                if (border) { result.setPixel(x, y, 0, 255); result.setPixel(x, y, 1, 255); result.setPixel(x, y, 2, 255); }
+            }
+        // Inner white
+        for (int y = outer + gap; y < newHeight - (outer + gap); ++y)
+            for (int x = outer + gap; x < newWidth - (outer + gap); ++x) {
+                bool border = (x < outer + gap + inner || x >= newWidth - (outer + gap + inner) || y < outer + gap + inner || y >= newHeight - (outer + gap + inner));
+                if (border) { result.setPixel(x, y, 0, 255); result.setPixel(x, y, 1, 255); result.setPixel(x, y, 2, 255); }
+            }
+        // Paste image
+        int ox = outer + gap + inner; int oy = outer + gap + inner;
+        for (int y = 0; y < currentImage.height; ++y)
+            for (int x = 0; x < currentImage.width; ++x)
+                for (int c = 0; c < 3; ++c)
+                    result.setPixel(x + ox, y + oy, c, currentImage(x, y, c));
+        currentImage = result;
+    } else if (frameType == "Solid Frame - Blue" || frameType == "Solid Frame - Red" || frameType == "Solid Frame - Green" || frameType == "Solid Frame - Black" || frameType == "Solid Frame - White") {
+        int frame = 20;
+        int color[3] = {0,0,0};
+        if (frameType.endsWith("Blue")) { color[2] = 255; }
+        else if (frameType.endsWith("Red")) { color[0] = 255; }
+        else if (frameType.endsWith("Green")) { color[1] = 255; }
+        else if (frameType.endsWith("White")) { color[0]=color[1]=color[2]=255; }
+        // Black already default 0
+        Image result(currentImage.width + 2 * frame, currentImage.height + 2 * frame);
+        for (int y = 0; y < result.height; ++y)
+            for (int x = 0; x < result.width; ++x)
+                for (int c = 0; c < 3; ++c)
+                    result.setPixel(x, y, c, color[c]);
+        for (int y = 0; y < currentImage.height; ++y)
+            for (int x = 0; x < currentImage.width; ++x)
+                for (int c = 0; c < 3; ++c)
+                    result.setPixel(x + frame, y + frame, c, currentImage(x, y, c));
+        currentImage = result;
+    } else if (frameType == "Shadow Frame") {
+        int pad = 15; int shadow = 18;
+        int newW = currentImage.width + pad + shadow;
+        int newH = currentImage.height + pad + shadow;
+        Image result(newW, newH);
+        // Base dark
+        for (int y = 0; y < newH; ++y)
+            for (int x = 0; x < newW; ++x) {
+                result.setPixel(x, y, 0, 20); result.setPixel(x, y, 1, 20); result.setPixel(x, y, 2, 20);
+            }
+        // Soft shadow gradient bottom-right
+        for (int y = 0; y < newH; ++y)
+            for (int x = 0; x < newW; ++x) {
+                int dx = std::max(0, x - (pad + currentImage.width));
+                int dy = std::max(0, y - (pad + currentImage.height));
+                int dist = std::max(dx, dy);
+                int shade = std::min(60, dist * 6);
+                int r = 20 + shade, g = 20 + shade, b = 20 + shade;
+                result.setPixel(x, y, 0, r); result.setPixel(x, y, 1, g); result.setPixel(x, y, 2, b);
+            }
+        // Paste image with light top-left highlight border
+        for (int y = 0; y < currentImage.height; ++y)
+            for (int x = 0; x < currentImage.width; ++x)
+                for (int c = 0; c < 3; ++c)
+                    result.setPixel(x + pad, y + pad, c, currentImage(x, y, c));
+        currentImage = result;
+    } else if (frameType == "Gold Decorated Frame") {
+        // Gold style decorative frame
+        int fw = 22;
+        int outer[3] = {180, 140, 40};
+        int inner[3] = {240, 210, 120};
+        int accent[3] = {200, 160, 60};
+        int newW = currentImage.width + 2 * fw;
+        int newH = currentImage.height + 2 * fw;
+        Image result(newW, newH);
+        // Fill outer gold
+        for (int y = 0; y < newH; ++y)
+            for (int x = 0; x < newW; ++x)
+                for (int c = 0; c < 3; ++c)
+                    result.setPixel(x, y, c, outer[c]);
+        // Accent stripes
+        for (int y = 3; y < newH - 3; ++y)
+            for (int x = 3; x < newW - 3; ++x) {
+                bool stripe = ((x + y) % 11 == 0) || ((x - y + 1000) % 13 == 0);
+                if (stripe) for (int c = 0; c < 3; ++c) result.setPixel(x, y, c, accent[c]);
+            }
+        // Inner plate
+        for (int y = fw - 6; y < newH - (fw - 6); ++y)
+            for (int x = fw - 6; x < newW - (fw - 6); ++x)
+                for (int c = 0; c < 3; ++c)
+                    result.setPixel(x, y, c, inner[c]);
+        // Paste image
+        for (int y = 0; y < currentImage.height; ++y)
+            for (int x = 0; x < currentImage.width; ++x)
+                for (int c = 0; c < 3; ++c)
+                    result.setPixel(x + fw, y + fw, c, currentImage(x, y, c));
+        currentImage = result;
     } else {
+        // Existing decorated frame (brown/beige) as fallback
         // Decorated frame with brown/beige design and accent patterns
         int frameWidth = 25;
         int outerColor[3] = {100, 70, 50};
@@ -767,6 +912,10 @@ void ImageFilters::applyResize(Image& currentImage, int width, int height)
 
 void ImageFilters::applyBlur(Image& currentImage, Image& preFilterImage, std::atomic<bool>& cancelRequested)
 {
+    applyBlur(currentImage, preFilterImage, cancelRequested, 60);
+}
+void ImageFilters::applyBlur(Image& currentImage, Image& preFilterImage, std::atomic<bool>& cancelRequested, int strength)
+{
     if (progressBar) {
         progressBar->setVisible(true);
         progressBar->setRange(0, currentImage.height);
@@ -777,19 +926,18 @@ void ImageFilters::applyBlur(Image& currentImage, Image& preFilterImage, std::at
         statusBar->showMessage("Applying Blur filter... (Click Cancel to stop)");
     }
     QApplication::processEvents();
-    
+
+    strength = std::max(0, std::min(100, strength));
+    // Map 0..100 to radius 1..25 (0 becomes 1)
+    int blurSize = std::max(1, (strength * 24) / 100 + 1);
     try {
-        // Radius-15 average blur with cancellation support
-        int blurSize = 15;
         Image result(currentImage.width, currentImage.height);
         
         for (int y = 0; y < currentImage.height; y++) {
-            // Check for cancellation
             if (cancelRequested) {
                 checkCancellation(cancelRequested, currentImage, preFilterImage, "Blur");
                 return;
             }
-            
             for (int x = 0; x < currentImage.width; x++) {
                 int R = 0, G = 0, B = 0;
                 int count = 0;
@@ -805,26 +953,21 @@ void ImageFilters::applyBlur(Image& currentImage, Image& preFilterImage, std::at
                         }
                     }
                 }
-                result.setPixel(x, y, 0, R / count);
-                result.setPixel(x, y, 1, G / count);
-                result.setPixel(x, y, 2, B / count);
+                result.setPixel(x, y, 0, R / std::max(1, count));
+                result.setPixel(x, y, 1, G / std::max(1, count));
+                result.setPixel(x, y, 2, B / std::max(1, count));
             }
-            
-            // Update progress
             updateProgress(y + 1, currentImage.height, 10);
         }
-        
         currentImage = result;
-        
         if (statusBar) {
-            statusBar->showMessage("Blur filter applied");
+            statusBar->showMessage(QString("Blur filter applied (radius %1)").arg(blurSize));
         }
     } catch (const std::exception& e) {
         if (statusBar) {
             statusBar->showMessage(QString("Filter failed: %1").arg(e.what()));
         }
     }
-    
     if (progressBar) {
         progressBar->setVisible(false);
     }

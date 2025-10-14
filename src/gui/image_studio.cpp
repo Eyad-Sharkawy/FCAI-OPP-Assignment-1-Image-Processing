@@ -54,6 +54,8 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QInputDialog>
+#include <QDialog>
+#include <QSlider>
 #include <QPixmap>
 #include <QImage>
 #include <QIcon>
@@ -300,7 +302,7 @@ private slots:
      * - Handles file format selection (PNG, JPEG, BMP)
      * - Updates the unsaved changes flag on successful save
      * - Provides user feedback through status bar messages
-     * 
+     * ;pl
      * @note The save operation uses the ImageIO class for Qt-integrated file operations.
      * @see saveImageWithDialog() for the actual save implementation
      * @see ImageIO::saveToFile() for file writing operations
@@ -394,6 +396,9 @@ private slots:
         runCancelableFilter([&]() {
             imageFilters->applyGrayscale(currentImage, preFilterImage, cancelRequested);
         });
+        setActiveFilterValue("Grayscale");
+        ui.colorModeValue->setText("Grayscale");
+        updatePropertiesPanel();
     }
     
     /**
@@ -411,6 +416,8 @@ private slots:
         runCancelableFilter([&]() {
             imageFilters->applyTVFilter(currentImage, preFilterImage, cancelRequested);
         });
+        setActiveFilterValue("TV/CRT Filter");
+        updatePropertiesPanel();
     }
     
     /**
@@ -429,6 +436,8 @@ private slots:
         currentImage = originalImage;
         updateImageDisplay();
         statusBar()->showMessage("Image reset to original");
+        setActiveFilterValue("None");
+        updatePropertiesPanel();
     }
     
     /**
@@ -446,6 +455,9 @@ private slots:
         runCancelableFilter([&]() {
             imageFilters->applyBlackAndWhite(currentImage, preFilterImage, cancelRequested);
         });
+        setActiveFilterValue("Black & White");
+        ui.colorModeValue->setText("Grayscale");
+        updatePropertiesPanel();
     }
     
     /**
@@ -463,6 +475,9 @@ private slots:
         runCancelableFilter([&]() {
             imageFilters->applyInvert(currentImage, preFilterImage, cancelRequested);
         });
+        setActiveFilterValue("Invert");
+        ui.colorModeValue->setText("RGB");
+        updatePropertiesPanel();
     }
     
     /**
@@ -491,17 +506,47 @@ private slots:
             "Select Image to Merge", QDir::homePath(), IMAGE_FILTER);
         
         if (!fileName.isEmpty()) {
-            try {
-                saveStateForUndo();
-                
-                Image mergeImage;
-                mergeImage.loadNewImage(fileName.toStdString());
-                
-                imageFilters->applyMerge(currentImage, mergeImage);
-                updateImageDisplay();
-            } catch (const std::exception& e) {
-                QMessageBox::critical(this, "Error", QString("Merge failed: %1").arg(e.what()));
+            mergeWithPath(fileName);
+        }
+    }
+
+    void mergeWithPath(const QString &fileName)
+    {
+        try {
+            saveStateForUndo();
+            Image mergeImage;
+            mergeImage.loadNewImage(fileName.toStdString());
+            // If dimensions differ, ask user how to merge
+            if (mergeImage.width != currentImage.width || mergeImage.height != currentImage.height) {
+                QStringList options;
+                options << "Resize smaller image to match larger" << "Merge common overlapping area";
+                bool ok = false;
+                QString choice = QInputDialog::getItem(this, "Merge Images",
+                    "Images have different sizes. Choose merge option:", options, 0, false, &ok);
+                if (!ok || choice.isEmpty()) {
+                    return; // user cancelled
+                }
+
+                if (choice == options[0]) {
+                    // Resize the smaller image to match the larger image dimensions
+                    const int targetW = std::max((int)currentImage.width, (int)mergeImage.width);
+                    const int targetH = std::max((int)currentImage.height, (int)mergeImage.height);
+                    if (currentImage.width != targetW || currentImage.height != targetH) {
+                        imageFilters->applyResize(currentImage, targetW, targetH);
+                    }
+                    if (mergeImage.width != targetW || mergeImage.height != targetH) {
+                        imageFilters->applyResize(mergeImage, targetW, targetH);
+                    }
+                }
+                // else: Merge common overlapping area by default behavior below
             }
+
+            imageFilters->applyMerge(currentImage, mergeImage);
+            updateImageDisplay();
+            setActiveFilterValue("Merge");
+            updatePropertiesPanel();
+        } catch (const std::exception& e) {
+            QMessageBox::critical(this, "Error", QString("Merge failed: %1").arg(e.what()));
         }
     }
     
@@ -520,6 +565,8 @@ private slots:
             try {
                 imageFilters->applyFlip(currentImage, choice);
                 updateImageDisplay();
+                setActiveFilterValue("Flip");
+                updatePropertiesPanel();
             } catch (const std::exception& e) {
                 QMessageBox::critical(this, "Error", QString("Filter failed: %1").arg(e.what()));
             }
@@ -541,6 +588,8 @@ private slots:
             try {
                 imageFilters->applyRotate(currentImage, choice);
                 updateImageDisplay();
+                setActiveFilterValue("Rotate");
+                updatePropertiesPanel();
             } catch (const std::exception& e) {
                 QMessageBox::critical(this, "Error", QString("Filter failed: %1").arg(e.what()));
             }
@@ -551,14 +600,22 @@ private slots:
     {
         if (!hasImage) return;
         
-        // Ask user for dark or light using GUI instead of std::cin
+        // Ask user for dark or light
         QStringList options; options << "dark" << "light";
-        QString choice = getInputFromList("Dark or Light", "Choose:", options);
+        QString choice = getInputFromList("Darken or Lighten", "Choose:", options);
         if (choice.isEmpty()) return;
-        
+
+        // Ask for percentage 0-100 via slider dialog
+        bool ok = false;
+        int percent = getPercentWithSlider("Adjust Brightness", choice == "dark" ? "Darken percentage" : "Lighten percentage", 50, &ok);
+        if (!ok) return;
+
         runSimpleFilter([&]() {
-            imageFilters->applyDarkAndLight(currentImage, choice);
+            imageFilters->applyDarkAndLight(currentImage, choice, percent);
         });
+        setActiveFilterValue("Dark & Light");
+        ui.colorModeValue->setText("RGB");
+        updatePropertiesPanel();
     }
     
     void applyFrame()
@@ -566,7 +623,15 @@ private slots:
         if (!hasImage) return;
         
         QStringList options;
-        options << "Simple Frame" << "Decorated Frame";
+        options << "Simple Frame"
+                << "Double Border - White"
+                << "Solid Frame - Blue"
+                << "Solid Frame - Red"
+                << "Solid Frame - Green"
+                << "Solid Frame - Black"
+                << "Solid Frame - White"
+                << "Shadow Frame"
+                << "Gold Decorated Frame";
         
         QString choice = getInputFromList("Add Frame", "Choose frame type:", options);
         
@@ -574,6 +639,8 @@ private slots:
             runSimpleFilter([&]() {
                 imageFilters->applyFrame(currentImage, choice);
             });
+            setActiveFilterValue("Frame");
+            updatePropertiesPanel();
         }
     }
     
@@ -583,6 +650,8 @@ private slots:
         runSimpleFilter([&]() {
             imageFilters->applyEdges(currentImage);
         });
+        setActiveFilterValue("Edge Detection");
+        updatePropertiesPanel();
     }
     
     void applyResize()
@@ -599,15 +668,23 @@ private slots:
             runSimpleFilter([&]() {
                 imageFilters->applyResize(currentImage, width, height);
             });
+            setActiveFilterValue("Resize");
+            updatePropertiesPanel();
         }
     }
     
     void applyBlur()
     {
         if (!hasImage) return;
+        // Ask user for blur strength 0..100
+        bool ok = false;
+        int percent = getPercentWithSlider("Blur Strength", "Choose blur level (0-100%)", 60, &ok);
+        if (!ok) return;
         runCancelableFilter([&]() {
-            imageFilters->applyBlur(currentImage, preFilterImage, cancelRequested);
+            imageFilters->applyBlur(currentImage, preFilterImage, cancelRequested, percent);
         });
+        setActiveFilterValue("Blur");
+        updatePropertiesPanel();
     }
     
     /**
@@ -619,6 +696,8 @@ private slots:
         runCancelableFilter([&]() {
             imageFilters->applyInfrared(currentImage, preFilterImage, cancelRequested);
         });
+        setActiveFilterValue("Infrared");
+        updatePropertiesPanel();
     }
     
     /**
@@ -630,6 +709,8 @@ private slots:
         runCancelableFilter([&]() {
             imageFilters->applyPurpleFilter(currentImage, preFilterImage, cancelRequested);
         });
+        setActiveFilterValue("Purple Filter");
+        updatePropertiesPanel();
     }
     
     /**
@@ -652,6 +733,12 @@ private slots:
     {
         if (!hasImage) return;
         if (!history.undo(currentImage)) return;
+        // Manage parallel filter name history
+        redoFilterNames.push(ui.activeFilterValue->text());
+        if (!undoFilterNames.empty()) {
+            setActiveFilterValue(undoFilterNames.top());
+            undoFilterNames.pop();
+        }
         
         updateImageDisplay();
         updateUndoRedoButtons();
@@ -665,6 +752,12 @@ private slots:
     {
         if (!hasImage) return;
         if (!history.redo(currentImage)) return;
+        // Manage parallel filter name history
+        undoFilterNames.push(ui.activeFilterValue->text());
+        if (!redoFilterNames.empty()) {
+            setActiveFilterValue(redoFilterNames.top());
+            redoFilterNames.pop();
+        }
         
         updateImageDisplay();
         updateUndoRedoButtons();
@@ -693,6 +786,10 @@ private:
         history.pushUndo(currentImage);
         // Mark as having unsaved changes
         hasUnsavedChanges = true;
+        // Track active filter name in parallel with history
+        undoFilterNames.push(ui.activeFilterValue->text());
+        // Any new branch invalidates redo filter names
+        while (!redoFilterNames.empty()) redoFilterNames.pop();
         
         updateUndoRedoButtons();
     }
@@ -813,7 +910,11 @@ protected:
                 if (suffix == "png" || suffix == "jpg" || suffix == "jpeg" || 
                     suffix == "bmp" || suffix == "tga") {
                     event->acceptProposedAction();
-                    statusBar()->showMessage("Drop image to load: " + fileInfo.fileName());
+                    if (hasImage) {
+                        statusBar()->showMessage("Drop image to merge: " + fileInfo.fileName());
+                    } else {
+                        statusBar()->showMessage("Drop image to load: " + fileInfo.fileName());
+                    }
                     return;
                 }
             }
@@ -857,9 +958,13 @@ protected:
                     suffix == "bmp" || suffix == "tga") {
                     
                     event->acceptProposedAction();
-                    
-                    // Load the dropped image
-                    loadImageFromPath(fileName, true);
+                    if (hasImage) {
+                        // Merge with current image
+                        mergeWithPath(fileName);
+                    } else {
+                        // Load the dropped image
+                        loadImageFromPath(fileName, true);
+                    }
                     return;
                 }
             }
@@ -950,6 +1055,8 @@ protected:
             .arg(scaledPixmap.width())
             .arg(scaledPixmap.height())
             .arg(QString::number(imageAspectRatio, 'f', 2)));
+        // Keep right-side properties in sync
+        updatePropertiesPanel();
     }
     
     /**
@@ -1007,6 +1114,8 @@ protected:
         }
         currentImage = result;
         updateImageDisplay();
+        setActiveFilterValue("Crop");
+        updatePropertiesPanel();
     }
     
     Image originalImage;
@@ -1020,6 +1129,8 @@ protected:
     
     // Undo/Redo system
     HistoryManager history{20};
+    std::stack<QString> undoFilterNames; // Parallel stack for active filter names
+    std::stack<QString> redoFilterNames; // Parallel stack for active filter names
     
     // Save state tracking
     bool hasUnsavedChanges = false;
@@ -1036,6 +1147,37 @@ protected:
     ImageFilters* imageFilters;
 
     // Helpers
+    void setActiveFilterValue(const QString &name)
+    {
+        ui.activeFilterValue->setText(name);
+    }
+
+    static QString formatBytes(qint64 bytes)
+    {
+        if (bytes < 0) return "—";
+        static const char* suffixes[] = {"B", "KB", "MB", "GB", "TB"};
+        double value = static_cast<double>(bytes);
+        int i = 0;
+        while (value >= 1024.0 && i < 4) { value /= 1024.0; ++i; }
+        return QString::number(value, 'f', i == 0 ? 0 : 2) + " " + suffixes[i];
+    }
+
+    void updatePropertiesPanel()
+    {
+        if (!hasImage) return;
+        // Dimensions
+        ui.dimensionsValue->setText(QString("%1 × %2").arg(currentImage.width).arg(currentImage.height));
+        // File size and format (if path known)
+        if (!currentFilePath.isEmpty()) {
+            QFileInfo fi(currentFilePath);
+            ui.fileSizeValue->setText(formatBytes(fi.size()));
+            ui.formatValue->setText(fi.suffix().toUpper());
+        }
+        // Default color mode if unset
+        if (ui.colorModeValue->text().trimmed().isEmpty() || ui.colorModeValue->text() == "—") {
+            ui.colorModeValue->setText("RGB");
+        }
+    }
     bool saveImageWithDialog()
     {
         QString fileName = QFileDialog::getSaveFileName(this,
@@ -1045,6 +1187,8 @@ protected:
             ImageIO::saveToFile(currentImage, fileName);
             hasUnsavedChanges = false; // Mark as saved
             statusBar()->showMessage(QString("Saved: %1").arg(QFileInfo(fileName).fileName()));
+            currentFilePath = fileName;
+            updatePropertiesPanel();
             return true;
         } catch (const std::exception& e) {
             QMessageBox::critical(this, "Error", QString("Failed to save image: %1").arg(e.what()));
@@ -1065,6 +1209,15 @@ protected:
         refreshButtons(false);
         // Update status bar
         statusBar()->showMessage("Image unloaded - Ready to load a new image");
+        // Clear right-side properties panel
+        ui.dimensionsValue->setText("—");
+        ui.fileSizeValue->setText("—");
+        ui.colorModeValue->setText("—");
+        ui.formatValue->setText("—");
+        ui.activeFilterValue->setText("None");
+        // Clear filter name stacks
+        while (!undoFilterNames.empty()) undoFilterNames.pop();
+        while (!redoFilterNames.empty()) redoFilterNames.pop();
     }
 
     void finalizeSuccessfulLoad(const QString &filePath, bool viaDrop)
@@ -1079,6 +1232,12 @@ protected:
         const QString baseName = QFileInfo(filePath).fileName();
         statusBar()->showMessage(viaDrop ? QString("Loaded via drag & drop: %1").arg(baseName)
                                          : QString("Loaded: %1").arg(baseName));
+        ui.activeFilterValue->setText("None");
+        ui.colorModeValue->setText("RGB");
+        updatePropertiesPanel();
+        // Reset filter name stacks
+        while (!undoFilterNames.empty()) undoFilterNames.pop();
+        while (!redoFilterNames.empty()) redoFilterNames.pop();
     }
 
     void loadImageFromPath(const QString &filePath, bool viaDrop)
@@ -1098,6 +1257,38 @@ protected:
     {
         bool ok;
         return QInputDialog::getItem(this, title, label, options, 0, false, &ok);
+    }
+
+    int getPercentWithSlider(const QString &title, const QString &label, int defaultValue, bool *ok)
+    {
+        // Build a tiny dialog with a slider 0-100 and OK/Cancel
+        QDialog dialog(this);
+        dialog.setWindowTitle(title);
+        QVBoxLayout *layout = new QVBoxLayout(&dialog);
+        QLabel *lbl = new QLabel(label, &dialog);
+        QSlider *slider = new QSlider(Qt::Horizontal, &dialog);
+        slider->setRange(0, 100);
+        slider->setValue(std::clamp(defaultValue, 0, 100));
+        QLabel *valueLabel = new QLabel(QString::number(slider->value()) + "%", &dialog);
+        QObject::connect(slider, &QSlider::valueChanged, &dialog, [valueLabel](int v){ valueLabel->setText(QString::number(v) + "%"); });
+        QHBoxLayout *buttons = new QHBoxLayout();
+        QPushButton *okBtn = new QPushButton("OK", &dialog);
+        QPushButton *cancelBtn = new QPushButton("Cancel", &dialog);
+        buttons->addStretch();
+        buttons->addWidget(okBtn);
+        buttons->addWidget(cancelBtn);
+        layout->addWidget(lbl);
+        layout->addWidget(slider);
+        layout->addWidget(valueLabel);
+        layout->addLayout(buttons);
+
+        int resultPercent = slider->value();
+        QObject::connect(okBtn, &QPushButton::clicked, &dialog, [&](){ resultPercent = slider->value(); dialog.accept(); });
+        QObject::connect(cancelBtn, &QPushButton::clicked, &dialog, [&](){ dialog.reject(); });
+
+        int res = dialog.exec();
+        if (ok) *ok = (res == QDialog::Accepted);
+        return resultPercent;
     }
 
     QSize calculateAspectRatioSize(const QSize &imageSize, const QSize &availableSize)

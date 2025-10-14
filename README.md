@@ -186,7 +186,7 @@ Comprehensive documentation is available in the `docs/` folder:
 - **[Installation Guide](docs/INSTALLATION.md)** - Installation instructions for all platforms
 
 ### API Documentation
-Generate comprehensive API documentation using Doxygen:
+Generate comprehensive API documentation using Doxygen (a ready-to-use `Doxyfile` is provided):
 
 1. **Install Doxygen**: 
    - Windows: `choco install doxygen.graphviz`
@@ -195,8 +195,6 @@ Generate comprehensive API documentation using Doxygen:
 2. **Generate Documentation**:
    ```bash
    # In repository root
-   doxygen -g Doxyfile
-   # Edit Doxyfile: set RECURSIVE=YES, EXTRACT_ALL=YES, OUTPUT_DIRECTORY=docs/api
    doxygen Doxyfile
    ```
 
@@ -238,4 +236,4 @@ This project is developed as part of a C++ Object-Oriented Programming assignmen
 
 **Image Studio v2.0.0** - Professional Image Processing Made Simple! 🎨
 
-*Last updated: October 13, 2025*
+*Last updated: October 14, 2025*

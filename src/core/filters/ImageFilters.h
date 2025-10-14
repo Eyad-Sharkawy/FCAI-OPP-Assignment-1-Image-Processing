@@ -204,6 +204,14 @@ public:
      * @throws std::invalid_argument if choice is not "dark" or "light"
      */
     void applyDarkAndLight(Image& currentImage, const QString& choice);
+    /**
+     * @brief Adjusts image brightness by a given percentage.
+     *
+     * @param currentImage Reference to the image to adjust (modified in-place)
+     * @param choice "dark" to darken, "light" to lighten
+     * @param percent Percentage in [0, 100]; 0 = no change, 100 = full effect
+     */
+    void applyDarkAndLight(Image& currentImage, const QString& choice, int percent);
     
     /**
      * @brief Adds a decorative frame around the image.
@@ -269,6 +277,11 @@ public:
      * @note This is a long-running operation that can be cancelled.
      */
     void applyBlur(Image& currentImage, Image& preFilterImage, std::atomic<bool>& cancelRequested);
+    /**
+     * @brief Applies a blur effect with adjustable strength.
+     * @param strength Percent in [0,100], mapped to kernel radius.
+     */
+    void applyBlur(Image& currentImage, Image& preFilterImage, std::atomic<bool>& cancelRequested, int strength);
     
     /**
      * @brief Applies an infrared photography simulation effect.

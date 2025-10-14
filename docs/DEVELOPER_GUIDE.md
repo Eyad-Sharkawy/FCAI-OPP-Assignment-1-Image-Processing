@@ -425,11 +425,7 @@ Use Doxygen to generate browsable documentation from in-source comments.
 - Manual: download from `https://www.doxygen.nl/download.html`
 
 ### Configure
-```bash
-# In repository root
-doxygen -g Doxyfile
-```
-Edit `Doxyfile`:
+Use the provided `Doxyfile` in the repository root. Key settings:
 - `PROJECT_NAME = "Image Studio"`
 - `OUTPUT_DIRECTORY = docs/api`
 - `RECURSIVE = YES`

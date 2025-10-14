@@ -62,8 +62,7 @@
 - **JPEG** (.jpg, .jpeg)
 - **PNG** (.png)
 - **BMP** (.bmp)
-- **TIFF** (.tiff, .tif)
-- **GIF** (.gif)
+- **TGA** (.tga)
 
 ### Loading Methods
 
@@ -198,9 +197,9 @@
 - **Real-time**: Changes apply immediately
 
 ### Progress Tracking
--- **Progress Bar**: Shows during long operations
--- **Status Updates**: Real-time status messages
--- **Cancellation**: Long-running filters (e.g., Grayscale, Blur, Infrared, Purple, TV) can be cancelled via the Cancel button
+- **Progress Bar**: Shows during long operations
+- **Status Updates**: Real-time status messages
+- **Cancellation**: Long-running filters (e.g., Grayscale, Blur, Infrared, Purple, TV) can be cancelled via the Cancel button
 
 ## ⌨️ Keyboard Shortcuts
 
