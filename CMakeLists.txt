@@ -16,6 +16,11 @@ project(PhotoSmith VERSION 3.0.1)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Enable resource compiler for Windows
+if(WIN32)
+    enable_language(RC)
+endif()
+
 # Find Qt6 components
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
 
@@ -72,10 +77,10 @@ if(WIN32)
         WIN32_EXECUTABLE TRUE
     )
     
-    # Set application icon if it exists
-    if(EXISTS "${CMAKE_SOURCE_DIR}/assets/icons/logo.ico")
+    # Set application icon using Qt's RC_ICONS property
+    if(EXISTS "${CMAKE_SOURCE_DIR}/assets/icons/icon.ico")
         set_target_properties(${PROJECT_NAME} PROPERTIES
-            RC_ICONS "${CMAKE_SOURCE_DIR}/assets/icons/logo.ico"
+            RC_ICONS "${CMAKE_SOURCE_DIR}/assets/icons/icon.ico"
         )
     endif()
     
