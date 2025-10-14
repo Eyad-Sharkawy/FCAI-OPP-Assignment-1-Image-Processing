@@ -57,8 +57,17 @@ set(UI_FILES
     src/gui/mainwindow.ui
 )
 
+# Qt resource files
+set(QT_RESOURCES
+    resources.qrc
+)
+
 # Create executable
-add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${UI_FILES})
+if(WIN32)
+    add_executable(${PROJECT_NAME} WIN32 ${SOURCES} ${HEADERS} ${UI_FILES} ${QT_RESOURCES})
+else()
+    add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${UI_FILES} ${QT_RESOURCES})
+endif()
 
 # Link Qt libraries
 target_link_libraries(${PROJECT_NAME} 
@@ -76,6 +85,7 @@ if(WIN32)
     set_target_properties(${PROJECT_NAME} PROPERTIES
         WIN32_EXECUTABLE TRUE
     )
+    
     
     # Set application icon using Qt's RC_ICONS property
     if(EXISTS "${CMAKE_SOURCE_DIR}/assets/icons/icon.ico")
