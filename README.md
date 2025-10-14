@@ -23,7 +23,7 @@ Photo Smith is a powerful desktop application built with Qt 6 and C++20 that pro
 PhotoSmith/
 ├── src/                            # Source code
 │   ├── gui/                        # GUI components
-│   │   ├── photo_smith.cpp         # Main Qt application class
+│   │   ├── image_studio.cpp        # Main Qt application class
 │   │   └── mainwindow.ui           # Qt Designer UI layout
 │   └── core/                       # Core functionality
 │       ├── image/                  # Image data structure + STB I/O
@@ -248,7 +248,7 @@ This project is developed as part of a C++ Object-Oriented Programming assignmen
 
 ## 🔗 Links
 
-- **GitHub Repository**: [Photo Smith on GitHub](https://github.com/Eyad-Sharkawy/FCAI-OPP-Assignment-1-Image-Processing)
+- **GitHub Repository**: [Image Studio on GitHub](https://github.com/Eyad-Sharkawy/FCAI-OPP-Assignment-1-Image-Processing)
 - **Releases**: [Latest Releases](https://github.com/Eyad-Sharkawy/FCAI-OPP-Assignment-1-Image-Processing/releases)
 - **Issues**: [Report Issues](https://github.com/Eyad-Sharkawy/FCAI-OPP-Assignment-1-Image-Processing/issues)
 

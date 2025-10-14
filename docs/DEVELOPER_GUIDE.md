@@ -426,7 +426,7 @@ Use Doxygen to generate browsable documentation from in-source comments.
 
 ### Configure
 Use the provided `Doxyfile` in the repository root. Key settings:
-- `PROJECT_NAME = "Photo Smith"`
+- `PROJECT_NAME = "Image Studio"`
 - `OUTPUT_DIRECTORY = docs/api`
 - `RECURSIVE = YES`
 - `EXTRACT_ALL = YES`

@@ -1,4 +1,4 @@
-# Photo Smith v3.0.1 - Installation Guide
+# Image Studio v3.0.1 - Installation Guide
 
 ## 📖 Table of Contents
 1. [Quick Start](#quick-start)
@@ -314,7 +314,7 @@ cmake -DCMAKE_BUILD_TYPE=Release \
 #### Report Issues
 When reporting issues, include:
 - Operating system version
-- Photo Smith version
+- Image Studio version
 - Error messages
 - Steps to reproduce
 - System specifications
@@ -322,7 +322,7 @@ When reporting issues, include:
 ## 🗑️ Uninstallation
 
 ### Portable Version
-1. Delete the Photo Smith folder
+1. Delete the Image Studio folder
 2. Remove any shortcuts created
 3. No registry entries to clean
 
@@ -376,6 +376,6 @@ rm -rf .qt/
 
 ---
 
-**Installation Guide v3.0.1** - Get Photo Smith running in minutes! 🚀
+**Installation Guide v3.0.1** - Get Image Studio running in minutes! 🚀
 
 For additional help, check the [User Guide](USER_GUIDE.md) or [Developer Guide](DEVELOPER_GUIDE.md).

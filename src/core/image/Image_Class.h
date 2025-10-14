@@ -3,7 +3,7 @@
  * @brief Core image data structure with STB library integration for comprehensive image I/O.
  * 
  * This file contains the declaration of the Image class, which serves as the fundamental
- * data structure for all image processing operations in the Photo Smith application.
+ * data structure for all image processing operations in the Image Studio application.
  * The class provides a high-level interface for image manipulation while leveraging
  * the powerful STB (Sean T. Barrett) library for robust image loading and saving.
  * 
@@ -83,7 +83,7 @@ extern "C" {
  * @brief Core image data structure with comprehensive I/O and manipulation capabilities.
  * 
  * The Image class is the fundamental data structure for all image processing operations
- * in the Photo Smith application. It provides a high-level, safe interface for image
+ * in the Image Studio application. It provides a high-level, safe interface for image
  * manipulation while leveraging the powerful STB library for robust image I/O operations.
  * 
  * @details This class implements:

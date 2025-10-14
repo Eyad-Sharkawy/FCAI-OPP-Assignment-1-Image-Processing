@@ -1,4 +1,4 @@
-# Photo Smith v2.0.0 - User Guide
+# Photo Smith v3.0.1 - User Guide
 
 ## 📖 Table of Contents
 1. [Getting Started](#getting-started)
@@ -19,9 +19,9 @@
 - **Graphics**: DirectX 11 compatible
 
 ### Installation
-1. Download `ImageStudio_Portable_v2.0.0-gui.zip`
+1. Download `PhotoSmith_Portable_v3.0.1-gui.zip`
 2. Extract the ZIP file to your desired location
-3. Run `ImageStudio.bat` or `bin/ImageStudio.exe`
+3. Run `PhotoSmith.bat` or `bin/PhotoSmith.exe`
 4. No additional installation required!
 
 ## 🖥️ Interface Overview
@@ -73,7 +73,7 @@
 
 #### Method 2: Drag & Drop
 1. Open File Explorer
-2. Drag your image file directly onto the Photo Smith window
+2. Drag your image file directly onto the Image Studio window
 3. Release to load the image
 
 #### Method 3: File Menu
@@ -251,8 +251,8 @@
 
 ### General Questions
 
-**Q: Is Photo Smith free?**
-A: Yes, Photo Smith is free and open-source.
+**Q: Is Image Studio free?**
+A: Yes, Image Studio is free and open-source.
 
 **Q: Can I use it commercially?**
 A: This is an educational project. Check the license for commercial use.
@@ -292,11 +292,11 @@ A: The interface is fixed in this version, but themes may be added later.
 ### Reporting Bugs
 When reporting bugs, please include:
 - Operating system version
-- Photo Smith version
+- Image Studio version
 - Steps to reproduce the issue
 - Error messages (if any)
 - Sample image (if relevant)
 
 ---
 
-**Photo Smith v2.0.0** - Professional Image Processing Made Simple! 🎨
+**Image Studio v2.0.0** - Professional Image Processing Made Simple! 🎨

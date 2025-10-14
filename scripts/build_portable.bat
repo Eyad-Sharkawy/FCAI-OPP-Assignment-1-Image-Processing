@@ -50,21 +50,21 @@ if %ERRORLEVEL% EQU 0 (
     
     REM Create README for portable version
     echo Photo Smith - Portable Version > build_portable\PhotoSmith_Portable\README.txt
-    echo. >> build_portable\PhotoSmith_Portable\README.txt
+    echo. >> build_portable\ImageStudio_Portable\README.txt
     echo This is a portable version of Photo Smith that includes all necessary >> build_portable\PhotoSmith_Portable\README.txt
     echo Qt libraries and dependencies. >> build_portable\PhotoSmith_Portable\README.txt
-    echo. >> build_portable\PhotoSmith_Portable\README.txt
-    echo To run: >> build_portable\PhotoSmith_Portable\README.txt
+    echo. >> build_portable\ImageStudio_Portable\README.txt
+    echo To run: >> build_portable\ImageStudio_Portable\README.txt
     echo 1. Double-click PhotoSmith.bat >> build_portable\PhotoSmith_Portable\README.txt
     echo 2. Or run bin\PhotoSmith.exe directly >> build_portable\PhotoSmith_Portable\README.txt
-    echo. >> build_portable\PhotoSmith_Portable\README.txt
-    echo Features: >> build_portable\PhotoSmith_Portable\README.txt
-    echo - All image processing filters >> build_portable\PhotoSmith_Portable\README.txt
-    echo - Drag and drop image loading >> build_portable\PhotoSmith_Portable\README.txt
-    echo - Undo/Redo functionality >> build_portable\PhotoSmith_Portable\README.txt
-    echo - Responsive UI >> build_portable\PhotoSmith_Portable\README.txt
+    echo. >> build_portable\ImageStudio_Portable\README.txt
+    echo Features: >> build_portable\ImageStudio_Portable\README.txt
+    echo - All image processing filters >> build_portable\ImageStudio_Portable\README.txt
+    echo - Drag and drop image loading >> build_portable\ImageStudio_Portable\README.txt
+    echo - Undo/Redo functionality >> build_portable\ImageStudio_Portable\README.txt
+    echo - Responsive UI >> build_portable\ImageStudio_Portable\README.txt
     echo - Professional interface >> build_portable\PhotoSmith_Portable\README.txt
-    echo. >> build_portable\PhotoSmith_Portable\README.txt
+    echo. >> build_portable\ImageStudio_Portable\README.txt
     echo No installation required! >> build_portable\PhotoSmith_Portable\README.txt
     
     echo.
@@ -80,17 +80,17 @@ if %ERRORLEVEL% EQU 0 (
     if exist "%ZIP_NAME%" del "%ZIP_NAME%"
     
     REM Create ZIP using PowerShell
-    powershell -Command "Compress-Archive -Path 'build_portable\PhotoSmith_Portable' -DestinationPath 'build_portable\PhotoSmith_Portable_v2.0.0-gui.zip' -Force"
+    powershell -Command "Compress-Archive -Path 'build_portable\PhotoSmith_Portable' -DestinationPath 'build_portable\PhotoSmith_Portable_v3.0.1-gui.zip' -Force"
     
     if %ERRORLEVEL% EQU 0 (
         echo.
-        echo ✓ ZIP file created successfully: build_portable\PhotoSmith_Portable_v2.0.0-gui.zip
+        echo ✓ ZIP file created successfully: build_portable\PhotoSmith_Portable_v3.0.1-gui.zip
         echo ✓ Portable package ready for distribution!
     ) else (
         echo.
         echo ⚠ Warning: Could not create ZIP file automatically.
         echo   You can create it manually by running:
-        echo   powershell Compress-Archive -Path "build_portable\PhotoSmith_Portable" -DestinationPath "build_portable\PhotoSmith_Portable_v2.0.0-gui.zip"
+        echo   powershell Compress-Archive -Path "build_portable\PhotoSmith_Portable" -DestinationPath "build_portable\PhotoSmith_Portable_v3.0.1-gui.zip"
     )
     echo.
 ) else (

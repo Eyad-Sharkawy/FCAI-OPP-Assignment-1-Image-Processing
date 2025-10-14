@@ -17,30 +17,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Find Qt6 components
-# Try to find Qt6 with different configurations
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
-
-# Set Qt6_DIR if not found automatically
-if(NOT Qt6_FOUND)
-    # Try common Qt6 installation paths
-    set(QT_PATHS
-        "C:/Qt/6.8.1/msvc2022_64"
-        "C:/Qt/6.8.1/msvc2019_64"
-        "C:/Qt/6.8.1/mingw_64"
-        "C:/Qt/6.8.1/msvc2022_64/lib/cmake/Qt6"
-        "C:/Qt/6.8.1/msvc2019_64/lib/cmake/Qt6"
-        "C:/Qt/6.8.1/mingw_64/lib/cmake/Qt6"
-    )
-    
-    foreach(QT_PATH ${QT_PATHS})
-        if(EXISTS "${QT_PATH}")
-            set(Qt6_DIR "${QT_PATH}/lib/cmake/Qt6")
-            break()
-        endif()
-    endforeach()
-    
-    find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
-endif()
 
 # Enable Qt's MOC, UIC, and RCC
 set(CMAKE_AUTOMOC ON)
@@ -57,7 +34,7 @@ include_directories(third_party/stb)
 
 # Source files
 set(SOURCES
-    src/gui/photo_smith.cpp
+    src/gui/image_studio.cpp
     src/core/filters/ImageFilters.cpp
     src/core/image/Image_Class.cpp
 )
@@ -89,16 +66,6 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
 )
 
-# Copy assets directory to build output
-if(EXISTS "${CMAKE_SOURCE_DIR}/assets")
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_SOURCE_DIR}/assets"
-        "${CMAKE_BINARY_DIR}/bin/assets"
-        COMMENT "Copying assets directory to build output"
-    )
-endif()
-
 # Windows specific settings
 if(WIN32)
     set_target_properties(${PROJECT_NAME} PROPERTIES
@@ -107,14 +74,6 @@ if(WIN32)
 endif()
 
 # Compiler flags
-if(MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE
-        /W3
-        /Zc:__cplusplus
-        /permissive-
-    )
-else()
-    target_compile_options(${PROJECT_NAME} PRIVATE
-        -Wno-missing-field-initializers
-    )
-endif()
+target_compile_options(${PROJECT_NAME} PRIVATE
+    -Wno-missing-field-initializers
+)
