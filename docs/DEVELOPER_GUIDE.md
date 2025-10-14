@@ -1,4 +1,4 @@
-# Image Studio v2.0.0 - Developer Guide
+# Image Studio v3.0.1 - Developer Guide
 
 ## 📖 Table of Contents
 1. [Project Overview](#project-overview)

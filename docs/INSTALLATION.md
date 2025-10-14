@@ -1,4 +1,4 @@
-# Image Studio v2.0.0 - Installation Guide
+# Image Studio v3.0.1 - Installation Guide
 
 ## 📖 Table of Contents
 1. [Quick Start](#quick-start)
@@ -12,7 +12,7 @@
 ## 🚀 Quick Start
 
 ### For End Users (Recommended)
-1. Download `ImageStudio_Portable_v2.0.0-gui.zip`
+1. Download `ImageStudio_Portable_v3.0.1-gui.zip`
 2. Extract to any folder
 3. Run `ImageStudio.bat`
 4. Start processing images!
@@ -48,7 +48,7 @@
 ## 📦 Download Options
 
 ### Option 1: Portable Version (Recommended for Users)
-- **File**: `ImageStudio_Portable_v2.0.0-gui.zip`
+- **File**: `ImageStudio_Portable_v3.0.1-gui.zip`
 - **Size**: ~25MB
 - **Includes**: Executable + all dependencies
 - **Installation**: None required
@@ -62,7 +62,7 @@
 - **Best for**: Developers, customization
 
 ### Option 3: Release Build (For Advanced Users)
-- **File**: `ImageStudio_v2.0.0.exe`
+- **File**: `ImageStudio_v3.0.1.exe`
 - **Size**: ~15MB
 - **Includes**: Executable only
 - **Installation**: Requires Qt runtime
@@ -73,8 +73,8 @@
 ### Method 1: Portable Installation (Easiest)
 
 #### Step 1: Download
-1. Go to the [Releases page](https://github.com/your-repo/releases)
-2. Download `ImageStudio_Portable_v2.0.0-gui.zip`
+1. Go to the Releases page of the repository
+2. Download `ImageStudio_Portable_v3.0.1-gui.zip`
 
 #### Step 2: Extract
 1. Right-click the ZIP file
@@ -376,6 +376,6 @@ rm -rf .qt/
 
 ---
 
-**Installation Guide v2.0.0** - Get Image Studio running in minutes! 🚀
+**Installation Guide v3.0.1** - Get Image Studio running in minutes! 🚀
 
 For additional help, check the [User Guide](USER_GUIDE.md) or [Developer Guide](DEVELOPER_GUIDE.md).

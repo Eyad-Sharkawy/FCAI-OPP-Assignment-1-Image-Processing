@@ -1,4 +1,4 @@
-# Image Studio v2.0.0
+# Image Studio v3.0.1
 
 A modern, professional Qt-based image processing application with a clean, intuitive interface and comprehensive image manipulation capabilities.
 
@@ -234,6 +234,6 @@ This project is developed as part of a C++ Object-Oriented Programming assignmen
 
 ---
 
-**Image Studio v2.0.0** - Professional Image Processing Made Simple! 🎨
+**Image Studio v3.0.1** - Professional Image Processing Made Simple! 🎨
 
 *Last updated: October 14, 2025*
