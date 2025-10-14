@@ -17,7 +17,30 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Find Qt6 components
+# Try to find Qt6 with different configurations
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
+
+# Set Qt6_DIR if not found automatically
+if(NOT Qt6_FOUND)
+    # Try common Qt6 installation paths
+    set(QT_PATHS
+        "C:/Qt/6.8.1/msvc2022_64"
+        "C:/Qt/6.8.1/msvc2019_64"
+        "C:/Qt/6.8.1/mingw_64"
+        "C:/Qt/6.8.1/msvc2022_64/lib/cmake/Qt6"
+        "C:/Qt/6.8.1/msvc2019_64/lib/cmake/Qt6"
+        "C:/Qt/6.8.1/mingw_64/lib/cmake/Qt6"
+    )
+    
+    foreach(QT_PATH ${QT_PATHS})
+        if(EXISTS "${QT_PATH}")
+            set(Qt6_DIR "${QT_PATH}/lib/cmake/Qt6")
+            break()
+        endif()
+    endforeach()
+    
+    find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
+endif()
 
 # Enable Qt's MOC, UIC, and RCC
 set(CMAKE_AUTOMOC ON)
