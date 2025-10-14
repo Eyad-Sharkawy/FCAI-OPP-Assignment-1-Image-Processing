@@ -212,6 +212,12 @@ Image tvFilter(Image &image); //Eyad
 // Skew Filter
 Image skewFilter(Image &image); // Tarek
 
+// emboss Filter
+Image embossFilter(Image &image); // Eyad
+
+// Double Vision Filter
+Image doubleVisionFilter(Image &image); // Ahmed
+
 static void clearStack(std::stack<Image> &s) {
     while (!s.empty()) s.pop();
 }
@@ -291,11 +297,13 @@ int main() {
         std::cout << "  14. purpleFilter\n";
         std::cout << "  15. TV/CRT Filter\n";
         std::cout << "  16. SKEW Filter\n";
-        std::cout << "  17. Reset to Original\n";
-        std::cout << "  18. Undo\n";
-        std::cout << "  19. Redo\n";
-        std::cout << "  20. Save current image\n";
-        std::cout << "  21. Exit\n";
+        std::cout << "  17. Emboss Filter\n";
+        std::cout << "  18. Double Vision Filter\n";
+        std::cout << "  19. Reset to Original\n";
+        std::cout << "  20. Undo\n";
+        std::cout << "  21. Redo\n";
+        std::cout << "  22. Save current image\n";
+        std::cout << "  23. Exit\n";
         int choice = readIntInRange("Enter your choice: ", 0, 20);
         switch (choice) {
             case 0: {
@@ -641,7 +649,35 @@ int main() {
                     std::cout << "=============================================\n";
                 }
                 break;
-            case 17: { // Reset
+            case 17:
+                if (hasImage) {
+                    saveStateForUndo(undoStack, redoStack, result);
+                    result = embossFilter(result);
+                    unsavedChanges = true;
+                    std::cout << "Applied Emboss.\n";
+                    std::cout << "=============================================\n";
+                } else {
+                    std::cout << "=============================================\n";
+                    std::cout << "error" << std::endl;
+                    std::cout << "please load an image" << std::endl;
+                    std::cout << "=============================================\n";
+                }
+                break;
+            case 18:
+                if (hasImage) {
+                    saveStateForUndo(undoStack, redoStack, result);
+                    result = doubleVisionFilter(result);
+                    unsavedChanges = true;
+                    std::cout << "Applied Double Vision.\n";
+                    std::cout << "=============================================\n";
+                } else {
+                    std::cout << "=============================================\n";
+                    std::cout << "error" << std::endl;
+                    std::cout << "please load an image" << std::endl;
+                    std::cout << "=============================================\n";
+                }
+                break;
+            case 19: { // Reset
                         if (hasImage) {
                             saveStateForUndo(undoStack, redoStack, result);
                             result = image; // restore to original loaded image
@@ -653,7 +689,7 @@ int main() {
                             std::cout << "please load an image" << std::endl;
                         }
                         break; }
-            case 18: { // Undo
+            case 20: { // Undo
                         if (hasImage) {
                             if (doUndo(undoStack, redoStack, result)) {
                                 unsavedChanges = true;
@@ -667,7 +703,7 @@ int main() {
                             std::cout << "please load an image" << std::endl;
                         }
                         break; }
-            case 19: { // Redo
+            case 21: { // Redo
                         if (hasImage) {
                             if (doRedo(undoStack, redoStack, result)) {
                                 unsavedChanges = true;
@@ -681,7 +717,7 @@ int main() {
                             std::cout << "please load an image" << std::endl;
                         }
                         break; }
-            case 20:
+            case 22:
                         if (hasImage) {
                             char ans = readCharChoice("Save to same file or new file? (s/n): ", "sn");
                             std::string savePath;
@@ -717,7 +753,7 @@ int main() {
                             std::cout << "please load an image" << std::endl;
                         }
                     break;
-                    case 21: {
+                    case 23: {
                         if (unsavedChanges) {
                             char ans = readCharChoice("You have unsaved changes. Save before exiting? (y/n): ",
                                                       "yn");
@@ -1313,3 +1349,74 @@ Image skewFilter(Image &image) {
     }
     return skewed;
 }
+
+//Emboss Filter
+Image embossFilter(Image &image) {
+    Image embossed(image.width, image.height);
+
+    for (int y = 0; y < image.height - 1; y++) {
+        for (int x = 0; x < image.width - 1; x++) {
+
+            int r1 = image(x, y, 0);
+            int g1 = image(x, y, 1);
+            int b1 = image(x, y, 2);
+
+            int r2 = image(x + 1, y + 1, 0);
+            int g2 = image(x + 1, y + 1, 1);
+            int b2 = image(x + 1, y + 1, 2);
+
+
+            int diffR = r1 - r2 + 128;
+            int diffG = g1 - g2 + 128;
+            int diffB = b1 - b2 + 128;
+
+
+            diffR = std::clamp(diffR, 0, 255);
+            diffG = std::clamp(diffG, 0, 255);
+            diffB = std::clamp(diffB, 0, 255);
+
+            int gray = (diffR + diffG + diffB) / 3;
+
+            for (int c = 0; c < 3; c++) {
+                embossed.setPixel(x, y, c, gray);
+            }
+        }
+    }
+
+    return embossed;
+}
+// Double Vision Filter
+Image doubleVisionFilter(Image &image) {
+        int offset = 15;
+        Image vision(image.width, image.height);
+
+        for (int y = 0; y < image.height; y++) {
+            for (int x = 0; x < image.width; x++) {
+
+                int nx = x + offset;
+
+                if (nx >= image.width) nx = image.width - 1;
+
+
+                int R1 = image(x, y, 0);
+                int G1 = image(x, y, 1);
+                int B1 = image(x, y, 2);
+
+                int R2 = image(nx, y, 0);
+                int G2 = image(nx, y, 1);
+                int B2 = image(nx, y, 2);
+
+
+                int R = (R1 * 0.6 + R2 * 0.4);
+                int G = (G1 * 0.6 + G2 * 0.4);
+                int B = (B1 * 0.6 + B2 * 0.4);
+
+                R = std::min(255, R + 25);
+
+                vision.setPixel(x, y, 0, R);
+                vision.setPixel(x, y, 1, G);
+                vision.setPixel(x, y, 2, B);
+            }
+        }
+        return vision;
+    }
