@@ -36,8 +36,7 @@ QMAKE_CXXFLAGS += -std=c++20
 # Disable warnings for STB library
 QMAKE_CXXFLAGS += -Wno-missing-field-initializers
 
-# Windows: embed executable icon if .png exists
-win32:exists(assets/icons/logo.png) {
-    # Note: Qt can use PNG directly as icon
-    ICON = assets/icons/logo.png
+# Windows: embed executable icon if .ico exists
+win32:exists(assets/icons/logo.ico) {
+    ICON = assets/icons/logo.ico
 }

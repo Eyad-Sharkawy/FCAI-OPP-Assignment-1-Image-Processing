@@ -73,12 +73,17 @@ if(WIN32)
     )
     
     # Set application icon if it exists
+    if(EXISTS "${CMAKE_SOURCE_DIR}/assets/icons/logo.ico")
+        set_target_properties(${PROJECT_NAME} PROPERTIES
+            RC_ICONS "${CMAKE_SOURCE_DIR}/assets/icons/logo.ico"
+        )
+    endif()
+    
+    # Copy the PNG icon to build directory for runtime access
     if(EXISTS "${CMAKE_SOURCE_DIR}/assets/icons/logo.png")
-        # Convert PNG to ICO for Windows (requires ImageMagick or similar)
-        # For now, we'll just copy the PNG as the icon
         configure_file(
             "${CMAKE_SOURCE_DIR}/assets/icons/logo.png"
-            "${CMAKE_BINARY_DIR}/bin/icon.png"
+            "${CMAKE_BINARY_DIR}/bin/logo.png"
             COPYONLY
         )
     endif()
