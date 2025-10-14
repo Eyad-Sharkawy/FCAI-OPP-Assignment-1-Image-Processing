@@ -22,6 +22,9 @@ REM Clean previous portable build
 if exist "build_portable" rmdir /s /q build_portable
 if exist "cmake-build-release" rmdir /s /q cmake-build-release
 
+REM Compile resource file
+windres app.rc -o app.res
+
 REM Configure and build with CMake (Release)
 cmake -S . -B cmake-build-release -G "%CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release -DCMAKE_MAKE_PROGRAM="%CMAKE_MAKE_PROGRAM%" -DCMAKE_C_COMPILER="%CMAKE_C_COMPILER%" -DCMAKE_CXX_COMPILER="%CMAKE_CXX_COMPILER%"
 cmake --build cmake-build-release -j 8

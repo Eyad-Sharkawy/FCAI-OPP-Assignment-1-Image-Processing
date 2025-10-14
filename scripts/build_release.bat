@@ -21,6 +21,9 @@ set CMAKE_CXX_COMPILER=C:\Qt\Tools\mingw1310_64\bin\g++.exe
 REM Clean previous CMake release build
 if exist "cmake-build-release" rmdir /s /q cmake-build-release
 
+REM Compile resource file
+windres app.rc -o app.res
+
 REM Configure with CMake (Release) using MinGW Makefiles
 cmake -S . -B cmake-build-release -G "%CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release -DCMAKE_MAKE_PROGRAM="%CMAKE_MAKE_PROGRAM%" -DCMAKE_C_COMPILER="%CMAKE_C_COMPILER%" -DCMAKE_CXX_COMPILER="%CMAKE_CXX_COMPILER%"
 

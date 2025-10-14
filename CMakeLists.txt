@@ -64,7 +64,7 @@ set(QT_RESOURCES
 
 # Create executable
 if(WIN32)
-    add_executable(${PROJECT_NAME} WIN32 ${SOURCES} ${HEADERS} ${UI_FILES} ${QT_RESOURCES})
+    add_executable(${PROJECT_NAME} WIN32 ${SOURCES} ${HEADERS} ${UI_FILES} ${QT_RESOURCES} app.res)
 else()
     add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${UI_FILES} ${QT_RESOURCES})
 endif()
