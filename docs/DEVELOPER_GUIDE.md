@@ -1,4 +1,4 @@
-# Image Studio v3.0.1 - Developer Guide
+# Photo Smith v3.0.1 - Developer Guide
 
 ## 📖 Table of Contents
 1. [Project Overview](#project-overview)
@@ -12,7 +12,7 @@
 
 ## 🏗️ Project Overview
 
-Image Studio is a Qt6-based image processing application built with C++20. It provides a modern GUI for various image manipulation operations using a custom image processing library.
+Photo Smith is a Qt6-based image processing application built with C++20. It provides a modern GUI for various image manipulation operations using a custom image processing library.
 
 ### Key Technologies
 - **Framework**: Qt 6.8.1
@@ -426,7 +426,7 @@ Use Doxygen to generate browsable documentation from in-source comments.
 
 ### Configure
 Use the provided `Doxyfile` in the repository root. Key settings:
-- `PROJECT_NAME = "Image Studio"`
+- `PROJECT_NAME = "Photo Smith"`
 - `OUTPUT_DIRECTORY = docs/api`
 - `RECURSIVE = YES`
 - `EXTRACT_ALL = YES`

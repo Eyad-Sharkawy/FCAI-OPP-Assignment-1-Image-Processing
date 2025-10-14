@@ -1,13 +1,13 @@
 /**
- * @file image_studio.cpp
- * @brief Main Qt application class for Image Studio with comprehensive GUI and image processing capabilities.
+ * @file photo_smith.cpp
+ * @brief Main Qt application class for Photo Smith with comprehensive GUI and image processing capabilities.
  * 
- * This file contains the complete implementation of the ImageStudio class, which serves as the main
- * application window for the Image Studio image processing application. It provides a modern Qt-based
+ * This file contains the complete implementation of the PhotoSmith class, which serves as the main
+ * application window for the Photo Smith image processing application. It provides a modern Qt-based
  * GUI with drag-and-drop support, real-time progress tracking, comprehensive undo/redo functionality,
  * and seamless integration with the core image processing filters.
  * 
- * @details The ImageStudio class implements:
+ * @details The PhotoSmith class implements:
  * - Complete Qt MainWindow with modern UI design
  * - Drag-and-drop image loading with format validation
  * - Real-time image processing with progress tracking and cancellation
@@ -86,10 +86,10 @@
 #include "../core/io/ImageIO.h"
 
 /**
- * @class ImageStudio
- * @brief Main Qt application window for Image Studio with comprehensive image processing capabilities.
+ * @class PhotoSmith
+ * @brief Main Qt application window for Photo Smith with comprehensive image processing capabilities.
  * 
- * The ImageStudio class serves as the primary application window and controller for the Image Studio
+ * The PhotoSmith class serves as the primary application window and controller for the Photo Smith
  * image processing application. It provides a complete Qt-based GUI with modern design patterns,
  * comprehensive image processing capabilities, and seamless integration with the core processing engine.
  * 
@@ -126,12 +126,12 @@
  * @example
  * @code
  * QApplication app(argc, argv);
- * ImageStudio window;
+ * PhotoSmith window;
  * window.show();
  * return app.exec();
  * @endcode
  */
-class ImageStudio : public QMainWindow
+class PhotoSmith : public QMainWindow
 {
     Q_OBJECT
 
@@ -142,7 +142,7 @@ private:
 
 public:
     /**
-     * @brief Constructs the main ImageStudio application window.
+     * @brief Constructs the main PhotoSmith application window.
      * 
      * Initializes the Qt MainWindow with comprehensive UI setup, signal/slot connections,
      * drag-and-drop support, and all necessary components for image processing operations.
@@ -160,13 +160,13 @@ public:
      * 
      * @note This constructor sets up the complete application state and should be
      *       called only once per application instance.
-     * @see ~ImageStudio() for cleanup operations
+     * @see ~PhotoSmith() for cleanup operations
      */
-    ImageStudio(QWidget *parent = nullptr) : QMainWindow(parent), hasImage(false)
+    PhotoSmith(QWidget *parent = nullptr) : QMainWindow(parent), hasImage(false)
     {
         ui.setupUi(this);
         
-        setWindowTitle("Image Studio");
+        setWindowTitle("Photo Smith");
         setWindowIcon(QIcon("assets/icon.jpg"));
         setMinimumSize(600, 400);
         
@@ -185,52 +185,52 @@ public:
         ui.imageLabel->setText("No image loaded\nClick 'Load Image' or drag & drop an image here");
         
         // Connect signals
-        connect(ui.loadButton, &QPushButton::clicked, this, &ImageStudio::loadImage);
-        connect(ui.saveButton, &QPushButton::clicked, this, &ImageStudio::saveImage);
-        connect(ui.unloadButton, &QPushButton::clicked, this, &ImageStudio::unloadImage);
-        connect(ui.resetButton, &QPushButton::clicked, this, &ImageStudio::resetImage);
-        connect(ui.undoButton, &QPushButton::clicked, this, &ImageStudio::undo);
-        connect(ui.redoButton, &QPushButton::clicked, this, &ImageStudio::redo);
-        connect(ui.grayscaleButton, &QPushButton::clicked, this, &ImageStudio::applyGrayscale);
-        connect(ui.blackWhiteButton, &QPushButton::clicked, this, &ImageStudio::applyBlackAndWhite);
-        connect(ui.invertButton, &QPushButton::clicked, this, &ImageStudio::applyInvert);
-        connect(ui.mergeButton, &QPushButton::clicked, this, &ImageStudio::applyMerge);
-        connect(ui.flipButton, &QPushButton::clicked, this, &ImageStudio::applyFlip);
-        connect(ui.rotateButton, &QPushButton::clicked, this, &ImageStudio::applyRotate);
-        connect(ui.darkLightButton, &QPushButton::clicked, this, &ImageStudio::applyDarkAndLight);
-        connect(ui.frameButton, &QPushButton::clicked, this, &ImageStudio::applyFrame);
-        connect(ui.cropButton, &QPushButton::clicked, this, &ImageStudio::startCropMode);
-        connect(ui.edgesButton, &QPushButton::clicked, this, &ImageStudio::applyEdges);
-        connect(ui.resizeButton, &QPushButton::clicked, this, &ImageStudio::applyResize);
-        connect(ui.blurButton, &QPushButton::clicked, this, &ImageStudio::applyBlur);
-        connect(ui.infraredButton, &QPushButton::clicked, this, &ImageStudio::applyInfrared);
-        connect(ui.purpleButton, &QPushButton::clicked, this, &ImageStudio::applyPurpleFilter);
-        connect(ui.tvFilterButton, &QPushButton::clicked, this, &ImageStudio::applyTVFilter);
-        connect(ui.cancelButton, &QPushButton::clicked, this, &ImageStudio::cancelFilter);
+        connect(ui.loadButton, &QPushButton::clicked, this, &PhotoSmith::loadImage);
+        connect(ui.saveButton, &QPushButton::clicked, this, &PhotoSmith::saveImage);
+        connect(ui.unloadButton, &QPushButton::clicked, this, &PhotoSmith::unloadImage);
+        connect(ui.resetButton, &QPushButton::clicked, this, &PhotoSmith::resetImage);
+        connect(ui.undoButton, &QPushButton::clicked, this, &PhotoSmith::undo);
+        connect(ui.redoButton, &QPushButton::clicked, this, &PhotoSmith::redo);
+        connect(ui.grayscaleButton, &QPushButton::clicked, this, &PhotoSmith::applyGrayscale);
+        connect(ui.blackWhiteButton, &QPushButton::clicked, this, &PhotoSmith::applyBlackAndWhite);
+        connect(ui.invertButton, &QPushButton::clicked, this, &PhotoSmith::applyInvert);
+        connect(ui.mergeButton, &QPushButton::clicked, this, &PhotoSmith::applyMerge);
+        connect(ui.flipButton, &QPushButton::clicked, this, &PhotoSmith::applyFlip);
+        connect(ui.rotateButton, &QPushButton::clicked, this, &PhotoSmith::applyRotate);
+        connect(ui.darkLightButton, &QPushButton::clicked, this, &PhotoSmith::applyDarkAndLight);
+        connect(ui.frameButton, &QPushButton::clicked, this, &PhotoSmith::applyFrame);
+        connect(ui.cropButton, &QPushButton::clicked, this, &PhotoSmith::startCropMode);
+        connect(ui.edgesButton, &QPushButton::clicked, this, &PhotoSmith::applyEdges);
+        connect(ui.resizeButton, &QPushButton::clicked, this, &PhotoSmith::applyResize);
+        connect(ui.blurButton, &QPushButton::clicked, this, &PhotoSmith::applyBlur);
+        connect(ui.infraredButton, &QPushButton::clicked, this, &PhotoSmith::applyInfrared);
+        connect(ui.purpleButton, &QPushButton::clicked, this, &PhotoSmith::applyPurpleFilter);
+        connect(ui.tvFilterButton, &QPushButton::clicked, this, &PhotoSmith::applyTVFilter);
+        connect(ui.cancelButton, &QPushButton::clicked, this, &PhotoSmith::cancelFilter);
         
         // Connect menu actions
-        connect(ui.actionLoadImage, &QAction::triggered, this, &ImageStudio::loadImage);
-        connect(ui.actionSaveImage, &QAction::triggered, this, &ImageStudio::saveImage);
-        connect(ui.actionUnloadImage, &QAction::triggered, this, &ImageStudio::unloadImage);
-        connect(ui.actionResetImage, &QAction::triggered, this, &ImageStudio::resetImage);
-        connect(ui.actionUndo, &QAction::triggered, this, &ImageStudio::undo);
-        connect(ui.actionRedo, &QAction::triggered, this, &ImageStudio::redo);
+        connect(ui.actionLoadImage, &QAction::triggered, this, &PhotoSmith::loadImage);
+        connect(ui.actionSaveImage, &QAction::triggered, this, &PhotoSmith::saveImage);
+        connect(ui.actionUnloadImage, &QAction::triggered, this, &PhotoSmith::unloadImage);
+        connect(ui.actionResetImage, &QAction::triggered, this, &PhotoSmith::resetImage);
+        connect(ui.actionUndo, &QAction::triggered, this, &PhotoSmith::undo);
+        connect(ui.actionRedo, &QAction::triggered, this, &PhotoSmith::redo);
         connect(ui.actionExit, &QAction::triggered, this, &QWidget::close);
-        connect(ui.actionGrayscale, &QAction::triggered, this, &ImageStudio::applyGrayscale);
-        connect(ui.actionBlackWhite, &QAction::triggered, this, &ImageStudio::applyBlackAndWhite);
-        connect(ui.actionInvert, &QAction::triggered, this, &ImageStudio::applyInvert);
-        connect(ui.actionMerge, &QAction::triggered, this, &ImageStudio::applyMerge);
-        connect(ui.actionFlip, &QAction::triggered, this, &ImageStudio::applyFlip);
-        connect(ui.actionRotate, &QAction::triggered, this, &ImageStudio::applyRotate);
-        connect(ui.actionCrop, &QAction::triggered, this, &ImageStudio::startCropMode);
-        connect(ui.actionDarkLight, &QAction::triggered, this, &ImageStudio::applyDarkAndLight);
-        connect(ui.actionFrame, &QAction::triggered, this, &ImageStudio::applyFrame);
-        connect(ui.actionEdgeDetection, &QAction::triggered, this, &ImageStudio::applyEdges);
-        connect(ui.actionResize, &QAction::triggered, this, &ImageStudio::applyResize);
-        connect(ui.actionBlur, &QAction::triggered, this, &ImageStudio::applyBlur);
-        connect(ui.actionInfrared, &QAction::triggered, this, &ImageStudio::applyInfrared);
-        connect(ui.actionPurpleFilter, &QAction::triggered, this, &ImageStudio::applyPurpleFilter);
-        connect(ui.actionTVFilter, &QAction::triggered, this, &ImageStudio::applyTVFilter);
+        connect(ui.actionGrayscale, &QAction::triggered, this, &PhotoSmith::applyGrayscale);
+        connect(ui.actionBlackWhite, &QAction::triggered, this, &PhotoSmith::applyBlackAndWhite);
+        connect(ui.actionInvert, &QAction::triggered, this, &PhotoSmith::applyInvert);
+        connect(ui.actionMerge, &QAction::triggered, this, &PhotoSmith::applyMerge);
+        connect(ui.actionFlip, &QAction::triggered, this, &PhotoSmith::applyFlip);
+        connect(ui.actionRotate, &QAction::triggered, this, &PhotoSmith::applyRotate);
+        connect(ui.actionCrop, &QAction::triggered, this, &PhotoSmith::startCropMode);
+        connect(ui.actionDarkLight, &QAction::triggered, this, &PhotoSmith::applyDarkAndLight);
+        connect(ui.actionFrame, &QAction::triggered, this, &PhotoSmith::applyFrame);
+        connect(ui.actionEdgeDetection, &QAction::triggered, this, &PhotoSmith::applyEdges);
+        connect(ui.actionResize, &QAction::triggered, this, &PhotoSmith::applyResize);
+        connect(ui.actionBlur, &QAction::triggered, this, &PhotoSmith::applyBlur);
+        connect(ui.actionInfrared, &QAction::triggered, this, &PhotoSmith::applyInfrared);
+        connect(ui.actionPurpleFilter, &QAction::triggered, this, &PhotoSmith::applyPurpleFilter);
+        connect(ui.actionTVFilter, &QAction::triggered, this, &PhotoSmith::applyTVFilter);
         
         // Create status bar
         statusBar()->showMessage("Ready - Drag an image here or click 'Load Image'");
@@ -239,7 +239,7 @@ public:
         resizeTimer = new QTimer(this);
         resizeTimer->setSingleShot(true);
         resizeTimer->setInterval(100); // 100ms delay
-        connect(resizeTimer, &QTimer::timeout, this, &ImageStudio::updateImageDisplay);
+        connect(resizeTimer, &QTimer::timeout, this, &PhotoSmith::updateImageDisplay);
         
         // Enable drag and drop
         setAcceptDrops(true);
@@ -256,7 +256,7 @@ public:
     }
     
     /**
-     * @brief Destructor for the ImageStudio application window.
+     * @brief Destructor for the PhotoSmith application window.
      * 
      * Performs cleanup operations to ensure proper resource management and
      * prevent memory leaks. This includes cleaning up dynamically allocated
@@ -1778,20 +1778,20 @@ protected:
  * @details The main function:
  * - Creates and configures the Qt application instance
  * - Sets the application window icon
- * - Creates the main ImageStudio window
+ * - Creates the main PhotoSmith window
  * - Shows the window and starts the event loop
  * - Handles application shutdown gracefully
  * 
  * @note This function follows Qt's standard application structure and should
  *       be called only once per application instance.
  * @see QApplication for Qt application management
- * @see ImageStudio for the main application window
+ * @see PhotoSmith for the main application window
  * 
  * @example
  * @code
  * int main(int argc, char *argv[]) {
  *     QApplication app(argc, argv);
- *     ImageStudio window;
+ *     PhotoSmith window;
  *     window.show();
  *     return app.exec();
  * }
@@ -1802,7 +1802,7 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     app.setWindowIcon(QIcon("assets/icon.jpg"));
     
-    ImageStudio window;
+    PhotoSmith window;
     window.show();
     
     return app.exec();

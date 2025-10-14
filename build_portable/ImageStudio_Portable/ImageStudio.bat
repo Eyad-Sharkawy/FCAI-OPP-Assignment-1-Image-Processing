@@ -1,4 +1,4 @@
 @echo off 
 cd /d "%~dp0bin" 
-echo Starting ImageStudio... 
-ImageStudio.exe %* 
+echo Starting PhotoSmith... 
+PhotoSmith.exe %* 

@@ -1,12 +1,12 @@
-# Image Studio v2.0.0 - Qt Project File (qmake)
+# Photo Smith v2.0.0 - Qt Project File (qmake)
 # 
-# This qmake project file defines the build configuration for Image Studio
+# This qmake project file defines the build configuration for Photo Smith
 # using Qt's qmake build system. It configures the project to use C++20,
 # Qt 6, and includes all necessary source files and dependencies.
 #
 # Note: This is the legacy build system. CMake is the recommended build system.
 #
-# Author: Image Studio Development Team
+# Author: Photo Smith Development Team
 # Institution: Faculty of Computers and Artificial Intelligence, Cairo University
 # Version: 2.0.0
 # Date: October 13, 2025
@@ -15,10 +15,10 @@ QT += core widgets
 
 CONFIG += c++20
 
-TARGET = ImageStudio
+TARGET = PhotoSmith
 TEMPLATE = app
 
-SOURCES += src/gui/image_studio.cpp \
+SOURCES += src/gui/photo_smith.cpp \
            src/core/ImageFilters.cpp \
            src/core/Image_Class.cpp
 

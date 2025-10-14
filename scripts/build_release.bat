@@ -6,7 +6,7 @@ set SCRIPT_DIR=%~dp0
 set PROJ_DIR=%SCRIPT_DIR%..\
 pushd "%PROJ_DIR%"
 
-echo Building Image Studio (release)...
+echo Building Photo Smith (release)...
 
 REM Set Qt environment
 set PATH=C:\Qt\6.8.1\mingw_64\bin;C:\Qt\Tools\mingw1310_64\bin;%PATH%

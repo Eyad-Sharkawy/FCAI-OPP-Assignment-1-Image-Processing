@@ -7,7 +7,7 @@ set PROJ_DIR=%SCRIPT_DIR%..\
 pushd "%PROJ_DIR%"
 
 echo ========================================
-echo    Image Studio - Complete Build
+echo    Photo Smith - Complete Build
 echo ========================================
 echo.
 
@@ -38,52 +38,52 @@ echo ✓ Release build successful
 echo.
 
 echo [3/4] Creating portable package...
-mkdir build_portable\ImageStudio_Portable
-mkdir build_portable\ImageStudio_Portable\bin
+mkdir build_portable\PhotoSmith_Portable
+mkdir build_portable\PhotoSmith_Portable\bin
 
-copy cmake-build-release\bin\ImageStudio.exe build_portable\ImageStudio_Portable\bin\
+copy cmake-build-release\bin\PhotoSmith.exe build_portable\PhotoSmith_Portable\bin\
 
-cd build_portable\ImageStudio_Portable\bin
-windeployqt ImageStudio.exe
+cd build_portable\PhotoSmith_Portable\bin
+windeployqt PhotoSmith.exe
 cd ..\..\..
 
 if exist "%PROJ_DIR%assets" (
-    xcopy "%PROJ_DIR%assets" build_portable\ImageStudio_Portable\assets\ /E /I
+    xcopy "%PROJ_DIR%assets" build_portable\PhotoSmith_Portable\assets\ /E /I
 )
 
-echo @echo off > build_portable\ImageStudio_Portable\ImageStudio.bat
-echo cd /d "%%~dp0bin" >> build_portable\ImageStudio_Portable\ImageStudio.bat
-echo echo Starting ImageStudio... >> build_portable\ImageStudio_Portable\ImageStudio.bat
-echo ImageStudio.exe %%* >> build_portable\ImageStudio_Portable\ImageStudio.bat
+echo @echo off > build_portable\PhotoSmith_Portable\PhotoSmith.bat
+echo cd /d "%%~dp0bin" >> build_portable\PhotoSmith_Portable\PhotoSmith.bat
+echo echo Starting PhotoSmith... >> build_portable\PhotoSmith_Portable\PhotoSmith.bat
+echo PhotoSmith.exe %%* >> build_portable\PhotoSmith_Portable\PhotoSmith.bat
 
-echo Image Studio - Portable Version > build_portable\ImageStudio_Portable\README.txt
-echo. >> build_portable\ImageStudio_Portable\README.txt
-echo This is a portable version of Image Studio that includes all necessary >> build_portable\ImageStudio_Portable\README.txt
-echo Qt libraries and dependencies. >> build_portable\ImageStudio_Portable\README.txt
-echo. >> build_portable\ImageStudio_Portable\README.txt
-echo To run: >> build_portable\ImageStudio_Portable\README.txt
-echo 1. Double-click ImageStudio.bat >> build_portable\ImageStudio_Portable\README.txt
-echo 2. Or run bin\ImageStudio.exe directly >> build_portable\ImageStudio_Portable\README.txt
-echo. >> build_portable\ImageStudio_Portable\README.txt
-echo Features: >> build_portable\ImageStudio_Portable\README.txt
-echo - All image processing filters >> build_portable\ImageStudio_Portable\README.txt
-echo - Drag and drop image loading >> build_portable\ImageStudio_Portable\README.txt
-echo - Undo/Redo functionality >> build_portable\ImageStudio_Portable\README.txt
-echo - Responsive UI >> build_portable\ImageStudio_Portable\README.txt
-echo - Professional interface >> build_portable\ImageStudio_Portable\README.txt
-echo. >> build_portable\ImageStudio_Portable\README.txt
-echo No installation required! >> build_portable\ImageStudio_Portable\README.txt
+echo Photo Smith - Portable Version > build_portable\PhotoSmith_Portable\README.txt
+echo. >> build_portable\PhotoSmith_Portable\README.txt
+echo This is a portable version of Photo Smith that includes all necessary >> build_portable\PhotoSmith_Portable\README.txt
+echo Qt libraries and dependencies. >> build_portable\PhotoSmith_Portable\README.txt
+echo. >> build_portable\PhotoSmith_Portable\README.txt
+echo To run: >> build_portable\PhotoSmith_Portable\README.txt
+echo 1. Double-click PhotoSmith.bat >> build_portable\PhotoSmith_Portable\README.txt
+echo 2. Or run bin\PhotoSmith.exe directly >> build_portable\PhotoSmith_Portable\README.txt
+echo. >> build_portable\PhotoSmith_Portable\README.txt
+echo Features: >> build_portable\PhotoSmith_Portable\README.txt
+echo - All image processing filters >> build_portable\PhotoSmith_Portable\README.txt
+echo - Drag and drop image loading >> build_portable\PhotoSmith_Portable\README.txt
+echo - Undo/Redo functionality >> build_portable\PhotoSmith_Portable\README.txt
+echo - Responsive UI >> build_portable\PhotoSmith_Portable\README.txt
+echo - Professional interface >> build_portable\PhotoSmith_Portable\README.txt
+echo. >> build_portable\PhotoSmith_Portable\README.txt
+echo No installation required! >> build_portable\PhotoSmith_Portable\README.txt
 
 echo ✓ Portable package created
 echo.
 
 echo [4/4] Creating distribution ZIP...
 set VERSION=2.0.0
-set ZIP_NAME=build_portable\ImageStudio_Portable_v%VERSION%-gui.zip
+set ZIP_NAME=build_portable\PhotoSmith_Portable_v%VERSION%-gui.zip
 
 if exist "%ZIP_NAME%" del "%ZIP_NAME%"
 
-powershell -Command "Compress-Archive -Path 'build_portable\ImageStudio_Portable' -DestinationPath 'build_portable\ImageStudio_Portable_v2.0.0-gui.zip' -Force"
+powershell -Command "Compress-Archive -Path 'build_portable\PhotoSmith_Portable' -DestinationPath 'build_portable\PhotoSmith_Portable_v2.0.0-gui.zip' -Force"
 
 if %ERRORLEVEL% EQU 0 (
     echo ✓ ZIP file created successfully
@@ -97,13 +97,13 @@ echo           BUILD COMPLETE!
 echo ========================================
 echo.
 echo Files created:
-echo ✓ release\ImageStudio.exe (Release executable)
-echo ✓ build_portable\ImageStudio_Portable\ (Portable package)
-echo ✓ build_portable\ImageStudio_Portable_v2.0.0-gui.zip (Distribution ZIP)
+echo ✓ release\PhotoSmith.exe (Release executable)
+echo ✓ build_portable\PhotoSmith_Portable\ (Portable package)
+echo ✓ build_portable\PhotoSmith_Portable_v2.0.0-gui.zip (Distribution ZIP)
 echo.
 echo You can now:
-echo - Run the application: release\ImageStudio.exe
-echo - Test the portable version: build_portable\ImageStudio_Portable\ImageStudio.bat
+echo - Run the application: release\PhotoSmith.exe
+echo - Test the portable version: build_portable\PhotoSmith_Portable\PhotoSmith.bat
 echo - Distribute the ZIP file to users
 echo.
 

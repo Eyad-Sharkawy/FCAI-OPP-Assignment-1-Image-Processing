@@ -1,16 +1,16 @@
-# Image Studio v3.0.1 - CMake Build Configuration
+# Photo Smith v3.0.1 - CMake Build Configuration
 # 
-# This CMake configuration file defines the build system for Image Studio,
+# This CMake configuration file defines the build system for Photo Smith,
 # a Qt-based image processing application. It configures the project to use
 # C++20, Qt 6, and includes all necessary source files and dependencies.
 #
-# Author: Image Studio Development Team
+# Author: Photo Smith Development Team
 # Institution: Faculty of Computers and Artificial Intelligence, Cairo University
 # Version: 3.0.1
 # Date: October 13, 2025
 
 cmake_minimum_required(VERSION 3.20)
-project(ImageStudio VERSION 3.0.1)
+project(PhotoSmith VERSION 3.0.1)
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 20)
@@ -34,7 +34,7 @@ include_directories(third_party/stb)
 
 # Source files
 set(SOURCES
-    src/gui/image_studio.cpp
+    src/gui/photo_smith.cpp
     src/core/filters/ImageFilters.cpp
     src/core/image/Image_Class.cpp
 )

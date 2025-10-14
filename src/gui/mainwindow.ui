@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   File: mainwindow.ui
-  Purpose: Qt Designer UI for Image Studio main window (buttons, menus, layouts)
-  Notes: This file defines the GUI layout used by Image Studio v2.0.0.
-         See image_studio.cpp for behavior and signal/slot connections.
+  Purpose: Qt Designer UI for Photo Smith main window (buttons, menus, layouts)
+  Notes: This file defines the GUI layout used by Photo Smith v2.0.0.
+         See photo_smith.cpp for behavior and signal/slot connections.
          Supported image formats: PNG, JPEG, BMP, TGA.
          Last updated: 2025-10-14
 -->
@@ -22,7 +22,7 @@
    <bool>true</bool>
   </property>
   <property name="windowTitle">
-   <string>Image Studio</string>
+   <string>Photo Smith</string>
   </property>
   <property name="styleSheet">
    <string>QWidget { background-color: #121212; color: #dddddd; }

@@ -1,10 +1,10 @@
-# Image Studio v3.0.1 - Documentation Hub
+# Photo Smith v3.0.1 - Documentation Hub
 
-Welcome to the Image Studio documentation! This is your central hub for all documentation related to Image Studio v3.0.1.
+Welcome to the Photo Smith documentation! This is your central hub for all documentation related to Photo Smith v3.0.1.
 
 ## 📚 Documentation Overview
 
-Image Studio is a modern, feature-rich image processing application built with Qt 6 and C++20. This documentation covers everything from basic usage to advanced development.
+Photo Smith is a modern, feature-rich image processing application built with Qt 6 and C++20. This documentation covers everything from basic usage to advanced development.
 
 ## 🚀 Quick Start
 
@@ -66,7 +66,7 @@ Image Studio is a modern, feature-rich image processing application built with Q
 - **Graphics**: DirectX 11 compatible
 
 ### Download
-- **Portable Version**: `ImageStudio_Portable_v3.0.1-gui.zip` (~25MB)
+- **Portable Version**: `PhotoSmith_Portable_v3.0.1-gui.zip` (~25MB)
 - **Source Code**: GitHub repository
 - **Requirements**: Qt 6.8.1+, C++20 compiler
 

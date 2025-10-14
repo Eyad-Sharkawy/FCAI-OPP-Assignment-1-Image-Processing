@@ -1,11 +1,11 @@
-Image Studio - Portable Version 
+Photo Smith - Portable Version 
  
-This is a portable version of Image Studio that includes all necessary 
+This is a portable version of Photo Smith that includes all necessary 
 Qt libraries and dependencies. 
  
 To run: 
-1. Double-click ImageStudio.bat 
-2. Or run bin\ImageStudio.exe directly 
+1. Double-click PhotoSmith.bat 
+2. Or run bin\PhotoSmith.exe directly 
  
 Features: 
 - All image processing filters 

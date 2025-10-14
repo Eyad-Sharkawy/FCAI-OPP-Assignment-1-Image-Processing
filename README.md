@@ -1,10 +1,10 @@
-# Image Studio v3.0.1
+# Photo Smith v3.0.1
 
 A modern, professional Qt-based image processing application with a clean, intuitive interface and comprehensive image manipulation capabilities.
 
 ## 🎯 Overview
 
-Image Studio is a powerful desktop application built with Qt 6 and C++20 that provides a complete suite of image processing tools. It features a modern GUI with drag-and-drop support, real-time progress tracking, and comprehensive undo/redo functionality. The application supports multiple image formats and provides both basic and advanced image processing filters.
+Photo Smith is a powerful desktop application built with Qt 6 and C++20 that provides a complete suite of image processing tools. It features a modern GUI with drag-and-drop support, real-time progress tracking, and comprehensive undo/redo functionality. The application supports multiple image formats and provides both basic and advanced image processing filters.
 
 ## ✨ Key Features
 
@@ -20,10 +20,10 @@ Image Studio is a powerful desktop application built with Qt 6 and C++20 that pr
 ## 🏗️ Project Structure
 
 ```
-ImageStudio/
+PhotoSmith/
 ├── src/                            # Source code
 │   ├── gui/                        # GUI components
-│   │   ├── image_studio.cpp        # Main Qt application class
+│   │   ├── photo_smith.cpp         # Main Qt application class
 │   │   └── mainwindow.ui           # Qt Designer UI layout
 │   └── core/                       # Core functionality
 │       ├── image/                  # Image data structure + STB I/O
@@ -55,7 +55,7 @@ ImageStudio/
 ├── cmake-build-*/                  # CMake build outputs
 ├── build_portable/                 # Portable build output
 ├── CMakeLists.txt                  # CMake build configuration
-├── ImageStudio.pro                 # Qt project file (legacy)
+├── PhotoSmith.pro                  # Qt project file (legacy)
 └── README.md                       # This file
 ```
 
@@ -98,7 +98,7 @@ ImageStudio/
 ## 🛠️ Building
 
 ### Using Qt Creator
-1. Open `ImageStudio.pro` in Qt Creator
+1. Open `PhotoSmith.pro` in Qt Creator
 2. Configure the project
 3. Build and run
 
@@ -112,7 +112,7 @@ cmake --build .
 
 ### Using Qt qmake
 ```bash
-qmake ImageStudio.pro
+qmake PhotoSmith.pro
 make
 ```
 
@@ -248,12 +248,12 @@ This project is developed as part of a C++ Object-Oriented Programming assignmen
 
 ## 🔗 Links
 
-- **GitHub Repository**: [Image Studio on GitHub](https://github.com/Eyad-Sharkawy/FCAI-OPP-Assignment-1-Image-Processing)
+- **GitHub Repository**: [Photo Smith on GitHub](https://github.com/Eyad-Sharkawy/FCAI-OPP-Assignment-1-Image-Processing)
 - **Releases**: [Latest Releases](https://github.com/Eyad-Sharkawy/FCAI-OPP-Assignment-1-Image-Processing/releases)
 - **Issues**: [Report Issues](https://github.com/Eyad-Sharkawy/FCAI-OPP-Assignment-1-Image-Processing/issues)
 
 ---
 
-**Image Studio v3.0.1** - Professional Image Processing Made Simple! 🎨
+**Photo Smith v3.0.1** - Professional Image Processing Made Simple! 🎨
 
 *Last updated: October 14, 2025*
