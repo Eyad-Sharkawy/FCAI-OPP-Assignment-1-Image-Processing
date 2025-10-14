@@ -13,12 +13,17 @@ set PATH=C:\Qt\6.8.1\mingw_64\bin;C:\Qt\Tools\mingw1310_64\bin;%PATH%
 set QTDIR=C:\Qt\6.8.1\mingw_64
 set CMAKE_GENERATOR=MinGW Makefiles
 
+REM Set compiler environment variables for proper icon embedding
+set CMAKE_MAKE_PROGRAM=C:\Qt\Tools\mingw1310_64\bin\mingw32-make.exe
+set CMAKE_C_COMPILER=C:\Qt\Tools\mingw1310_64\bin\gcc.exe
+set CMAKE_CXX_COMPILER=C:\Qt\Tools\mingw1310_64\bin\g++.exe
+
 REM Clean previous portable build
 if exist "build_portable" rmdir /s /q build_portable
 if exist "cmake-build-release" rmdir /s /q cmake-build-release
 
 REM Configure and build with CMake (Release)
-cmake -S . -B cmake-build-release -G "%CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release
+cmake -S . -B cmake-build-release -G "%CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release -DCMAKE_MAKE_PROGRAM="%CMAKE_MAKE_PROGRAM%" -DCMAKE_C_COMPILER="%CMAKE_C_COMPILER%" -DCMAKE_CXX_COMPILER="%CMAKE_CXX_COMPILER%"
 cmake --build cmake-build-release -j 8
 
 if %ERRORLEVEL% EQU 0 (
