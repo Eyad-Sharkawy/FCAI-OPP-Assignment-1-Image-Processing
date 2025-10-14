@@ -185,20 +185,40 @@ Comprehensive documentation is available in the `docs/` folder:
 - **[Developer Guide](docs/DEVELOPER_GUIDE.md)** - Architecture, build system, and development guide
 - **[Installation Guide](docs/INSTALLATION.md)** - Installation instructions for all platforms
 
-### API Documentation
-Generate comprehensive API documentation using Doxygen (a ready-to-use `Doxyfile` is provided):
+### API Documentation (Doxygen)
+Generate browsable API docs from source comments. A ready-to-use `Doxyfile` is included.
 
-1. **Install Doxygen**: 
-   - Windows: `choco install doxygen.graphviz`
-   - Or download from [doxygen.nl](https://www.doxygen.nl/download.html)
+1) Install tools (any one method)
 
-2. **Generate Documentation**:
-   ```bash
-   # In repository root
-   doxygen Doxyfile
-   ```
+- Chocolatey (Windows):
+  - `choco install doxygen.install graphviz -y`
+- Winget (Windows):
+  - `winget install Doxygen.Doxygen`
+  - `winget install Graphviz.Graphviz`
+- Manual installers:
+  - Doxygen: `https://www.doxygen.nl/download.html`
+  - Graphviz: `https://graphviz.org/download/`
 
-3. **View Documentation**: Open `docs/api/html/index.html` in your browser
+2) Verify installation
+
+```powershell
+doxygen -v
+dot -V
+```
+
+3) Generate docs (from repository root)
+
+```powershell
+doxygen Doxyfile
+```
+
+4) Open docs
+
+- `docs/api/html/index.html`
+
+Notes:
+- Graphviz enables class/dir diagrams; it is optional but recommended.
+- If PATH isn’t updated, start a new terminal or call the full exe path (e.g., `"C:\\Program Files\\doxygen\\bin\\doxygen.exe"`).
 
 ## 🤝 Contributing
 

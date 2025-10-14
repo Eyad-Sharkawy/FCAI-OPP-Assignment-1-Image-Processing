@@ -109,6 +109,43 @@ Image Studio is a modern, feature-rich image processing application built with Q
 └──────────────────────────────────────────────────────────┘
 ```
 
+## 🧩 API Documentation (Doxygen)
+
+Source-annotated API documentation can be generated locally using Doxygen. The output is placed under `docs/api/html`.
+
+### Install
+
+- Chocolatey (Windows):
+  - `choco install doxygen.install graphviz -y`
+- Winget (Windows):
+  - `winget install Doxygen.Doxygen`
+  - `winget install Graphviz.Graphviz`
+- Manual:
+  - Doxygen: `https://www.doxygen.nl/download.html`
+  - Graphviz: `https://graphviz.org/download/`
+
+### Verify
+
+```powershell
+doxygen -v
+dot -V
+```
+
+### Generate
+
+```powershell
+# From repository root
+doxygen Doxyfile
+```
+
+### View
+
+- Open `docs/api/html/index.html` in your browser.
+
+Notes:
+- Graphviz enables diagrams; recommended but optional.
+- If PATH isn’t refreshed, open a new terminal or call the full executable path.
+
 ### Project Structure
 ```
 ImageStudio/

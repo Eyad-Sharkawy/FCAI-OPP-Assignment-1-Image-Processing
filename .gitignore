@@ -1,69 +1,24 @@
 # Build directories
-build/
-build_*/
 cmake-build-*/
+build/
 debug/
 release/
 
-# Qt generated files
-*.pro.user
-*.pro.user.*
-*.qbs.user
-*.qbs.user.*
+# Generated files
 *.moc
-moc_*.cpp
-moc_*.h
-qrc_*.cpp
+*.moc.d
 ui_*.h
-*.qm
-*.prl
-
-# Qt Creator
-CMakeLists.txt.user*
-
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
+moc_*.cpp
+qrc_*.cpp
 
 # IDE files
 .vscode/
 .idea/
-*.swp
-*.swo
-*~
+*.pro.user
+*.vcxproj.user
 
-# OS generated files
+# OS files
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
 
 # Temporary files
@@ -71,7 +26,16 @@ Thumbs.db
 *.temp
 *.log
 
+# Compiled binaries
+*.exe
+*.dll
+*.so
+*.dylib
+
 # Package files
 *.zip
 *.tar.gz
 *.rar
+
+# Documentation output
+docs/api/

@@ -100,6 +100,27 @@ void ImageFilters::checkCancellation(std::atomic<bool>& cancelRequested, Image& 
     }
 }
 
+/**
+ * @brief Apply grayscale conversion to the image with progress tracking and cancellation support.
+ * 
+ * Converts the image to grayscale by averaging RGB values for each pixel.
+ * This operation supports real-time progress tracking and can be cancelled by the user.
+ * 
+ * @param currentImage Reference to the image to process (modified in-place)
+ * @param preFilterImage Reference to store the original image state for cancellation
+ * @param cancelRequested Atomic flag to check for cancellation requests
+ * 
+ * @details The grayscale conversion:
+ * - Uses simple averaging: gray = (R + G + B) / 3
+ * - Processes pixels row by row for progress tracking
+ * - Checks for cancellation after each row
+ * - Updates progress bar and status messages
+ * - Restores original state if cancelled
+ * 
+ * @note This is a long-running operation that can be cancelled.
+ * @see updateProgress() for progress tracking
+ * @see checkCancellation() for cancellation handling
+ */
 void ImageFilters::applyGrayscale(Image& currentImage, Image& preFilterImage, std::atomic<bool>& cancelRequested)
 {
     if (progressBar) {
@@ -150,6 +171,28 @@ void ImageFilters::applyGrayscale(Image& currentImage, Image& preFilterImage, st
     }
 }
 
+/**
+ * @brief Apply TV/CRT monitor simulation effect with progress tracking and cancellation support.
+ * 
+ * Creates a vintage TV/CRT monitor appearance with scan lines, color shifts, and noise effects.
+ * This operation supports real-time progress tracking and can be cancelled by the user.
+ * 
+ * @param currentImage Reference to the image to process (modified in-place)
+ * @param preFilterImage Reference to store the original image state for cancellation
+ * @param cancelRequested Atomic flag to check for cancellation requests
+ * 
+ * @details The TV/CRT effect includes:
+ * - Horizontal scan lines (darker every 3rd row)
+ * - Color temperature shifts (blue/purple for dark areas, warm orange for bright areas)
+ * - Random noise for authentic TV feel
+ * - Brightness-based color adjustments
+ * - Processes pixels row by row for progress tracking
+ * - Checks for cancellation after each row
+ * 
+ * @note This is a long-running operation that can be cancelled.
+ * @see updateProgress() for progress tracking
+ * @see checkCancellation() for cancellation handling
+ */
 void ImageFilters::applyTVFilter(Image& currentImage, Image& preFilterImage, std::atomic<bool>& cancelRequested)
 {
     if (progressBar) {
@@ -241,6 +284,28 @@ void ImageFilters::applyTVFilter(Image& currentImage, Image& preFilterImage, std
     }
 }
 
+/**
+ * @brief Apply black and white conversion with progress tracking and cancellation support.
+ * 
+ * Converts the image to pure black and white using threshold-based processing.
+ * This operation supports real-time progress tracking and can be cancelled by the user.
+ * 
+ * @param currentImage Reference to the image to process (modified in-place)
+ * @param preFilterImage Reference to store the original image state for cancellation
+ * @param cancelRequested Atomic flag to check for cancellation requests
+ * 
+ * @details The black and white conversion:
+ * - Calculates grayscale value: gray = (R + G + B) / 3
+ * - Applies threshold: white (255) if gray > 127, black (0) otherwise
+ * - Processes pixels row by row for progress tracking
+ * - Checks for cancellation after each row
+ * - Updates progress bar and status messages
+ * - Restores original state if cancelled
+ * 
+ * @note This is a long-running operation that can be cancelled.
+ * @see updateProgress() for progress tracking
+ * @see checkCancellation() for cancellation handling
+ */
 void ImageFilters::applyBlackAndWhite(Image& currentImage, Image& preFilterImage, std::atomic<bool>& cancelRequested)
 {
     if (progressBar) {
@@ -292,6 +357,27 @@ void ImageFilters::applyBlackAndWhite(Image& currentImage, Image& preFilterImage
     }
 }
 
+/**
+ * @brief Apply color inversion with progress tracking and cancellation support.
+ * 
+ * Inverts all color values in the image to create a negative effect.
+ * This operation supports real-time progress tracking and can be cancelled by the user.
+ * 
+ * @param currentImage Reference to the image to process (modified in-place)
+ * @param preFilterImage Reference to store the original image state for cancellation
+ * @param cancelRequested Atomic flag to check for cancellation requests
+ * 
+ * @details The color inversion:
+ * - Subtracts each RGB component from 255: new_value = 255 - old_value
+ * - Processes pixels row by row for progress tracking
+ * - Checks for cancellation after each row
+ * - Updates progress bar and status messages
+ * - Restores original state if cancelled
+ * 
+ * @note This is a long-running operation that can be cancelled.
+ * @see updateProgress() for progress tracking
+ * @see checkCancellation() for cancellation handling
+ */
 void ImageFilters::applyInvert(Image& currentImage, Image& preFilterImage, std::atomic<bool>& cancelRequested)
 {
     if (progressBar) {
@@ -337,6 +423,24 @@ void ImageFilters::applyInvert(Image& currentImage, Image& preFilterImage, std::
     }
 }
 
+/**
+ * @brief Merge the current image with another image by averaging pixel values.
+ * 
+ * Combines two images by averaging their corresponding pixel values.
+ * The resulting image will have the dimensions of the smaller input image.
+ * 
+ * @param currentImage Reference to the first image (modified in-place)
+ * @param mergeImage Reference to the second image to merge with
+ * 
+ * @details The merge operation:
+ * - Uses the smaller dimensions of both images
+ * - Averages RGB values: new_value = (value1 + value2) / 2
+ * - Processes all pixels in the overlapping area
+ * - Updates status messages during processing
+ * 
+ * @note This is an immediate operation without progress tracking.
+ * @see Image class for pixel access and manipulation
+ */
 void ImageFilters::applyMerge(Image& currentImage, Image& mergeImage)
 {
     if (statusBar) {
@@ -363,6 +467,25 @@ void ImageFilters::applyMerge(Image& currentImage, Image& mergeImage)
     }
 }
 
+/**
+ * @brief Flip the image horizontally or vertically.
+ * 
+ * Applies a horizontal or vertical flip transformation to the image
+ * by swapping pixel positions across the specified axis.
+ * 
+ * @param currentImage Reference to the image to flip (modified in-place)
+ * @param direction String specifying flip direction: "Horizontal" or "Vertical"
+ * 
+ * @details The flip operation:
+ * - Horizontal: Swaps pixels across the vertical center line
+ * - Vertical: Swaps pixels across the horizontal center line
+ * - Processes pixels in-place for memory efficiency
+ * - Updates status messages during processing
+ * 
+ * @note This is an immediate operation without progress tracking.
+ * @throws std::invalid_argument if direction is not "Horizontal" or "Vertical"
+ * @see Image class for pixel access and manipulation
+ */
 void ImageFilters::applyFlip(Image& currentImage, const QString& direction)
 {
     if (statusBar) {

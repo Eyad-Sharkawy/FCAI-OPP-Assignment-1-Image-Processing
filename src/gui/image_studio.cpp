@@ -33,7 +33,7 @@
  * @author Team Members:
  * - Ahmed Mohamed ElSayed Tolba (ID: 20242023) - Small ID: 1, 4, 7, 10, (17 "bonus"), menu
  * - Eyad Mohamed Saad Ali (ID: 20242062) - Middle ID: 2, 5, 8, 11, (15 "bonus"), menu  
- * - Tarek Sami Mohamed Mohamed (ID: 20242190) - Large ID: 3, 6, 9, 12, (16 "bonus"), menu
+ * - Tarek Sami Mohamed (ID: 20242190) - Large ID: 3, 6, 9, 12, (16 "bonus"), menu
  * 
  * @institution Faculty of Computers and Artificial Intelligence, Cairo University
  * @section S33, Group B, Lab 7
@@ -510,6 +510,29 @@ private slots:
         }
     }
 
+    /**
+     * @brief Merge the current image with another image from the specified path.
+     * 
+     * Loads an image from the given file path and merges it with the current image.
+     * Handles different image dimensions by offering resize options or merging
+     * the common overlapping area.
+     * 
+     * @param fileName Qt string containing the path to the image file to merge
+     * 
+     * @details This method:
+     * - Saves the current state for undo functionality
+     * - Loads the merge image from the specified path
+     * - Handles dimension mismatches with user dialog options
+     * - Applies the merge operation using ImageFilters
+     * - Updates the display and properties panel
+     * - Provides comprehensive error handling
+     * 
+     * @note This is an immediate operation without progress tracking.
+     * @see ImageFilters::applyMerge() for the actual merge implementation
+     * @see ImageIO::loadFromFile() for image loading operations
+     * 
+     * @throws std::exception if image loading or merge operation fails
+     */
     void mergeWithPath(const QString &fileName)
     {
         try {
@@ -550,6 +573,24 @@ private slots:
         }
     }
     
+    /**
+     * @brief Apply horizontal or vertical flip transformation to the current image.
+     * 
+     * Presents a dialog to the user to choose between horizontal or vertical flip
+     * direction, then applies the selected transformation to the current image.
+     * 
+     * @details This method:
+     * - Validates that an image is currently loaded
+     * - Shows a selection dialog for flip direction
+     * - Saves the current state for undo functionality
+     * - Applies the flip transformation using ImageFilters
+     * - Updates the display and properties panel
+     * - Handles errors gracefully with user feedback
+     * 
+     * @note This is an immediate operation without progress tracking.
+     * @see ImageFilters::applyFlip() for the actual flip implementation
+     * @see getInputFromList() for user input dialog
+     */
     void applyFlip()
     {
         if (!hasImage) return;
@@ -573,6 +614,24 @@ private slots:
         }
     }
     
+    /**
+     * @brief Apply rotation transformation to the current image.
+     * 
+     * Presents a dialog to the user to choose between 90°, 180°, or 270° rotation
+     * angles, then applies the selected rotation to the current image.
+     * 
+     * @details This method:
+     * - Validates that an image is currently loaded
+     * - Shows a selection dialog for rotation angle
+     * - Saves the current state for undo functionality
+     * - Applies the rotation transformation using ImageFilters
+     * - Updates the display and properties panel
+     * - Handles errors gracefully with user feedback
+     * 
+     * @note This is an immediate operation without progress tracking.
+     * @see ImageFilters::applyRotate() for the actual rotation implementation
+     * @see getInputFromList() for user input dialog
+     */
     void applyRotate()
     {
         if (!hasImage) return;
@@ -596,6 +655,26 @@ private slots:
         }
     }
     
+    /**
+     * @brief Apply brightness adjustment (darken or lighten) to the current image.
+     * 
+     * Presents dialogs to the user to choose between darkening or lightening
+     * and to specify the intensity percentage, then applies the brightness
+     * adjustment to the current image.
+     * 
+     * @details This method:
+     * - Validates that an image is currently loaded
+     * - Shows a selection dialog for dark/light choice
+     * - Shows a slider dialog for intensity percentage (0-100%)
+     * - Applies the brightness adjustment using ImageFilters
+     * - Updates the display and properties panel
+     * - Handles user cancellation gracefully
+     * 
+     * @note This is an immediate operation without progress tracking.
+     * @see ImageFilters::applyDarkAndLight() for the actual brightness implementation
+     * @see getInputFromList() for choice selection dialog
+     * @see getPercentWithSlider() for percentage input dialog
+     */
     void applyDarkAndLight()
     {
         if (!hasImage) return;
@@ -618,6 +697,30 @@ private slots:
         updatePropertiesPanel();
     }
     
+    /**
+     * @brief Add a decorative frame around the current image.
+     * 
+     * Presents a dialog to the user to choose from various frame styles,
+     * then applies the selected frame decoration to the current image.
+     * 
+     * @details This method:
+     * - Validates that an image is currently loaded
+     * - Shows a selection dialog with multiple frame options
+     * - Applies the selected frame using ImageFilters
+     * - Updates the display and properties panel
+     * - Handles user cancellation gracefully
+     * 
+     * Available frame types include:
+     * - Simple Frame: Basic blue and white border
+     * - Double Border: White double border
+     * - Solid Frames: Various colored solid borders
+     * - Shadow Frame: Frame with shadow effect
+     * - Gold Decorated Frame: Ornate gold-style frame
+     * 
+     * @note This is an immediate operation without progress tracking.
+     * @see ImageFilters::applyFrame() for the actual frame implementation
+     * @see getInputFromList() for frame selection dialog
+     */
     void applyFrame()
     {
         if (!hasImage) return;
@@ -644,6 +747,27 @@ private slots:
         }
     }
     
+    /**
+     * @brief Apply edge detection filter to the current image.
+     * 
+     * Applies Sobel edge detection algorithm with Gaussian blur preprocessing
+     * to highlight edges and outlines in the current image.
+     * 
+     * @details This method:
+     * - Validates that an image is currently loaded
+     * - Applies edge detection using ImageFilters
+     * - Updates the display and properties panel
+     * - Uses Sobel algorithm with Gaussian blur for noise reduction
+     * 
+     * The edge detection algorithm:
+     * 1. Converts to grayscale using weighted average
+     * 2. Applies 5x5 Gaussian blur to reduce noise
+     * 3. Uses 3x3 Sobel kernels for edge detection
+     * 4. Calculates gradient magnitude and applies threshold
+     * 
+     * @note This is an immediate operation without progress tracking.
+     * @see ImageFilters::applyEdges() for the actual edge detection implementation
+     */
     void applyEdges()
     {
         if (!hasImage) return;
@@ -654,6 +778,24 @@ private slots:
         updatePropertiesPanel();
     }
     
+    /**
+     * @brief Resize the current image to specified dimensions.
+     * 
+     * Presents dialogs to the user to input new width and height values,
+     * then resizes the current image using nearest-neighbor interpolation.
+     * 
+     * @details This method:
+     * - Validates that an image is currently loaded
+     * - Shows input dialogs for width and height (1-10000 pixels)
+     * - Uses current image dimensions as default values
+     * - Applies resize transformation using ImageFilters
+     * - Updates the display and properties panel
+     * - Handles user cancellation gracefully
+     * 
+     * @note This is an immediate operation without progress tracking.
+     * @note The aspect ratio is not preserved during resize.
+     * @see ImageFilters::applyResize() for the actual resize implementation
+     */
     void applyResize()
     {
         if (!hasImage) return;
@@ -673,6 +815,25 @@ private slots:
         }
     }
     
+    /**
+     * @brief Apply blur effect to the current image with adjustable strength.
+     * 
+     * Presents a slider dialog to the user to specify blur strength (0-100%),
+     * then applies the blur effect to the current image with progress tracking
+     * and cancellation support.
+     * 
+     * @details This method:
+     * - Validates that an image is currently loaded
+     * - Shows a slider dialog for blur strength (0-100%)
+     * - Uses 60% as the default blur strength
+     * - Applies blur with progress tracking and cancellation support
+     * - Updates the display and properties panel
+     * - Handles user cancellation gracefully
+     * 
+     * @note This is a long-running operation that can be cancelled.
+     * @see ImageFilters::applyBlur() for the actual blur implementation
+     * @see getPercentWithSlider() for percentage input dialog
+     */
     void applyBlur()
     {
         if (!hasImage) return;
@@ -1147,11 +1308,39 @@ protected:
     ImageFilters* imageFilters;
 
     // Helpers
+    /**
+     * @brief Set the active filter value in the properties panel.
+     * 
+     * Updates the active filter display in the properties panel to show
+     * which filter was last applied to the image.
+     * 
+     * @param name The name of the filter to display
+     * 
+     * @note This method is used to maintain consistency between the actual
+     *       filter applied and the displayed filter name in the UI.
+     */
     void setActiveFilterValue(const QString &name)
     {
         ui.activeFilterValue->setText(name);
     }
 
+    /**
+     * @brief Format a byte count into a human-readable string.
+     * 
+     * Converts a byte count into a formatted string with appropriate units
+     * (B, KB, MB, GB, TB) and proper decimal precision.
+     * 
+     * @param bytes The number of bytes to format
+     * @return Formatted string with units (e.g., "1.5 MB", "256 B")
+     * 
+     * @details The formatting:
+     * - Uses binary units (1024-based) for consistency with file systems
+     * - Shows no decimal places for bytes, 2 decimal places for larger units
+     * - Returns "—" for negative values
+     * - Handles values up to TB (terabytes)
+     * 
+     * @note This is a static utility method used for displaying file sizes.
+     */
     static QString formatBytes(qint64 bytes)
     {
         if (bytes < 0) return "—";
@@ -1162,6 +1351,22 @@ protected:
         return QString::number(value, 'f', i == 0 ? 0 : 2) + " " + suffixes[i];
     }
 
+    /**
+     * @brief Update the properties panel with current image information.
+     * 
+     * Refreshes all the image properties displayed in the right-side panel,
+     * including dimensions, file size, format, and color mode information.
+     * 
+     * @details This method updates:
+     * - Image dimensions (width × height)
+     * - File size (if file path is known)
+     * - File format (if file path is known)
+     * - Color mode (defaults to RGB if unset)
+     * 
+     * @note This method should be called whenever the image changes or
+     *       when the properties panel needs to be refreshed.
+     * @see formatBytes() for file size formatting
+     */
     void updatePropertiesPanel()
     {
         if (!hasImage) return;
@@ -1178,6 +1383,27 @@ protected:
             ui.colorModeValue->setText("RGB");
         }
     }
+    /**
+     * @brief Save the current image using a file dialog.
+     * 
+     * Opens a save dialog to allow the user to choose a location and format
+     * for saving the current image, then performs the save operation.
+     * 
+     * @return true if the image was saved successfully, false if cancelled or failed
+     * 
+     * @details This method:
+     * - Opens a Qt file dialog for save location selection
+     * - Handles file format selection (PNG, JPEG, BMP)
+     * - Uses ImageIO for the actual save operation
+     * - Updates the unsaved changes flag on successful save
+     * - Updates the current file path and properties panel
+     * - Provides user feedback through status bar messages
+     * - Handles errors gracefully with error dialogs
+     * 
+     * @note This method is used internally by save operations and close events.
+     * @see ImageIO::saveToFile() for the actual file writing
+     * @see SAVE_FILTER for supported file formats
+     */
     bool saveImageWithDialog()
     {
         QString fileName = QFileDialog::getSaveFileName(this,
@@ -1196,6 +1422,25 @@ protected:
         }
     }
 
+    /**
+     * @brief Reset the UI to the no-image state.
+     * 
+     * Resets all UI elements to their initial state when no image is loaded,
+     * clearing history, disabling buttons, and resetting all displays.
+     * 
+     * @details This method:
+     * - Clears undo/redo history and updates button states
+     * - Resets the image label with placeholder text
+     * - Updates minimum window size and disables all buttons
+     * - Updates the status bar with appropriate message
+     * - Clears all properties panel values
+     * - Resets filter name tracking stacks
+     * 
+     * @note This method is called when unloading images or initializing
+     *       the application to ensure a consistent UI state.
+     * @see refreshButtons() for button state management
+     * @see updatePropertiesPanel() for properties display
+     */
     void resetUiToNoImageState()
     {
         // Clear undo/redo history
@@ -1220,6 +1465,28 @@ protected:
         while (!redoFilterNames.empty()) redoFilterNames.pop();
     }
 
+    /**
+     * @brief Finalize the successful loading of an image.
+     * 
+     * Completes the image loading process by updating all UI elements,
+     * clearing history, and setting up the application state for the new image.
+     * 
+     * @param filePath The path to the successfully loaded image file
+     * @param viaDrop Whether the image was loaded via drag and drop
+     * 
+     * @details This method:
+     * - Sets the current file path and clears unsaved changes flag
+     * - Updates the image display and minimum window size
+     * - Enables all buttons and clears undo/redo history
+     * - Updates the status bar with appropriate message
+     * - Resets filter and color mode displays
+     * - Updates the properties panel
+     * - Clears filter name tracking stacks
+     * 
+     * @note This method is called after successful image loading to ensure
+     *       the application is in a consistent state.
+     * @see loadImageFromPath() for the main loading implementation
+     */
     void finalizeSuccessfulLoad(const QString &filePath, bool viaDrop)
     {
         currentFilePath = filePath;
@@ -1240,6 +1507,28 @@ protected:
         while (!redoFilterNames.empty()) redoFilterNames.pop();
     }
 
+    /**
+     * @brief Load an image from the specified file path.
+     * 
+     * Loads an image from the given file path using the ImageIO class,
+     * handling errors gracefully and updating the application state.
+     * 
+     * @param filePath The path to the image file to load
+     * @param viaDrop Whether the image was loaded via drag and drop
+     * 
+     * @details This method:
+     * - Uses ImageIO to load the image with proper error handling
+     * - Sets both original and current image references
+     * - Marks that an image is loaded
+     * - Calls finalizeSuccessfulLoad() to complete the setup
+     * - Shows error dialogs and status messages on failure
+     * 
+     * @note This method is the main entry point for image loading operations.
+     * @see ImageIO::loadFromFile() for the actual file loading
+     * @see finalizeSuccessfulLoad() for post-load setup
+     * 
+     * @throws std::exception if image loading fails (handled internally)
+     */
     void loadImageFromPath(const QString &filePath, bool viaDrop)
     {
         try {
@@ -1253,12 +1542,50 @@ protected:
         }
     }
 
+    /**
+     * @brief Show a dialog to get user input from a list of options.
+     * 
+     * Displays a Qt input dialog with a dropdown list of options for the user
+     * to choose from. Returns the selected option or an empty string if cancelled.
+     * 
+     * @param title The dialog window title
+     * @param label The label text for the dialog
+     * @param options List of options to choose from
+     * @return The selected option string, or empty string if cancelled
+     * 
+     * @note This is a utility method used throughout the application for
+     *       getting user choices for various operations.
+     * @see QInputDialog::getItem() for the underlying Qt dialog
+     */
     QString getInputFromList(const QString &title, const QString &label, const QStringList &options)
     {
         bool ok;
         return QInputDialog::getItem(this, title, label, options, 0, false, &ok);
     }
 
+    /**
+     * @brief Show a dialog with a slider to get a percentage value from the user.
+     * 
+     * Creates a custom dialog with a horizontal slider (0-100%) and displays
+     * the current value in real-time. Returns the selected percentage value.
+     * 
+     * @param title The dialog window title
+     * @param label The label text for the dialog
+     * @param defaultValue The initial slider value (clamped to 0-100)
+     * @param ok Pointer to boolean to receive success status (can be nullptr)
+     * @return The selected percentage value (0-100)
+     * 
+     * @details The dialog includes:
+     * - A label with the prompt text
+     * - A horizontal slider with range 0-100
+     * - A value label showing current percentage
+     * - OK and Cancel buttons
+     * - Real-time value updates as slider moves
+     * 
+     * @note This is a utility method used for getting percentage values
+     *       for operations like blur strength and brightness adjustment.
+     * @see QSlider for the underlying slider widget
+     */
     int getPercentWithSlider(const QString &title, const QString &label, int defaultValue, bool *ok)
     {
         // Build a tiny dialog with a slider 0-100 and OK/Cancel
@@ -1291,6 +1618,27 @@ protected:
         return resultPercent;
     }
 
+    /**
+     * @brief Calculate the optimal display size maintaining aspect ratio.
+     * 
+     * Determines the best size to display an image within the available space
+     * while preserving the original aspect ratio and preventing upscaling.
+     * 
+     * @param imageSize The original image dimensions
+     * @param availableSize The available display space
+     * @return QSize representing the optimal display dimensions
+     * 
+     * @details The calculation:
+     * - Compares image and available space aspect ratios
+     * - Fits to width if image is wider than available space
+     * - Fits to height if image is taller than available space
+     * - Prevents upscaling by returning original size if larger
+     * - Maintains exact aspect ratio throughout
+     * 
+     * @note This method is used for smart image display that prevents
+     *       scrollbars while maintaining image quality.
+     * @see updateImageDisplay() for usage in image display
+     */
     QSize calculateAspectRatioSize(const QSize &imageSize, const QSize &availableSize)
     {
         double imageAspectRatio = static_cast<double>(imageSize.width()) / imageSize.height();
@@ -1314,6 +1662,28 @@ protected:
         
         return targetSize;
     }
+    /**
+     * @brief Execute a filter operation with cancellation support.
+     * 
+     * Runs a filter operation that can be cancelled by the user, providing
+     * progress tracking and the ability to restore the previous state.
+     * 
+     * @param filterCall Function to execute for the filter operation
+     * 
+     * @details This method:
+     * - Resets the cancellation flag
+     * - Saves the current image state for potential restoration
+     * - Saves state for undo functionality
+     * - Shows the cancel button for user interaction
+     * - Executes the filter operation
+     * - Updates the image display on success
+     * - Handles errors gracefully with error dialogs
+     * - Hides the cancel button when complete
+     * 
+     * @note This method is used for long-running operations that support
+     *       cancellation, such as grayscale, blur, and infrared filters.
+     * @see runSimpleFilter() for operations without cancellation support
+     */
     void runCancelableFilter(const std::function<void()> &filterCall)
     {
         cancelRequested = false;
@@ -1329,6 +1699,24 @@ protected:
         ui.cancelButton->setVisible(false);
     }
 
+    /**
+     * @brief Execute a simple filter operation without cancellation support.
+     * 
+     * Runs a filter operation that completes quickly and doesn't require
+     * cancellation support or progress tracking.
+     * 
+     * @param filterCall Function to execute for the filter operation
+     * 
+     * @details This method:
+     * - Saves state for undo functionality
+     * - Executes the filter operation
+     * - Updates the image display on success
+     * - Handles errors gracefully with error dialogs
+     * 
+     * @note This method is used for immediate operations that don't need
+     *       cancellation support, such as flip, rotate, and edge detection.
+     * @see runCancelableFilter() for operations with cancellation support
+     */
     void runSimpleFilter(const std::function<void()> &filterCall)
     {
         saveStateForUndo();
