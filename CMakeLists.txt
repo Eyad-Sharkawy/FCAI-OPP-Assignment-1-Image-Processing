@@ -66,6 +66,16 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
 )
 
+# Copy assets directory to build output
+if(EXISTS "${CMAKE_SOURCE_DIR}/assets")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_SOURCE_DIR}/assets"
+        "${CMAKE_BINARY_DIR}/bin/assets"
+        COMMENT "Copying assets directory to build output"
+    )
+endif()
+
 # Windows specific settings
 if(WIN32)
     set_target_properties(${PROJECT_NAME} PROPERTIES

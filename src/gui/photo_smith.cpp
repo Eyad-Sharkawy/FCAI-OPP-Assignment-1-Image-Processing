@@ -167,7 +167,7 @@ public:
         ui.setupUi(this);
         
         setWindowTitle("Photo Smith");
-        setWindowIcon(QIcon("assets/icon.jpg"));
+        setWindowIcon(QIcon("assets/icons/logo.png"));
         setMinimumSize(600, 400);
         
         // Set up the image label styling
@@ -1800,7 +1800,7 @@ protected:
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-    app.setWindowIcon(QIcon("assets/icon.jpg"));
+    app.setWindowIcon(QIcon("assets/icons/logo.png"));
     
     PhotoSmith window;
     window.show();
