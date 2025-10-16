@@ -439,3 +439,37 @@ Use the provided `Doxyfile` in the repository root. Key settings:
 doxygen Doxyfile
 ```
 Open `docs/api/html/index.html` in your browser.
+
+### Recommended Comment Conventions
+
+- Prefer documenting public APIs in headers.
+- Start with a one-line `\brief` summary; expand with details as needed.
+- Tag parameters and return values with `\param` and `\return`.
+- Document error conditions and exceptions with `\throws`.
+- Use `\defgroup` and `@{`/`@}` to group related APIs.
+
+Examples:
+
+```cpp
+/// \file ImageIO.h
+/// \brief File I/O utilities for reading and writing images.
+
+/** \brief Load an image from file.
+ *  \param path UTF-8 file path.
+ *  \return Loaded image.
+ *  \throws std::runtime_error on read failure.
+ */
+Image loadFromFile(const std::string& path);
+
+/** \defgroup IO Image I/O
+ *  High-level file operations.
+ *  @{ */
+bool saveToFile(const Image& image, const std::string& path);
+/** @} */
+```
+
+### Troubleshooting Doxygen
+
+- Diagrams missing: ensure Graphviz is installed and `HAVE_DOT = YES`.
+- Empty pages: confirm `INPUT` includes `src` and markdown files; rebuild.
+- Symbols not linked: add headers to `INPUT` and ensure declarations are visible.

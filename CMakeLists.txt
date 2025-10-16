@@ -22,7 +22,7 @@ if(WIN32)
 endif()
 
 # Find Qt6 components
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets Multimedia MultimediaWidgets)
 
 # Enable Qt's MOC, UIC, and RCC
 set(CMAKE_AUTOMOC ON)
@@ -73,6 +73,8 @@ endif()
 target_link_libraries(${PROJECT_NAME} 
     Qt6::Core 
     Qt6::Widgets
+    Qt6::Multimedia
+    Qt6::MultimediaWidgets
 )
 
 # Set output directory

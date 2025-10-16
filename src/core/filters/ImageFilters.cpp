@@ -1033,6 +1033,372 @@ void ImageFilters::applyResize(Image& currentImage, int width, int height)
     }
 }
 
+/**
+ * @brief Skew the image horizontally by a given angle.
+ *
+ * Expands the canvas to fit the skewed image. Background is filled with white.
+ */
+void ImageFilters::applySkew(Image& currentImage, double angleDegrees)
+{
+    if (statusBar) {
+        statusBar->showMessage("Applying Skew filter...");
+    }
+    QApplication::processEvents();
+
+    try {
+        const double angleRad = angleDegrees * M_PI / 180.0;
+        const double tanA = std::tan(angleRad);
+
+        // Compute horizontal shift range over all rows
+        int minShift = 0;
+        int maxShift = 0;
+        if (currentImage.height > 0) {
+            int shiftTop = static_cast<int>(std::floor(tanA * 0));
+            int shiftBottom = static_cast<int>(std::floor(tanA * (currentImage.height - 1)));
+            minShift = std::min(shiftTop, shiftBottom);
+            maxShift = std::max(shiftTop, shiftBottom);
+        }
+
+        const int newWidth = std::max(1, (int)currentImage.width + (maxShift - minShift));
+        const int newHeight = currentImage.height;
+
+        Image skewed(newWidth, newHeight);
+        // Fill background white
+        for (int y = 0; y < newHeight; ++y) {
+            for (int x = 0; x < newWidth; ++x) {
+                skewed.setPixel(x, y, 0, 255);
+                skewed.setPixel(x, y, 1, 255);
+                skewed.setPixel(x, y, 2, 255);
+            }
+        }
+
+        // Copy pixels with per-row shift, offset to keep within bounds
+        for (int y = 0; y < currentImage.height; ++y) {
+            int shift = static_cast<int>(std::floor(tanA * y));
+            int base = shift - minShift; // normalize so min lands at 0
+            for (int x = 0; x < currentImage.width; ++x) {
+                int nx = x + base;
+                if (nx >= 0 && nx < newWidth) {
+                    for (int c = 0; c < 3; ++c) {
+                        skewed.setPixel(nx, y, c, currentImage(x, y, c));
+                    }
+                }
+            }
+        }
+
+        currentImage = skewed;
+        if (statusBar) {
+            statusBar->showMessage(QString("Skew filter applied (%1°)").arg(angleDegrees));
+        }
+    } catch (const std::exception& e) {
+        if (statusBar) {
+            statusBar->showMessage(QString("Filter failed: %1").arg(e.what()));
+        }
+    }
+}
+
+void ImageFilters::applyEmboss(Image& currentImage)
+{
+    if (statusBar) statusBar->showMessage("Applying Emboss...");
+    QApplication::processEvents();
+    Image embossed(currentImage.width, currentImage.height);
+    for (int y = 0; y < currentImage.height - 1; y++) {
+        for (int x = 0; x < currentImage.width - 1; x++) {
+            int r1 = currentImage(x, y, 0);
+            int g1 = currentImage(x, y, 1);
+            int b1 = currentImage(x, y, 2);
+            int r2 = currentImage(x + 1, y + 1, 0);
+            int g2 = currentImage(x + 1, y + 1, 1);
+            int b2 = currentImage(x + 1, y + 1, 2);
+            int diffR = std::clamp(r1 - r2 + 128, 0, 255);
+            int diffG = std::clamp(g1 - g2 + 128, 0, 255);
+            int diffB = std::clamp(b1 - b2 + 128, 0, 255);
+            int gray = (diffR + diffG + diffB) / 3;
+            for (int c = 0; c < 3; ++c) embossed.setPixel(x, y, c, gray);
+        }
+    }
+    currentImage = embossed;
+    if (statusBar) statusBar->showMessage("Emboss applied");
+}
+
+void ImageFilters::applyEmboss(Image& currentImage, Image& preFilterImage, std::atomic<bool>& cancelRequested)
+{
+    if (progressBar) { progressBar->setVisible(true); progressBar->setRange(0, currentImage.height); progressBar->setValue(0); }
+    if (statusBar) statusBar->showMessage("Applying Emboss... (Click Cancel to stop)");
+    QApplication::processEvents();
+    Image embossed(currentImage.width, currentImage.height);
+    for (int y = 0; y < currentImage.height - 1; y++) {
+        if (cancelRequested) { checkCancellation(cancelRequested, currentImage, preFilterImage, "Emboss"); return; }
+        for (int x = 0; x < currentImage.width - 1; x++) {
+            int r1 = currentImage(x, y, 0);
+            int g1 = currentImage(x, y, 1);
+            int b1 = currentImage(x, y, 2);
+            int r2 = currentImage(x + 1, y + 1, 0);
+            int g2 = currentImage(x + 1, y + 1, 1);
+            int b2 = currentImage(x + 1, y + 1, 2);
+            int diffR = std::clamp(r1 - r2 + 128, 0, 255);
+            int diffG = std::clamp(g1 - g2 + 128, 0, 255);
+            int diffB = std::clamp(b1 - b2 + 128, 0, 255);
+            int gray = (diffR + diffG + diffB) / 3;
+            for (int c = 0; c < 3; ++c) embossed.setPixel(x, y, c, gray);
+        }
+        updateProgress(y + 1, currentImage.height, 20);
+    }
+    currentImage = embossed;
+    if (statusBar) statusBar->showMessage("Emboss applied");
+    if (progressBar) progressBar->setVisible(false);
+}
+
+void ImageFilters::applyDoubleVision(Image& currentImage, int offset)
+{
+    if (statusBar) statusBar->showMessage("Applying Double Vision...");
+    QApplication::processEvents();
+    offset = std::max(0, offset);
+    Image out(currentImage.width, currentImage.height);
+    for (int y = 0; y < currentImage.height; ++y) {
+        for (int x = 0; x < currentImage.width; ++x) {
+            int nx = x + offset;
+            if (nx >= currentImage.width) nx = currentImage.width - 1;
+            int R1 = currentImage(x, y, 0);
+            int G1 = currentImage(x, y, 1);
+            int B1 = currentImage(x, y, 2);
+            int R2 = currentImage(nx, y, 0);
+            int G2 = currentImage(nx, y, 1);
+            int B2 = currentImage(nx, y, 2);
+            int R = std::min(255, int(R1 * 0.6 + R2 * 0.4) + 25);
+            int G = int(G1 * 0.6 + G2 * 0.4);
+            int B = int(B1 * 0.6 + B2 * 0.4);
+            out.setPixel(x, y, 0, R);
+            out.setPixel(x, y, 1, G);
+            out.setPixel(x, y, 2, B);
+        }
+    }
+    currentImage = out;
+    if (statusBar) statusBar->showMessage("Double Vision applied");
+}
+
+void ImageFilters::applyDoubleVision(Image& currentImage, Image& preFilterImage, std::atomic<bool>& cancelRequested, int offset)
+{
+    if (progressBar) { progressBar->setVisible(true); progressBar->setRange(0, currentImage.height); progressBar->setValue(0); }
+    if (statusBar) statusBar->showMessage("Applying Double Vision... (Click Cancel to stop)");
+    QApplication::processEvents();
+    offset = std::max(0, offset);
+    Image out(currentImage.width, currentImage.height);
+    for (int y = 0; y < currentImage.height; ++y) {
+        if (cancelRequested) { checkCancellation(cancelRequested, currentImage, preFilterImage, "Double Vision"); return; }
+        for (int x = 0; x < currentImage.width; ++x) {
+            int nx = x + offset;
+            if (nx >= currentImage.width) nx = currentImage.width - 1;
+            int R1 = currentImage(x, y, 0);
+            int G1 = currentImage(x, y, 1);
+            int B1 = currentImage(x, y, 2);
+            int R2 = currentImage(nx, y, 0);
+            int G2 = currentImage(nx, y, 1);
+            int B2 = currentImage(nx, y, 2);
+            int R = std::min(255, int(R1 * 0.6 + R2 * 0.4) + 25);
+            int G = int(G1 * 0.6 + G2 * 0.4);
+            int B = int(B1 * 0.6 + B2 * 0.4);
+            out.setPixel(x, y, 0, R);
+            out.setPixel(x, y, 1, G);
+            out.setPixel(x, y, 2, B);
+        }
+        updateProgress(y + 1, currentImage.height, 20);
+    }
+    currentImage = out;
+    if (statusBar) statusBar->showMessage("Double Vision applied");
+    if (progressBar) progressBar->setVisible(false);
+}
+
+void ImageFilters::applyOilPainting(Image& currentImage, int radius, int intensity)
+{
+    if (statusBar) statusBar->showMessage("Applying Oil Painting...");
+    QApplication::processEvents();
+    radius = std::max(1, radius);
+    intensity = std::max(1, std::min(255, intensity));
+    Image result(currentImage.width, currentImage.height);
+    for (int i = 0; i < currentImage.width; ++i) {
+        for (int j = 0; j < currentImage.height; ++j) {
+            int colorCount[256] = {0};
+            int redSum[256] = {0};
+            int greenSum[256] = {0};
+            int blueSum[256] = {0};
+            for (int dy = -radius; dy <= radius; ++dy) {
+                for (int dx = -radius; dx <= radius; ++dx) {
+                    int nx = i + dx, ny = j + dy;
+                    if (nx >= 0 && nx < currentImage.width && ny >= 0 && ny < currentImage.height) {
+                        int r = currentImage(nx, ny, 0);
+                        int g = currentImage(nx, ny, 1);
+                        int b = currentImage(nx, ny, 2);
+                        int avg = (r + g + b) / 3;
+                        int level = std::min(255, std::max(0, avg / std::max(1, intensity)));
+                        colorCount[level]++;
+                        redSum[level] += r;
+                        greenSum[level] += g;
+                        blueSum[level] += b;
+                    }
+                }
+            }
+            int maxCount = 0, maxLevel = 0;
+            for (int k = 0; k < 256; ++k) if (colorCount[k] > maxCount) { maxCount = colorCount[k]; maxLevel = k; }
+            int denom = std::max(1, colorCount[maxLevel]);
+            result.setPixel(i, j, 0, redSum[maxLevel] / denom);
+            result.setPixel(i, j, 1, greenSum[maxLevel] / denom);
+            result.setPixel(i, j, 2, blueSum[maxLevel] / denom);
+        }
+    }
+    currentImage = result;
+    if (statusBar) statusBar->showMessage("Oil Painting applied");
+}
+
+void ImageFilters::applyOilPainting(Image& currentImage, Image& preFilterImage, std::atomic<bool>& cancelRequested, int radius, int intensity)
+{
+    if (progressBar) { progressBar->setVisible(true); progressBar->setRange(0, currentImage.height); progressBar->setValue(0); }
+    if (statusBar) statusBar->showMessage("Applying Oil Painting... (Click Cancel to stop)");
+    QApplication::processEvents();
+    radius = std::max(1, radius);
+    intensity = std::max(1, std::min(255, intensity));
+    Image result(currentImage.width, currentImage.height);
+    for (int j = 0; j < currentImage.height; ++j) {
+        if (cancelRequested) { checkCancellation(cancelRequested, currentImage, preFilterImage, "Oil Painting"); return; }
+        for (int i = 0; i < currentImage.width; ++i) {
+            int colorCount[256] = {0};
+            int redSum[256] = {0};
+            int greenSum[256] = {0};
+            int blueSum[256] = {0};
+            for (int dy = -radius; dy <= radius; ++dy) {
+                for (int dx = -radius; dx <= radius; ++dx) {
+                    int nx = i + dx, ny = j + dy;
+                    if (nx >= 0 && nx < currentImage.width && ny >= 0 && ny < currentImage.height) {
+                        int r = currentImage(nx, ny, 0);
+                        int g = currentImage(nx, ny, 1);
+                        int b = currentImage(nx, ny, 2);
+                        int avg = (r + g + b) / 3;
+                        int level = std::min(255, std::max(0, avg / std::max(1, intensity)));
+                        colorCount[level]++;
+                        redSum[level] += r;
+                        greenSum[level] += g;
+                        blueSum[level] += b;
+                    }
+                }
+            }
+            int maxCount = 0, maxLevel = 0;
+            for (int k = 0; k < 256; ++k) if (colorCount[k] > maxCount) { maxCount = colorCount[k]; maxLevel = k; }
+            int denom = std::max(1, colorCount[maxLevel]);
+            result.setPixel(i, j, 0, redSum[maxLevel] / denom);
+            result.setPixel(i, j, 1, greenSum[maxLevel] / denom);
+            result.setPixel(i, j, 2, blueSum[maxLevel] / denom);
+        }
+        updateProgress(j + 1, currentImage.height, 5);
+    }
+    currentImage = result;
+    if (statusBar) statusBar->showMessage("Oil Painting applied");
+    if (progressBar) progressBar->setVisible(false);
+}
+
+void ImageFilters::applyEnhanceSunlight(Image& currentImage)
+{
+    if (statusBar) statusBar->showMessage("Enhancing Sunlight...");
+    QApplication::processEvents();
+    Image result(currentImage.width, currentImage.height);
+    for (int x = 0; x < currentImage.width; ++x) {
+        for (int y = 0; y < currentImage.height; ++y) {
+            for (int c = 0; c < currentImage.channels; ++c) {
+                int v = currentImage(x, y, c);
+                if (c == 0 || c == 1) v = std::min(255, int(v * 1.4)); // boost R and G
+                result.setPixel(x, y, c, v);
+            }
+        }
+    }
+    currentImage = result;
+    if (statusBar) statusBar->showMessage("Sunlight enhanced");
+}
+
+void ImageFilters::applyEnhanceSunlight(Image& currentImage, Image& preFilterImage, std::atomic<bool>& cancelRequested)
+{
+    if (progressBar) { progressBar->setVisible(true); progressBar->setRange(0, currentImage.height); progressBar->setValue(0); }
+    if (statusBar) statusBar->showMessage("Enhancing Sunlight... (Click Cancel to stop)");
+    QApplication::processEvents();
+    Image result(currentImage.width, currentImage.height);
+    for (int y = 0; y < currentImage.height; ++y) {
+        if (cancelRequested) { checkCancellation(cancelRequested, currentImage, preFilterImage, "Enhance Sunlight"); return; }
+        for (int x = 0; x < currentImage.width; ++x) {
+            for (int c = 0; c < 3; ++c) {
+                int v = currentImage(x, y, c);
+                if (c == 0 || c == 1) v = std::min(255, int(v * 1.4)); // boost R and G
+                result.setPixel(x, y, c, v);
+            }
+        }
+        updateProgress(y + 1, currentImage.height, 20);
+    }
+    currentImage = result;
+    if (statusBar) statusBar->showMessage("Sunlight enhanced");
+    if (progressBar) progressBar->setVisible(false);
+}
+
+void ImageFilters::applyFishEye(Image& currentImage)
+{
+    if (statusBar) statusBar->showMessage("Applying Fish-Eye...");
+    QApplication::processEvents();
+    Image out(currentImage.width, currentImage.height);
+    float centerX = currentImage.width / 2.0f;
+    float centerY = currentImage.height / 2.0f;
+    float radius = std::min(centerX, centerY);
+    for (int y = 0; y < currentImage.height; ++y) {
+        for (int x = 0; x < currentImage.width; ++x) {
+            float dx = (x - centerX) / radius;
+            float dy = (y - centerY) / radius;
+            float dist = std::sqrt(dx * dx + dy * dy);
+            if (dist < 1.0f && dist > 0.0f) {
+                float factor = 1.0f;
+                float newDist = std::pow(dist, factor * 0.75f);
+                float nx = centerX + (dx / dist) * newDist * radius;
+                float ny = centerY + (dy / dist) * newDist * radius;
+                int ix = std::clamp(int(nx), 0, (int)currentImage.width - 1);
+                int iy = std::clamp(int(ny), 0, (int)currentImage.height - 1);
+                for (int c = 0; c < 3; ++c) out.setPixel(x, y, c, currentImage(ix, iy, c));
+            } else {
+                for (int c = 0; c < 3; ++c) out.setPixel(x, y, c, currentImage(x, y, c));
+            }
+        }
+    }
+    currentImage = out;
+    if (statusBar) statusBar->showMessage("Fish-Eye applied");
+}
+
+void ImageFilters::applyFishEye(Image& currentImage, Image& preFilterImage, std::atomic<bool>& cancelRequested)
+{
+    if (progressBar) { progressBar->setVisible(true); progressBar->setRange(0, currentImage.height); progressBar->setValue(0); }
+    if (statusBar) statusBar->showMessage("Applying Fish-Eye... (Click Cancel to stop)");
+    QApplication::processEvents();
+    Image out(currentImage.width, currentImage.height);
+    float centerX = currentImage.width / 2.0f;
+    float centerY = currentImage.height / 2.0f;
+    float radius = std::min(centerX, centerY);
+    for (int y = 0; y < currentImage.height; ++y) {
+        if (cancelRequested) { checkCancellation(cancelRequested, currentImage, preFilterImage, "Fish-Eye"); return; }
+        for (int x = 0; x < currentImage.width; ++x) {
+            float dx = (x - centerX) / radius;
+            float dy = (y - centerY) / radius;
+            float dist = std::sqrt(dx * dx + dy * dy);
+            if (dist < 1.0f && dist > 0.0f) {
+                float factor = 1.0f;
+                float newDist = std::pow(dist, factor * 0.75f);
+                float nx = centerX + (dx / dist) * newDist * radius;
+                float ny = centerY + (dy / dist) * newDist * radius;
+                int ix = std::clamp(int(nx), 0, (int)currentImage.width - 1);
+                int iy = std::clamp(int(ny), 0, (int)currentImage.height - 1);
+                for (int c = 0; c < 3; ++c) out.setPixel(x, y, c, currentImage(ix, iy, c));
+            } else {
+                for (int c = 0; c < 3; ++c) out.setPixel(x, y, c, currentImage(x, y, c));
+            }
+        }
+        updateProgress(y + 1, currentImage.height, 10);
+    }
+    currentImage = out;
+    if (statusBar) statusBar->showMessage("Fish-Eye applied");
+    if (progressBar) progressBar->setVisible(false);
+}
+
 void ImageFilters::applyBlur(Image& currentImage, Image& preFilterImage, std::atomic<bool>& cancelRequested)
 {
     applyBlur(currentImage, preFilterImage, cancelRequested, 60);

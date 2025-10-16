@@ -1,12 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  File: mainwindow.ui
-  Purpose: Qt Designer UI for Image Studio main window (buttons, menus, layouts)
-  Notes: This file defines the GUI layout used by Image Studio v2.0.0.
-         See image_studio.cpp for behavior and signal/slot connections.
-         Supported image formats: PNG, JPEG, BMP, TGA.
-         Last updated: 2025-10-14
--->
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
@@ -14,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1200</width>
-    <height>800</height>
+    <width>1218</width>
+    <height>1046</height>
    </rect>
   </property>
   <property name="acceptDrops">
@@ -60,7 +52,6 @@ QProgressBar::chunk { background-color: #3c6e71; }</string>
      <number>0</number>
     </property>
     <item>
-     <!-- LEFT SIDEBAR: Filter Categories -->
      <widget class="QFrame" name="sidebarFrame">
       <property name="minimumSize">
        <size>
@@ -75,7 +66,7 @@ QProgressBar::chunk { background-color: #3c6e71; }</string>
        </size>
       </property>
       <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
+       <enum>QFrame::Shape::StyledPanel</enum>
       </property>
       <layout class="QVBoxLayout" name="sidebarLayout">
        <property name="spacing">
@@ -83,11 +74,11 @@ QProgressBar::chunk { background-color: #3c6e71; }</string>
        </property>
        <item>
         <widget class="QLabel" name="basicFiltersLabel">
-         <property name="text">
-          <string>BASIC FILTERS</string>
-         </property>
          <property name="styleSheet">
           <string>font-weight: bold; color: #888; font-size: 10px;</string>
+         </property>
+         <property name="text">
+          <string>BASIC FILTERS</string>
          </property>
         </widget>
        </item>
@@ -169,11 +160,11 @@ QProgressBar::chunk { background-color: #3c6e71; }</string>
        </item>
        <item>
         <widget class="QLabel" name="adjustmentsLabel">
-         <property name="text">
-          <string>ADJUSTMENTS</string>
-         </property>
          <property name="styleSheet">
           <string>font-weight: bold; color: #888; font-size: 10px;</string>
+         </property>
+         <property name="text">
+          <string>ADJUSTMENTS</string>
          </property>
         </widget>
        </item>
@@ -236,11 +227,106 @@ QProgressBar::chunk { background-color: #3c6e71; }</string>
        </item>
        <item>
         <widget class="QLabel" name="effectsLabel">
+         <property name="styleSheet">
+          <string>font-weight: bold; color: #888; font-size: 10px;</string>
+         </property>
          <property name="text">
           <string>EFFECTS</string>
          </property>
-         <property name="styleSheet">
-          <string>font-weight: bold; color: #888; font-size: 10px;</string>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="embossButton">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>50</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Emboss</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="doubleVisionButton">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>50</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Double Vision</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="oilPaintingButton">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>50</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Oil Painting</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="sunlightButton">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>50</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Enhance Sunlight</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="fishEyeButton">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>50</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Fish-Eye</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -304,7 +390,7 @@ QProgressBar::chunk { background-color: #3c6e71; }</string>
        <item>
         <spacer name="sidebarSpacer">
          <property name="orientation">
-          <enum>Qt::Vertical</enum>
+          <enum>Qt::Orientation::Vertical</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -318,10 +404,9 @@ QProgressBar::chunk { background-color: #3c6e71; }</string>
      </widget>
     </item>
     <item>
-     <!-- CENTER PANEL: Image Preview and Controls -->
      <widget class="QFrame" name="centerFrame">
       <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
+       <enum>QFrame::Shape::StyledPanel</enum>
       </property>
       <layout class="QVBoxLayout" name="centerLayout">
        <property name="spacing">
@@ -340,7 +425,6 @@ QProgressBar::chunk { background-color: #3c6e71; }</string>
         <number>0</number>
        </property>
        <item>
-        <!-- Toolbar -->
         <widget class="QFrame" name="toolbarFrame">
          <property name="minimumSize">
           <size>
@@ -355,9 +439,86 @@ QProgressBar::chunk { background-color: #3c6e71; }</string>
           </size>
          </property>
          <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
+          <enum>QFrame::Shape::StyledPanel</enum>
          </property>
          <layout class="QHBoxLayout" name="toolbarLayout">
+          <item>
+           <widget class="QLabel" name="appIconLabel">
+            <property name="minimumSize">
+             <size>
+              <width>24</width>
+              <height>24</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>24</width>
+              <height>24</height>
+             </size>
+            </property>
+            <property name="pixmap">
+             <pixmap resource="../../resources.qrc">:/icons/assets/icons/logo.png</pixmap>
+            </property>
+            <property name="scaledContents">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="appNameLabel">
+            <property name="styleSheet">
+             <string>font-weight: bold; font-size: 14px; margin-left: 2px;</string>
+            </property>
+            <property name="text">
+             <string>Photo Smith</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignmentFlag::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="brandingRightSpacer">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Policy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>30</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="cameraButton">
+            <property name="minimumSize">
+             <size>
+              <width>40</width>
+              <height>32</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>Capture from Camera</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="../../resources.qrc">
+              <normaloff>:/icons/assets/icons/camera.svg</normaloff>:/icons/assets/icons/camera.svg</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>16</width>
+              <height>16</height>
+             </size>
+            </property>
+           </widget>
+          </item>
           <item>
            <widget class="QPushButton" name="loadButton">
             <property name="minimumSize">
@@ -370,6 +531,43 @@ QProgressBar::chunk { background-color: #3c6e71; }</string>
              <string>Open Image</string>
             </property>
            </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="brandingWidget" native="true">
+            <layout class="QHBoxLayout" name="brandingLayout">
+             <property name="spacing">
+              <number>6</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <spacer name="brandingLeftSpacer">
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Policy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>12</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
           </item>
           <item>
            <widget class="QPushButton" name="saveButton">
@@ -406,7 +604,7 @@ QProgressBar::chunk { background-color: #3c6e71; }</string>
           <item>
            <spacer name="toolbarSpacer">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -452,7 +650,6 @@ QProgressBar::chunk { background-color: #3c6e71; }</string>
         </widget>
        </item>
        <item>
-        <!-- Image Preview Area -->
         <widget class="QScrollArea" name="scrollArea">
          <property name="acceptDrops">
           <bool>true</bool>
@@ -465,8 +662,8 @@ QProgressBar::chunk { background-color: #3c6e71; }</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>648</width>
-            <height>519</height>
+            <width>686</width>
+            <height>760</height>
            </rect>
           </property>
           <property name="acceptDrops">
@@ -494,7 +691,6 @@ QProgressBar::chunk { background-color: #3c6e71; }</string>
         </widget>
        </item>
        <item>
-        <!-- Controls Panel -->
         <widget class="QFrame" name="controlsFrame">
          <property name="minimumSize">
           <size>
@@ -509,16 +705,16 @@ QProgressBar::chunk { background-color: #3c6e71; }</string>
           </size>
          </property>
          <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
+          <enum>QFrame::Shape::StyledPanel</enum>
          </property>
          <layout class="QVBoxLayout" name="controlsLayout">
           <item>
            <widget class="QLabel" name="controlsTitle">
-            <property name="text">
-             <string>FILTER CONTROLS</string>
-            </property>
             <property name="styleSheet">
              <string>font-weight: bold; color: #888; font-size: 10px;</string>
+            </property>
+            <property name="text">
+             <string>FILTER CONTROLS</string>
             </property>
            </widget>
           </item>
@@ -589,6 +785,22 @@ QProgressBar::chunk { background-color: #3c6e71; }</string>
              </widget>
             </item>
             <item>
+             <widget class="QPushButton" name="skewButton">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>35</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Skew</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QPushButton" name="mergeButton">
               <property name="enabled">
                <bool>false</bool>
@@ -636,7 +848,7 @@ QProgressBar::chunk { background-color: #3c6e71; }</string>
           <item>
            <spacer name="controlsSpacer">
             <property name="orientation">
-             <enum>Qt::Vertical</enum>
+             <enum>Qt::Orientation::Vertical</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -653,7 +865,6 @@ QProgressBar::chunk { background-color: #3c6e71; }</string>
      </widget>
     </item>
     <item>
-     <!-- RIGHT SIDEBAR: Properties Panel -->
      <widget class="QFrame" name="propertiesFrame">
       <property name="minimumSize">
        <size>
@@ -668,23 +879,23 @@ QProgressBar::chunk { background-color: #3c6e71; }</string>
        </size>
       </property>
       <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
+       <enum>QFrame::Shape::StyledPanel</enum>
       </property>
       <layout class="QVBoxLayout" name="propertiesLayout">
        <item>
         <widget class="QLabel" name="imagePropertiesLabel">
-         <property name="text">
-          <string>IMAGE PROPERTIES</string>
-         </property>
          <property name="styleSheet">
           <string>font-weight: bold; color: #888; font-size: 10px;</string>
+         </property>
+         <property name="text">
+          <string>IMAGE PROPERTIES</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QFrame" name="propertyLine1">
          <property name="frameShape">
-          <enum>QFrame::HLine</enum>
+          <enum>QFrame::Shape::HLine</enum>
          </property>
         </widget>
        </item>
@@ -692,18 +903,18 @@ QProgressBar::chunk { background-color: #3c6e71; }</string>
         <layout class="QHBoxLayout" name="dimensionsLayout">
          <item>
           <widget class="QLabel" name="dimensionsLabel">
-           <property name="text">
-            <string>Dimensions</string>
-           </property>
            <property name="styleSheet">
             <string>color: #888;</string>
+           </property>
+           <property name="text">
+            <string>Dimensions</string>
            </property>
           </widget>
          </item>
          <item>
           <spacer name="dimensionsSpacer">
            <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+            <enum>Qt::Orientation::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -725,7 +936,7 @@ QProgressBar::chunk { background-color: #3c6e71; }</string>
        <item>
         <widget class="QFrame" name="propertyLine2">
          <property name="frameShape">
-          <enum>QFrame::HLine</enum>
+          <enum>QFrame::Shape::HLine</enum>
          </property>
         </widget>
        </item>
@@ -733,18 +944,18 @@ QProgressBar::chunk { background-color: #3c6e71; }</string>
         <layout class="QHBoxLayout" name="fileSizeLayout">
          <item>
           <widget class="QLabel" name="fileSizeLabel">
-           <property name="text">
-            <string>File Size</string>
-           </property>
            <property name="styleSheet">
             <string>color: #888;</string>
+           </property>
+           <property name="text">
+            <string>File Size</string>
            </property>
           </widget>
          </item>
          <item>
           <spacer name="fileSizeSpacer">
            <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+            <enum>Qt::Orientation::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -766,7 +977,7 @@ QProgressBar::chunk { background-color: #3c6e71; }</string>
        <item>
         <widget class="QFrame" name="propertyLine3">
          <property name="frameShape">
-          <enum>QFrame::HLine</enum>
+          <enum>QFrame::Shape::HLine</enum>
          </property>
         </widget>
        </item>
@@ -774,18 +985,18 @@ QProgressBar::chunk { background-color: #3c6e71; }</string>
         <layout class="QHBoxLayout" name="colorModeLayout">
          <item>
           <widget class="QLabel" name="colorModeLabel">
-           <property name="text">
-            <string>Color Mode</string>
-           </property>
            <property name="styleSheet">
             <string>color: #888;</string>
+           </property>
+           <property name="text">
+            <string>Color Mode</string>
            </property>
           </widget>
          </item>
          <item>
           <spacer name="colorModeSpacer">
            <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+            <enum>Qt::Orientation::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -807,7 +1018,7 @@ QProgressBar::chunk { background-color: #3c6e71; }</string>
        <item>
         <widget class="QFrame" name="propertyLine4">
          <property name="frameShape">
-          <enum>QFrame::HLine</enum>
+          <enum>QFrame::Shape::HLine</enum>
          </property>
         </widget>
        </item>
@@ -815,18 +1026,18 @@ QProgressBar::chunk { background-color: #3c6e71; }</string>
         <layout class="QHBoxLayout" name="formatLayout">
          <item>
           <widget class="QLabel" name="formatLabel">
-           <property name="text">
-            <string>Format</string>
-           </property>
            <property name="styleSheet">
             <string>color: #888;</string>
+           </property>
+           <property name="text">
+            <string>Format</string>
            </property>
           </widget>
          </item>
          <item>
           <spacer name="formatSpacer">
            <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+            <enum>Qt::Orientation::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -848,17 +1059,17 @@ QProgressBar::chunk { background-color: #3c6e71; }</string>
        <item>
         <widget class="QFrame" name="propertyLine5">
          <property name="frameShape">
-          <enum>QFrame::HLine</enum>
+          <enum>QFrame::Shape::HLine</enum>
          </property>
         </widget>
        </item>
        <item>
         <spacer name="propertiesSpacer1">
          <property name="orientation">
-          <enum>Qt::Vertical</enum>
+          <enum>Qt::Orientation::Vertical</enum>
          </property>
          <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
+          <enum>QSizePolicy::Policy::Fixed</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -870,18 +1081,18 @@ QProgressBar::chunk { background-color: #3c6e71; }</string>
        </item>
        <item>
         <widget class="QLabel" name="filterSettingsLabel">
-         <property name="text">
-          <string>FILTER SETTINGS</string>
-         </property>
          <property name="styleSheet">
           <string>font-weight: bold; color: #888; font-size: 10px;</string>
+         </property>
+         <property name="text">
+          <string>FILTER SETTINGS</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QFrame" name="propertyLine6">
          <property name="frameShape">
-          <enum>QFrame::HLine</enum>
+          <enum>QFrame::Shape::HLine</enum>
          </property>
         </widget>
        </item>
@@ -889,18 +1100,18 @@ QProgressBar::chunk { background-color: #3c6e71; }</string>
         <layout class="QHBoxLayout" name="activeFilterLayout">
          <item>
           <widget class="QLabel" name="activeFilterLabel">
-           <property name="text">
-            <string>Active Filter</string>
-           </property>
            <property name="styleSheet">
             <string>color: #888;</string>
+           </property>
+           <property name="text">
+            <string>Active Filter</string>
            </property>
           </widget>
          </item>
          <item>
           <spacer name="activeFilterSpacer">
            <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+            <enum>Qt::Orientation::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -922,7 +1133,7 @@ QProgressBar::chunk { background-color: #3c6e71; }</string>
        <item>
         <widget class="QFrame" name="propertyLine7">
          <property name="frameShape">
-          <enum>QFrame::HLine</enum>
+          <enum>QFrame::Shape::HLine</enum>
          </property>
         </widget>
        </item>
@@ -945,7 +1156,7 @@ QProgressBar::chunk { background-color: #3c6e71; }</string>
        <item>
         <spacer name="propertiesSpacer2">
          <property name="orientation">
-          <enum>Qt::Vertical</enum>
+          <enum>Qt::Orientation::Vertical</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -965,8 +1176,8 @@ QProgressBar::chunk { background-color: #3c6e71; }</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1200</width>
-     <height>21</height>
+     <width>1218</width>
+     <height>33</height>
     </rect>
    </property>
    <widget class="QMenu" name="fileMenu">
@@ -1126,6 +1337,8 @@ QProgressBar::chunk { background-color: #3c6e71; }</string>
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../resources.qrc"/>
+ </resources>
  <connections/>
- </ui>
+</ui>

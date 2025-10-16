@@ -72,6 +72,12 @@
 #include <QMouseEvent>
 #include <QProgressBar>
 #include <QCloseEvent>
+#include <QCamera>
+#include <QMediaCaptureSession>
+#include <QImageCapture>
+#include <QCameraDevice>
+#include <QMediaDevices>
+#include <QVideoWidget>
 #include <cmath>
 #include <algorithm>
 #include <stack>
@@ -166,6 +172,23 @@ public:
     {
         ui.setupUi(this);
         
+        // Ensure momentary buttons (restore color after click)
+        ui.grayscaleButton->setCheckable(false);
+        ui.blackWhiteButton->setCheckable(false);
+        ui.invertButton->setCheckable(false);
+        ui.blurButton->setCheckable(false);
+        ui.darkLightButton->setCheckable(false);
+        ui.purpleButton->setCheckable(false);
+        ui.infraredButton->setCheckable(false);
+        ui.embossButton->setCheckable(false);
+        ui.doubleVisionButton->setCheckable(false);
+        ui.oilPaintingButton->setCheckable(false);
+        ui.sunlightButton->setCheckable(false);
+        ui.fishEyeButton->setCheckable(false);
+        ui.edgesButton->setCheckable(false);
+        ui.tvFilterButton->setCheckable(false);
+        ui.frameButton->setCheckable(false);
+
         setWindowTitle("Photo Smith");
         setWindowIcon(QIcon("assets/icons/logo.png"));
         setMinimumSize(600, 400);
@@ -186,6 +209,7 @@ public:
         
         // Connect signals
         connect(ui.loadButton, &QPushButton::clicked, this, &PhotoSmith::loadImage);
+        connect(ui.cameraButton, &QPushButton::clicked, this, &PhotoSmith::loadFromCamera);
         connect(ui.saveButton, &QPushButton::clicked, this, &PhotoSmith::saveImage);
         connect(ui.unloadButton, &QPushButton::clicked, this, &PhotoSmith::unloadImage);
         connect(ui.resetButton, &QPushButton::clicked, this, &PhotoSmith::resetImage);
@@ -206,7 +230,14 @@ public:
         connect(ui.infraredButton, &QPushButton::clicked, this, &PhotoSmith::applyInfrared);
         connect(ui.purpleButton, &QPushButton::clicked, this, &PhotoSmith::applyPurpleFilter);
         connect(ui.tvFilterButton, &QPushButton::clicked, this, &PhotoSmith::applyTVFilter);
+        connect(ui.embossButton, &QPushButton::clicked, this, &PhotoSmith::applyEmboss);
+        connect(ui.doubleVisionButton, &QPushButton::clicked, this, &PhotoSmith::applyDoubleVision);
+        connect(ui.oilPaintingButton, &QPushButton::clicked, this, &PhotoSmith::applyOilPainting);
+        connect(ui.sunlightButton, &QPushButton::clicked, this, &PhotoSmith::applyEnhanceSunlight);
+        connect(ui.fishEyeButton, &QPushButton::clicked, this, &PhotoSmith::applyFishEye);
         connect(ui.cancelButton, &QPushButton::clicked, this, &PhotoSmith::cancelFilter);
+        // Wire Skew button in controls section
+        connect(ui.skewButton, &QPushButton::clicked, this, &PhotoSmith::applySkew);
         
         // Connect menu actions
         connect(ui.actionLoadImage, &QAction::triggered, this, &PhotoSmith::loadImage);
@@ -314,6 +345,74 @@ private slots:
             return;
         }
         (void)saveImageWithDialog();
+    }
+
+    /**
+     * @brief Capture a single frame from the default camera and load it.
+     */
+    void loadFromCamera()
+    {
+        // Choose default camera
+        QCameraDevice device = QMediaDevices::defaultVideoInput();
+        if (!device.isNull()) {
+            // Build capture session and preview dialog
+            QDialog *dlg = new QDialog(this);
+            dlg->setWindowTitle("Camera Preview");
+            QVBoxLayout *layout = new QVBoxLayout(dlg);
+            QCamera *camera = new QCamera(device);
+            // Parent the session to the dialog to ensure it stays alive
+            QMediaCaptureSession *session = new QMediaCaptureSession(dlg);
+            session->setCamera(camera);
+            QVideoWidget *view = new QVideoWidget(dlg);
+            view->setAspectRatioMode(Qt::KeepAspectRatio);
+            view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+            view->setMinimumSize(640, 480);
+            session->setVideoOutput(view);
+            QImageCapture *imageCapture = new QImageCapture(dlg);
+            session->setImageCapture(imageCapture);
+
+            QPushButton *captureBtn = new QPushButton("Capture", dlg);
+            QPushButton *closeBtn = new QPushButton("Close", dlg);
+            QHBoxLayout *btns = new QHBoxLayout();
+            btns->addStretch(); btns->addWidget(captureBtn); btns->addWidget(closeBtn);
+            layout->addWidget(view);
+            layout->addLayout(btns);
+            dlg->resize(900, 700);
+
+            // Temp file
+            QString tempPath = QDir::temp().filePath("photosmith_capture.png");
+            QFile::remove(tempPath);
+
+            QObject::connect(captureBtn, &QPushButton::clicked, dlg, [this, imageCapture, tempPath]() {
+                imageCapture->captureToFile(tempPath);
+            });
+            QObject::connect(closeBtn, &QPushButton::clicked, dlg, [camera, dlg]() {
+                camera->stop();
+                dlg->reject();
+            });
+            QObject::connect(imageCapture, &QImageCapture::imageSaved, dlg, [this, camera, dlg](int, const QString &filePath){
+                camera->stop();
+                dlg->accept();
+                loadImageFromPath(filePath, false);
+            });
+            QObject::connect(imageCapture, &QImageCapture::errorOccurred, dlg, [camera, dlg](int, QImageCapture::Error, const QString &errorString){
+                camera->stop();
+                QMessageBox::critical(dlg, "Camera Error", errorString);
+            });
+            QObject::connect(camera, &QCamera::errorOccurred, dlg, [dlg](QCamera::Error, const QString &errorString){
+                QMessageBox::critical(dlg, "Camera Error", errorString);
+            });
+
+            camera->start();
+            dlg->exec();
+
+            // Cleanup
+            dlg->deleteLater();
+            session->deleteLater();
+            camera->deleteLater();
+        } else {
+            QMessageBox::warning(this, "Camera", "No camera device found.");
+        }
     }
     
     /**
@@ -873,6 +972,83 @@ private slots:
         setActiveFilterValue("Purple Filter");
         updatePropertiesPanel();
     }
+    void applyEmboss()
+    {
+        if (!hasImage) return;
+        runCancelableFilter([&]() { imageFilters->applyEmboss(currentImage, preFilterImage, cancelRequested); });
+        setActiveFilterValue("Emboss");
+        updatePropertiesPanel();
+    }
+    void applyDoubleVision()
+    {
+        if (!hasImage) return;
+        runCancelableFilter([&]() { imageFilters->applyDoubleVision(currentImage, preFilterImage, cancelRequested, 15); });
+        setActiveFilterValue("Double Vision");
+        updatePropertiesPanel();
+    }
+    void applyOilPainting()
+    {
+        if (!hasImage) return;
+        runCancelableFilter([&]() { imageFilters->applyOilPainting(currentImage, preFilterImage, cancelRequested, 3, 30); });
+        setActiveFilterValue("Oil Painting");
+        updatePropertiesPanel();
+    }
+    void applyEnhanceSunlight()
+    {
+        if (!hasImage) return;
+        runCancelableFilter([&]() { imageFilters->applyEnhanceSunlight(currentImage, preFilterImage, cancelRequested); });
+        setActiveFilterValue("Enhance Sunlight");
+        updatePropertiesPanel();
+    }
+    void applyFishEye()
+    {
+        if (!hasImage) return;
+        runCancelableFilter([&]() { imageFilters->applyFishEye(currentImage, preFilterImage, cancelRequested); });
+        setActiveFilterValue("Fish-Eye");
+        updatePropertiesPanel();
+    }
+    
+    /**
+     * @brief Apply horizontal skew with an angle chosen via slider.
+     */
+    void applySkew()
+    {
+        if (!hasImage) return;
+        bool ok = false;
+        // Reuse the slider dialog helper for percentage-like values, map -60..+60
+        // Build a custom slider dialog for angle specifically (since helper is 0..100)
+        QDialog dialog(this);
+        dialog.setWindowTitle("Skew Angle");
+        QVBoxLayout *layout = new QVBoxLayout(&dialog);
+        QLabel *lbl = new QLabel("Choose angle (degrees)", &dialog);
+        QSlider *slider = new QSlider(Qt::Horizontal, &dialog);
+        slider->setRange(-60, 60);
+        slider->setValue(40);
+        QLabel *valueLabel = new QLabel(QString::number(slider->value()) + "°", &dialog);
+        QObject::connect(slider, &QSlider::valueChanged, &dialog, [valueLabel](int v){ valueLabel->setText(QString::number(v) + "°"); });
+        QHBoxLayout *buttons = new QHBoxLayout();
+        QPushButton *okBtn = new QPushButton("OK", &dialog);
+        QPushButton *cancelBtn = new QPushButton("Cancel", &dialog);
+        buttons->addStretch();
+        buttons->addWidget(okBtn);
+        buttons->addWidget(cancelBtn);
+        layout->addWidget(lbl);
+        layout->addWidget(slider);
+        layout->addWidget(valueLabel);
+        layout->addLayout(buttons);
+
+        double chosenAngle = slider->value();
+        QObject::connect(okBtn, &QPushButton::clicked, &dialog, [&](){ chosenAngle = slider->value(); dialog.accept(); });
+        QObject::connect(cancelBtn, &QPushButton::clicked, &dialog, [&](){ dialog.reject(); });
+
+        if (dialog.exec() != QDialog::Accepted) return;
+
+        runSimpleFilter([&]() {
+            imageFilters->applySkew(currentImage, chosenAngle);
+        });
+        setActiveFilterValue("Skew");
+        updatePropertiesPanel();
+    }
     
     /**
      * @brief Enter interactive crop mode using a rubber-band selection.
@@ -1003,6 +1179,12 @@ private:
         ui.infraredButton->setEnabled(isActive);
         ui.purpleButton->setEnabled(isActive);
         ui.tvFilterButton->setEnabled(isActive);
+        ui.skewButton->setEnabled(isActive);
+        ui.embossButton->setEnabled(isActive);
+        ui.doubleVisionButton->setEnabled(isActive);
+        ui.oilPaintingButton->setEnabled(isActive);
+        ui.sunlightButton->setEnabled(isActive);
+        ui.fishEyeButton->setEnabled(isActive);
     }
 
     /**

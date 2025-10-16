@@ -260,6 +260,31 @@ public:
      */
     void applyResize(Image& currentImage, int width, int height);
     
+    /**
+     * @brief Skews the image horizontally by a given angle in degrees.
+     * 
+     * Creates a shearing effect along the X axis. The resulting canvas width
+     * increases to accommodate the skewed content and is filled with white.
+     * 
+     * @param currentImage Reference to the image to skew (modified in-place)
+     * @param angleDegrees Skew angle in degrees (positive skews right, negative left)
+     * 
+     * @note This is an immediate operation without progress tracking.
+     */
+    void applySkew(Image& currentImage, double angleDegrees = 40.0);
+
+    // ===================== ADDITIONAL EFFECT FILTERS (immediate) =====================
+    /** Emboss effect producing a relief-like grayscale. */
+    void applyEmboss(Image& currentImage);
+    /** Double vision horizontal offset blend. */
+    void applyDoubleVision(Image& currentImage, int offset = 15);
+    /** Oil painting effect (radius/intensity). */
+    void applyOilPainting(Image& currentImage, int radius = 3, int intensity = 30);
+    /** Enhance sunlight (boost warm channels). */
+    void applyEnhanceSunlight(Image& currentImage);
+    /** Fish-eye lens distortion effect. */
+    void applyFishEye(Image& currentImage);
+    
     // ============================================================================
     // ADVANCED EFFECTS (with progress tracking and cancellation)
     // ============================================================================
@@ -320,6 +345,13 @@ public:
      * @note This is a long-running operation that can be cancelled.
      */
     void applyPurpleFilter(Image& currentImage, Image& preFilterImage, std::atomic<bool>& cancelRequested);
+
+    // New filters with progress and cancellation
+    void applyEmboss(Image& currentImage, Image& preFilterImage, std::atomic<bool>& cancelRequested);
+    void applyDoubleVision(Image& currentImage, Image& preFilterImage, std::atomic<bool>& cancelRequested, int offset = 15);
+    void applyOilPainting(Image& currentImage, Image& preFilterImage, std::atomic<bool>& cancelRequested, int radius = 3, int intensity = 30);
+    void applyEnhanceSunlight(Image& currentImage, Image& preFilterImage, std::atomic<bool>& cancelRequested);
+    void applyFishEye(Image& currentImage, Image& preFilterImage, std::atomic<bool>& cancelRequested);
 
 private:
     QProgressBar* progressBar;  ///< Pointer to Qt progress bar for progress tracking

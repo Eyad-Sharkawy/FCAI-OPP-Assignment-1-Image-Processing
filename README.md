@@ -220,6 +220,63 @@ Notes:
 - Graphviz enables class/dir diagrams; it is optional but recommended.
 - If PATH isn’t updated, start a new terminal or call the full exe path (e.g., `"C:\\Program Files\\doxygen\\bin\\doxygen.exe"`).
 
+#### Comment Style Quick Reference
+
+Add Doxygen-style comments in headers and important implementation files.
+
+```cpp
+/// \file ImageFilters.h
+/// \brief Image processing filters and utilities.
+
+/** \class ImageFilters
+ *  \brief A collection of static image processing functions.
+ */
+class ImageFilters {
+public:
+    /** \brief Convert an image to grayscale.
+     *  \param input The input image.
+     *  \return A new grayscale image.
+     */
+    static Image grayscale(const Image& input);
+};
+
+/** \brief Apply a box blur.
+ *  \param input Source image.
+ *  \param kernelSize Odd kernel size (e.g. 3, 5, 15).
+ *  \return Blurred image.
+ *  \throws std::invalid_argument if kernelSize is not odd or < 3.
+ */
+Image blur(const Image& input, int kernelSize);
+```
+
+Grouping related APIs into modules improves navigation:
+
+```cpp
+/** \defgroup Filters Image Filters
+ *  High-level filter operations.
+ *  @{ */
+Image grayscale(const Image& input);
+Image invert(const Image& input);
+/** @} */
+```
+
+Qt-specific tips:
+- Prefer documenting in headers (`.h`) where symbols are declared.
+- Use `\brief` first sentence for summaries shown in lists.
+- Document signals/slots like regular functions.
+
+#### Cleaning/Regenerating
+
+```powershell
+Remove-Item -Recurse -Force docs/api/html -ErrorAction SilentlyContinue
+doxygen Doxyfile
+```
+
+#### Troubleshooting
+- Ensure `HAVE_DOT = YES` in `Doxyfile` to enable diagrams.
+- If diagrams are missing, verify `dot -V` works and Graphviz is on PATH.
+- If pages are empty, confirm `INPUT` in `Doxyfile` includes `src` and `README.md`.
+
 ## 🤝 Contributing
 
 ### Development Team

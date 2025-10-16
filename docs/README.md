@@ -146,6 +146,34 @@ Notes:
 - Graphviz enables diagrams; recommended but optional.
 - If PATH isn’t refreshed, open a new terminal or call the full executable path.
 
+### Comment Style Cheatsheet
+
+Use concise `\brief` summaries and parameter/return tags:
+
+```cpp
+/** \brief Rotate image 90 degrees clockwise.
+ *  \param input Source image.
+ *  \return Rotated image.
+ */
+Image rotate90(const Image& input);
+```
+
+Group related API with modules for easier navigation:
+
+```cpp
+/** \defgroup Geometry Geometry Operations
+ *  @{ */
+Image flipHorizontal(const Image& input);
+Image flipVertical(const Image& input);
+/** @} */
+```
+
+### Regenerate/Clean
+```powershell
+Remove-Item -Recurse -Force docs/api/html -ErrorAction SilentlyContinue
+doxygen Doxyfile
+```
+
 ### Project Structure
 ```
 ImageStudio/
