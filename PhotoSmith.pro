@@ -11,7 +11,8 @@
 # Version: 3.0.1
 # Date: October 13, 2025
 
-QT += core widgets
+QT += core widgets multimedia multimediawidgets
+
 
 CONFIG += c++20
 
@@ -19,11 +20,11 @@ TARGET = PhotoSmith
 TEMPLATE = app
 
 SOURCES += src/gui/photo_smith.cpp \
-           src/core/ImageFilters.cpp \
-           src/core/Image_Class.cpp
+           src/core/filters/ImageFilters.cpp \
+           src/core/image/Image_Class.cpp
 
-HEADERS += src/core/Image_Class.h \
-           src/core/ImageFilters.h
+HEADERS += src/core/image/Image_Class.h \
+           src/core/filters/ImageFilters.h
 
 FORMS += src/gui/mainwindow.ui
 
@@ -40,3 +41,6 @@ QMAKE_CXXFLAGS += -Wno-missing-field-initializers
 win32:exists(assets/icons/logo.ico) {
     ICON = assets/icons/logo.ico
 }
+
+RESOURCES += \
+    resources.qrc

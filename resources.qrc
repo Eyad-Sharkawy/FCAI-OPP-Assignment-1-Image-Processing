@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/icons">
+        <file>assets/icons/camera.svg</file>
         <file>assets/icons/icon.ico</file>
         <file>assets/icons/logo.png</file>
-        <file>assets/icons/camera.svg</file>
     </qresource>
 </RCC>
