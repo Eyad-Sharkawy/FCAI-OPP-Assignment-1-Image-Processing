@@ -172,18 +172,24 @@ make
 ```
 
 #### Method 3: CMake (Recommended)
-```bash
-# Configure + build (Windows, MinGW)
-cmake -S . -B cmake-build-release -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release
-cmake --build cmake-build-release -j 8
+Windows (Visual Studio generator):
+```powershell
+mkdir build
+cd build
+cmake ..
+cmake --build . --config Release   # or Debug
+```
 
-# Configure + build (Linux/macOS)
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+Linux/macOS or MinGW (single-config generators):
+```bash
+mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j 8
 
 # Run (from build dir)
-./bin/ImageStudio    # Linux/macOS
-bin\ImageStudio.exe  # Windows
+./bin/PhotoSmith       # Linux/macOS (name may vary)
+bin/PhotoSmith.exe     # Windows
 ```
 
 #### Method 4: Build Scripts (Windows)

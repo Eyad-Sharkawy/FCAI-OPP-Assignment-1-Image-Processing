@@ -103,12 +103,23 @@ PhotoSmith/
 3. Build and run
 
 ### Using CMake
-```bash
+Windows (Visual Studio generator):
+```powershell
 mkdir build
 cd build
 cmake ..
-cmake --build .
+cmake --build . --config Release   # or Debug
 ```
+
+Linux/macOS or MinGW (single-config generators):
+```bash
+mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+cmake --build . -j 8
+```
+
+Tip: ensure you use `.` (dot) in the build command, not `.m`.
 
 ### Using Qt qmake
 ```bash

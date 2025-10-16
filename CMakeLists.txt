@@ -64,7 +64,12 @@ set(QT_RESOURCES
 
 # Create executable
 if(WIN32)
-    add_executable(${PROJECT_NAME} WIN32 ${SOURCES} ${HEADERS} ${UI_FILES} ${QT_RESOURCES} app.res)
+    # Prefer compiling resources from app.rc if it exists
+    set(WIN_RES)
+    if(EXISTS "${CMAKE_SOURCE_DIR}/app.rc")
+        set(WIN_RES app.rc)
+    endif()
+    add_executable(${PROJECT_NAME} WIN32 ${SOURCES} ${HEADERS} ${UI_FILES} ${QT_RESOURCES} ${WIN_RES})
 else()
     add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${UI_FILES} ${QT_RESOURCES})
 endif()
