@@ -1,4 +1,4 @@
-# Photo Smith v3.0.1
+# Photo Smith v3.5.0
 
 A modern, professional Qt-based image processing application with a clean, intuitive interface and comprehensive image manipulation capabilities.
 
@@ -103,23 +103,12 @@ PhotoSmith/
 3. Build and run
 
 ### Using CMake
-Windows (Visual Studio generator):
-```powershell
-mkdir build
-cd build
-cmake ..
-cmake --build . --config Release   # or Debug
-```
-
-Linux/macOS or MinGW (single-config generators):
 ```bash
 mkdir build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
-cmake --build . -j 8
+cmake ..
+cmake --build .
 ```
-
-Tip: ensure you use `.` (dot) in the build command, not `.m`.
 
 ### Using Qt qmake
 ```bash
@@ -322,6 +311,6 @@ This project is developed as part of a C++ Object-Oriented Programming assignmen
 
 ---
 
-**Photo Smith v3.0.1** - Professional Image Processing Made Simple! 🎨
+**Photo Smith v3.5.0** - Professional Image Processing Made Simple! 🎨
 
 *Last updated: October 14, 2025*

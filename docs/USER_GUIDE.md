@@ -1,4 +1,4 @@
-# Photo Smith v3.0.1 - User Guide
+# Photo Smith v3.5.0 - User Guide
 
 ## 📖 Table of Contents
 1. [Getting Started](#getting-started)
@@ -19,7 +19,7 @@
 - **Graphics**: DirectX 11 compatible
 
 ### Installation
-1. Download `PhotoSmith_Portable_v3.0.1-gui.zip`
+1. Download `PhotoSmith_Portable_v3.5.0-gui.zip`
 2. Extract the ZIP file to your desired location
 3. Run `PhotoSmith.bat` or `bin/PhotoSmith.exe`
 4. No additional installation required!
@@ -299,4 +299,4 @@ When reporting bugs, please include:
 
 ---
 
-**Image Studio v2.0.0** - Professional Image Processing Made Simple! 🎨
+**Image Studio v3.5.0** - Professional Image Processing Made Simple! 🎨

@@ -83,12 +83,12 @@ echo ✓ Portable package created
 echo.
 
 echo [4/4] Creating distribution ZIP...
-set VERSION=2.0.0
+set VERSION=3.5.0
 set ZIP_NAME=build_portable\PhotoSmith_Portable_v%VERSION%-gui.zip
 
 if exist "%ZIP_NAME%" del "%ZIP_NAME%"
 
-powershell -Command "Compress-Archive -Path 'build_portable\PhotoSmith_Portable' -DestinationPath 'build_portable\PhotoSmith_Portable_v3.0.1-gui.zip' -Force"
+powershell -Command "Compress-Archive -Path 'build_portable\PhotoSmith_Portable' -DestinationPath 'build_portable\PhotoSmith_Portable_v%VERSION%-gui.zip' -Force"
 
 if %ERRORLEVEL% EQU 0 (
     echo ✓ ZIP file created successfully
@@ -104,7 +104,7 @@ echo.
 echo Files created:
 echo ✓ release\PhotoSmith.exe (Release executable)
 echo ✓ build_portable\PhotoSmith_Portable\ (Portable package)
-echo ✓ build_portable\PhotoSmith_Portable_v3.0.1-gui.zip (Distribution ZIP)
+echo ✓ build_portable\PhotoSmith_Portable_v%VERSION%-gui.zip (Distribution ZIP)
 echo.
 echo You can now:
 echo - Run the application: release\PhotoSmith.exe

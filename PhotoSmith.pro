@@ -1,4 +1,4 @@
-# Photo Smith v3.0.1 - Qt Project File (qmake)
+# Photo Smith v3.5.0 - Qt Project File (qmake)
 # 
 # This qmake project file defines the build configuration for Photo Smith
 # using Qt's qmake build system. It configures the project to use C++20,
@@ -8,7 +8,7 @@
 #
 # Author: Photo Smith Development Team
 # Institution: Faculty of Computers and Artificial Intelligence, Cairo University
-# Version: 3.0.1
+# Version: 3.5.0
 # Date: October 13, 2025
 
 QT += core widgets

@@ -39,3 +39,12 @@ Thumbs.db
 
 # Documentation output
 docs/api/
+
+# Qt/qmake and distribution artifacts
+.qmake.stash
+build_portable/
+dev-package/
+Makefile
+Makefile.Debug
+Makefile.Release
+app.res
