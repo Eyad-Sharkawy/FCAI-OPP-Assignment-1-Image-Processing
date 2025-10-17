@@ -81,24 +81,24 @@ if %ERRORLEVEL% EQU 0 (
     echo Creating ZIP file...
     
     REM Create ZIP file with version number
-    set VERSION=2.0.0
+    set VERSION=3.5.0
     set ZIP_NAME=build_portable\PhotoSmith_Portable_v%VERSION%-gui.zip
     
     REM Remove existing ZIP if it exists
     if exist "%ZIP_NAME%" del "%ZIP_NAME%"
     
     REM Create ZIP using PowerShell
-    powershell -Command "Compress-Archive -Path 'build_portable\PhotoSmith_Portable' -DestinationPath 'build_portable\PhotoSmith_Portable_v3.0.1-gui.zip' -Force"
+    powershell -Command "Compress-Archive -Path 'build_portable\PhotoSmith_Portable' -DestinationPath 'build_portable\PhotoSmith_Portable_v%VERSION%-gui.zip' -Force"
     
     if %ERRORLEVEL% EQU 0 (
         echo.
-        echo ✓ ZIP file created successfully: build_portable\PhotoSmith_Portable_v3.0.1-gui.zip
+        echo ✓ ZIP file created successfully: build_portable\PhotoSmith_Portable_v%VERSION%-gui.zip
         echo ✓ Portable package ready for distribution!
     ) else (
         echo.
         echo ⚠ Warning: Could not create ZIP file automatically.
         echo   You can create it manually by running:
-        echo   powershell Compress-Archive -Path "build_portable\PhotoSmith_Portable" -DestinationPath "build_portable\PhotoSmith_Portable_v3.0.1-gui.zip"
+        echo   powershell Compress-Archive -Path "build_portable\PhotoSmith_Portable" -DestinationPath "build_portable\PhotoSmith_Portable_v%VERSION%-gui.zip"
     )
     echo.
 ) else (

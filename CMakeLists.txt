@@ -1,4 +1,4 @@
-# Photo Smith v3.0.1 - CMake Build Configuration
+# Photo Smith v3.5.0 - CMake Build Configuration
 # 
 # This CMake configuration file defines the build system for Photo Smith,
 # a Qt-based image processing application. It configures the project to use
@@ -6,11 +6,11 @@
 #
 # Author: Photo Smith Development Team
 # Institution: Faculty of Computers and Artificial Intelligence, Cairo University
-# Version: 3.0.1
+# Version: 3.5.0
 # Date: October 13, 2025
 
 cmake_minimum_required(VERSION 3.20)
-project(PhotoSmith VERSION 3.0.1)
+project(PhotoSmith VERSION 3.5.0)
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 20)
@@ -64,12 +64,7 @@ set(QT_RESOURCES
 
 # Create executable
 if(WIN32)
-    # Prefer compiling resources from app.rc if it exists
-    set(WIN_RES)
-    if(EXISTS "${CMAKE_SOURCE_DIR}/app.rc")
-        set(WIN_RES app.rc)
-    endif()
-    add_executable(${PROJECT_NAME} WIN32 ${SOURCES} ${HEADERS} ${UI_FILES} ${QT_RESOURCES} ${WIN_RES})
+    add_executable(${PROJECT_NAME} WIN32 ${SOURCES} ${HEADERS} ${UI_FILES} ${QT_RESOURCES})
 else()
     add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${UI_FILES} ${QT_RESOURCES})
 endif()
@@ -112,6 +107,10 @@ if(WIN32)
 endif()
 
 # Compiler flags
-target_compile_options(${PROJECT_NAME} PRIVATE
-    -Wno-missing-field-initializers
-)
+if(MSVC)
+    # MSVC does not support GCC/Clang style -Wno-* flags; keep defaults
+else()
+    target_compile_options(${PROJECT_NAME} PRIVATE
+        -Wno-missing-field-initializers
+    )
+endif()
